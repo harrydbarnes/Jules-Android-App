@@ -9,10 +9,27 @@ object RepoManager {
     private const val PREFS_NAME = "jules_prefs"
     private const val KEY_RECENT_REPOS = "recent_repos"
 
+    private var cachedRepos: List<String>? = null
+
+    // VisibleForTesting
+    fun resetCache() {
+        cachedRepos = null
+    }
+
     fun getRecentRepos(context: Context): List<String> {
         val prefs: SharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        return getRecentRepos(prefs)
+    }
+
+    fun getRecentRepos(prefs: SharedPreferences): List<String> {
+        cachedRepos?.let { return it }
+
         val reposString = prefs.getString(KEY_RECENT_REPOS, "")
-        if (reposString.isNullOrEmpty()) return emptyList()
+        if (reposString.isNullOrEmpty()) {
+            val empty = emptyList<String>()
+            cachedRepos = empty
+            return empty
+        }
 
         val list = mutableListOf<String>()
         try {
@@ -23,19 +40,29 @@ object RepoManager {
         } catch (e: JSONException) {
             // Log the exception for debugging purposes
             // Log.e("RepoManager", "Error parsing recent repos as JSON, falling back to comma-separated", e)
-            return reposString.split(",").filter { it.isNotEmpty() }
+            val fallback = reposString.split(",").filter { it.isNotEmpty() }
+            cachedRepos = fallback
+            return fallback
         }
+        cachedRepos = list
         return list
     }
 
     fun addRepo(context: Context, repo: String) {
-        val repos = getRecentRepos(context).toMutableList()
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        addRepo(prefs, repo)
+    }
+
+    fun addRepo(prefs: SharedPreferences, repo: String) {
+        val repos = getRecentRepos(prefs).toMutableList()
         repos.remove(repo)
         repos.add(0, repo) // Add to top
         if (repos.size > 10) {
             repos.removeAt(repos.size - 1)
         }
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+
+        cachedRepos = repos.toList()
+
         val jsonArray = JSONArray()
         for (r in repos) {
             jsonArray.put(r)
