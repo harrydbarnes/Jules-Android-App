@@ -27,11 +27,11 @@ class MainActivity : AppCompatActivity(), NewTabFragment.OnRepoSelectedListener,
         setSupportActionBar(findViewById(R.id.toolbar))
 
         if (savedInstanceState == null) {
-            tabs.add(TabInfo("New Tab", null))
+            tabs.add(TabInfo(getString(R.string.new_tab), null))
         } else {
             // Restore state if needed, simpler to just start fresh or handle config changes naturally
             // For now, simple start
-             if (tabs.isEmpty()) tabs.add(TabInfo("New Tab", null))
+             if (tabs.isEmpty()) tabs.add(TabInfo(getString(R.string.new_tab), null))
         }
 
         viewPager = findViewById(R.id.view_pager)
@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity(), NewTabFragment.OnRepoSelectedListener,
                 true
             }
             100 -> { // Add Tab
-                tabs.add(TabInfo("New Tab", null))
+                tabs.add(TabInfo(getString(R.string.new_tab), null))
                 adapter.notifyItemInserted(tabs.size - 1)
                 viewPager.currentItem = tabs.size - 1
                 true
@@ -89,7 +89,7 @@ class MainActivity : AppCompatActivity(), NewTabFragment.OnRepoSelectedListener,
     }
 
     override fun onBackPressed() {
-        val currentFragment = supportFragmentManager.fragments.firstOrNull { it.isResumed && it.isVisible }
+        val currentFragment = supportFragmentManager.findFragmentByTag("f" + adapter.getItemId(viewPager.currentItem))
         if (currentFragment is WebViewFragment && currentFragment.canGoBack()) {
             currentFragment.goBack()
         } else {
