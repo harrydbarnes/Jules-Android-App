@@ -80,7 +80,7 @@ class RepoManagerTest {
         class FakeEditor(private val prefs: FakeSharedPreferences) : SharedPreferences.Editor {
             private val changes = mutableMapOf<String, Any?>()
             override fun putString(key: String?, value: String?): SharedPreferences.Editor {
-                changes[key!!] = value
+                key?.let { changes[it] = value }
                 return this
             }
             override fun putStringSet(key: String?, values: MutableSet<String>?): SharedPreferences.Editor = this
