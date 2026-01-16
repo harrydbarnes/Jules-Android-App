@@ -4,8 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 
 class WebViewFragment : Fragment() {
@@ -43,9 +45,23 @@ class WebViewFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val url = arguments?.getString(ARG_URL) ?: "https://jules.google.com"
         val webView = view.findViewById<WebView>(R.id.webview)
-        
+        val progressBar = view.findViewById<ProgressBar>(R.id.progress_bar)
+
         webView.settings.javaScriptEnabled = true
         webView.settings.domStorageEnabled = true
+        webView.settings.databaseEnabled = true
+
+        webView.webChromeClient = object : WebChromeClient() {
+            override fun onProgressChanged(view: WebView?, newProgress: Int) {
+                if (newProgress == 100) {
+                    progressBar.visibility = View.GONE
+                } else {
+                    progressBar.visibility = View.VISIBLE
+                    progressBar.progress = newProgress
+                }
+            }
+        }
+
         webView.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)

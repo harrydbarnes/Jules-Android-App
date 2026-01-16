@@ -2,6 +2,8 @@ package com.jules.loader
 
 import android.content.Context
 import android.content.SharedPreferences
+import org.json.JSONArray
+import org.json.JSONException
 
 object RepoManager {
     private const val PREFS_NAME = "jules_prefs"
@@ -11,7 +13,18 @@ object RepoManager {
         val prefs: SharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val reposString = prefs.getString(KEY_RECENT_REPOS, "")
         if (reposString.isNullOrEmpty()) return emptyList()
-        return reposString.split(",").filter { it.isNotEmpty() }
+
+        val list = mutableListOf<String>()
+        try {
+            val jsonArray = JSONArray(reposString)
+            for (i in 0 until jsonArray.length()) {
+                list.add(jsonArray.getString(i))
+            }
+        } catch (e: JSONException) {
+            // Fallback to comma-separated for backward compatibility
+            return reposString.split(",").filter { it.isNotEmpty() }
+        }
+        return list
     }
 
     fun addRepo(context: Context, repo: String) {
@@ -22,6 +35,10 @@ object RepoManager {
             repos.removeAt(repos.size - 1)
         }
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit().putString(KEY_RECENT_REPOS, repos.joinToString(",")).apply()
+        val jsonArray = JSONArray()
+        for (r in repos) {
+            jsonArray.put(r)
+        }
+        prefs.edit().putString(KEY_RECENT_REPOS, jsonArray.toString()).apply()
     }
 }
