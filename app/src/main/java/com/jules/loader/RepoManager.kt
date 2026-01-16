@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import org.json.JSONArray
 import org.json.JSONException
+import kotlin.jvm.Synchronized
 
 object RepoManager {
     private const val PREFS_NAME = "jules_prefs"
@@ -12,6 +13,7 @@ object RepoManager {
     private var cachedRepos: List<String>? = null
 
     // VisibleForTesting
+    @Synchronized
     fun resetCache() {
         cachedRepos = null
     }
@@ -21,6 +23,7 @@ object RepoManager {
         return getRecentRepos(prefs)
     }
 
+    @Synchronized
     fun getRecentRepos(prefs: SharedPreferences): List<String> {
         cachedRepos?.let { return it }
 
@@ -53,6 +56,7 @@ object RepoManager {
         addRepo(prefs, repo)
     }
 
+    @Synchronized
     fun addRepo(prefs: SharedPreferences, repo: String) {
         val repos = getRecentRepos(prefs).toMutableList()
         repos.remove(repo)
