@@ -25,7 +25,6 @@ object RepoManager {
             // Log.e("RepoManager", "Error parsing recent repos as JSON, falling back to comma-separated", e)
             return reposString.split(",").filter { it.isNotEmpty() }
         }
-        }
         return list
     }
 
