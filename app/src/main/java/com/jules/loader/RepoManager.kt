@@ -21,8 +21,10 @@ object RepoManager {
                 list.add(jsonArray.getString(i))
             }
         } catch (e: JSONException) {
-            // Fallback to comma-separated for backward compatibility
+            // Log the exception for debugging purposes
+            // Log.e("RepoManager", "Error parsing recent repos as JSON, falling back to comma-separated", e)
             return reposString.split(",").filter { it.isNotEmpty() }
+        }
         }
         return list
     }
