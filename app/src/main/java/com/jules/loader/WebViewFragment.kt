@@ -49,7 +49,8 @@ class WebViewFragment : Fragment() {
 
         webView.settings.javaScriptEnabled = true
         webView.settings.domStorageEnabled = true
-        webView.settings.databaseEnabled = true
+        webView.settings.domStorageEnabled = true
+        // webView.settings.databaseEnabled = true // Deprecated in API level 18+
 
         webView.webChromeClient = object : WebChromeClient() {
             override fun onProgressChanged(view: WebView?, newProgress: Int) {
