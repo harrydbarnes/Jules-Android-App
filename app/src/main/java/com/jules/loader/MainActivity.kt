@@ -123,7 +123,7 @@ class MainActivity : AppCompatActivity(), NewTabFragment.OnRepoSelectedListener,
                         else repoName
                     }
                 } catch (e: Exception) {
-                    android.util.Log.e("MainActivity", "Failed to parse repo name from URL: $url", e)
+                    android.util.Log.e(TAG, "Failed to parse repo name from URL: $url", e)
                     // Fallback to title
                 }
             }
