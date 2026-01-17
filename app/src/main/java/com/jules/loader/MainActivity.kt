@@ -27,11 +27,11 @@ class MainActivity : AppCompatActivity(), NewTabFragment.OnRepoSelectedListener,
         setSupportActionBar(findViewById(R.id.toolbar))
 
         if (savedInstanceState == null) {
-            tabs.add(TabInfo(getString(R.string.new_tab), null))
+            tabs.add(TabInfo("Jules", "https://jules.google.com"))
         } else {
             // Restore state if needed, simpler to just start fresh or handle config changes naturally
             // For now, simple start
-             if (tabs.isEmpty()) tabs.add(TabInfo(getString(R.string.new_tab), null))
+             if (tabs.isEmpty()) tabs.add(TabInfo("Jules", "https://jules.google.com"))
         }
 
         viewPager = findViewById(R.id.view_pager)
@@ -61,9 +61,15 @@ class MainActivity : AppCompatActivity(), NewTabFragment.OnRepoSelectedListener,
                 true
             }
             100 -> { // Add Tab
-                tabs.add(TabInfo(getString(R.string.new_tab), null))
-                adapter.notifyItemInserted(tabs.size - 1)
-                viewPager.currentItem = tabs.size - 1
+                val prefs = getSharedPreferences("jules_prefs", android.content.Context.MODE_PRIVATE)
+                val allowUnlimited = prefs.getBoolean("allow_unlimited_tabs", false)
+                if (!allowUnlimited && tabs.size >= 3) {
+                     android.widget.Toast.makeText(this, "Tab limit reached (3). Enable more in Settings.", android.widget.Toast.LENGTH_SHORT).show()
+                } else {
+                    tabs.add(TabInfo(getString(R.string.new_tab), null))
+                    adapter.notifyItemInserted(tabs.size - 1)
+                    viewPager.currentItem = tabs.size - 1
+                }
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -107,8 +113,21 @@ class MainActivity : AppCompatActivity(), NewTabFragment.OnRepoSelectedListener,
             
             tab.url = url
             
-            val isHome = url == "https://jules.google.com/" || url == "https://jules.google.com"
-            val newTitle = if (isHome) "Jules" else title ?: "Repo"
+            val isHome = url.contains("jules.google.com")
+            var newTitle = if (isHome) "Jules" else title ?: "Repo"
+
+            if (!isHome && url.contains("github.com")) {
+                try {
+                    val uri = android.net.Uri.parse(url)
+                    val segments = uri.pathSegments
+                    if (segments.size >= 2) {
+                        val repoName = "${segments[0]}/${segments[1]}"
+                        newTitle = if (repoName.length > 20) repoName.take(20) + "..." else repoName
+                    }
+                } catch (e: Exception) {
+                    // Fallback to title
+                }
+            }
             
             if (tab.title != newTitle) {
                 tab.title = newTitle
