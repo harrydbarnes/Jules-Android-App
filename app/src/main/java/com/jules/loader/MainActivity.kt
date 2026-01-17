@@ -83,11 +83,6 @@ class MainActivity : AppCompatActivity(), NewTabFragment.OnRepoSelectedListener,
         val newTab = TabInfo(name, url) // New ID generated
         tabs[position] = newTab
         adapter.notifyItemChanged(position)
-        
-        // Add to recent repos
-        if (!url.contains(Constants.JULES_DOMAIN_PART)) {
-             RepoManager.addRepo(this, url)
-        }
     }
 
     override fun onBackPressed() {
