@@ -8,8 +8,10 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.launch
 
 class NewTabFragment : Fragment() {
 
@@ -43,9 +45,12 @@ class NewTabFragment : Fragment() {
 
         val recycler = view.findViewById<RecyclerView>(R.id.recycler_recent_repos)
         recycler.layoutManager = LinearLayoutManager(context)
-        val repos = RepoManager.getRecentRepos(requireContext())
-        recycler.adapter = RecentReposAdapter(repos) { repo ->
-            listener?.onRepoSelected(repo, repo.substringAfterLast("/")) 
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            val repos = RepoManager.getRecentRepos(requireContext())
+            recycler.adapter = RecentReposAdapter(repos) { repo ->
+                listener?.onRepoSelected(repo, repo.substringAfterLast("/"))
+            }
         }
     }
 

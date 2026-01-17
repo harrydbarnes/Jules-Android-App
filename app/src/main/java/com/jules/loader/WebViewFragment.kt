@@ -9,6 +9,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 
 class WebViewFragment : Fragment() {
 
@@ -46,6 +47,11 @@ class WebViewFragment : Fragment() {
         val url = arguments?.getString(ARG_URL) ?: "https://jules.google.com"
         val webView = view.findViewById<WebView>(R.id.webview)
         val progressBar = view.findViewById<ProgressBar>(R.id.progress_bar)
+        val swipeRefresh = view.findViewById<SwipeRefreshLayout>(R.id.swipe_refresh)
+
+        swipeRefresh.setOnRefreshListener {
+            webView.reload()
+        }
 
         webView.settings.javaScriptEnabled = true
         webView.settings.domStorageEnabled = true
@@ -66,6 +72,7 @@ class WebViewFragment : Fragment() {
         webView.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
+                swipeRefresh.isRefreshing = false
                 (activity as? OnWebStateListener)?.onUrlChanged(url ?: "", view?.title)
             }
         }
