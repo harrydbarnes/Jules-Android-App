@@ -56,7 +56,7 @@ class MainActivity : AppCompatActivity(), NewTabFragment.OnRepoSelectedListener,
                 startActivity(Intent(this, AboutActivity::class.java))
                 true
             }
-            100 -> { // Add Tab
+            MENU_ID_ADD_TAB -> { // Add Tab
                 val prefs = getSharedPreferences(Constants.PREFS_NAME, android.content.Context.MODE_PRIVATE)
                 val allowUnlimited = prefs.getBoolean(Constants.PREF_ALLOW_UNLIMITED_TABS, false)
                 if (!allowUnlimited && tabs.size >= Constants.DEFAULT_TAB_LIMIT) {
