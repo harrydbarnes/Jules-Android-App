@@ -55,10 +55,27 @@ class RepoManagerTest {
         assertEquals(1, fakePrefs.getStringCallCount) // Still 1, did not read again
     }
 
+    @Test
+    fun testAddRepoSkipWriteIfAtTop() {
+        val fakePrefs = FakeSharedPreferences()
+        fakePrefs.data["recent_repos"] = "[\"https://top.com\",\"https://other.com\"]"
+
+        // Initial fetch
+        RepoManager.getRecentRepos(fakePrefs)
+        val initialWrites = fakePrefs.applyCount
+
+        // Add the top repo again
+        RepoManager.addRepo(fakePrefs, "https://top.com")
+
+        // Assert writes did NOT increase
+        assertEquals("Should skip write if already at top", initialWrites, fakePrefs.applyCount)
+    }
+
     // Fake implementation
     class FakeSharedPreferences : SharedPreferences {
         val data = mutableMapOf<String, Any?>()
         var getStringCallCount = 0
+        var applyCount = 0
 
         override fun getAll(): MutableMap<String, *> = data
         override fun getString(key: String?, defValue: String?): String? {
@@ -92,6 +109,7 @@ class RepoManagerTest {
             override fun clear(): SharedPreferences.Editor = this
             override fun commit(): Boolean { apply(); return true }
             override fun apply() {
+                prefs.applyCount++
                 for ((k, v) in changes) {
                     prefs.data[k] = v
                 }
