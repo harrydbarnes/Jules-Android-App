@@ -12,7 +12,7 @@
     \n- AndroidX
     \n- Material Components
     \n\nSource Code:</string>
-    <string name="repo_url">https://github.com/placeholder/jules-loader</string>
+    <string name="repo_url">https://github.com/harrydbarnes/Jules-Android-App</string>
     <string name="enter_repo_url">Enter Repo URL</string>
     <string name="load">Load</string>
 </resources>
