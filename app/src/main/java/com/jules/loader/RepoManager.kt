@@ -60,7 +60,14 @@ object RepoManager {
     fun addRepo(prefs: SharedPreferences, repo: String) {
         val jsonToSave: String
         synchronized(this) {
-            val repos = getRecentRepos(prefs).toMutableList()
+            val currentRepos = getRecentRepos(prefs)
+            // Optimization: if the repo is already at the top, we don't need to do anything.
+            // This saves List copy, JSON serialization, and Disk I/O.
+            if (currentRepos.isNotEmpty() && currentRepos[0] == repo) {
+                return
+            }
+
+            val repos = currentRepos.toMutableList()
             repos.remove(repo)
             repos.add(0, repo) // Add to top
             if (repos.size > 10) {

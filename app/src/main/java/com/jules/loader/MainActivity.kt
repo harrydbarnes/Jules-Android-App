@@ -18,6 +18,11 @@ class MainActivity : AppCompatActivity(), NewTabFragment.OnRepoSelectedListener,
     private lateinit var adapter: TabsAdapter
     private val tabs = mutableListOf<TabInfo>()
 
+    companion object {
+        private const val MENU_ID_ADD_TAB = 100
+        private const val TAG = "MainActivity"
+    }
+
     data class TabInfo(var title: String, var url: String?, val id: Long = System.nanoTime())
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,7 +47,7 @@ class MainActivity : AppCompatActivity(), NewTabFragment.OnRepoSelectedListener,
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
-        menu.add(0, 100, 0, "Add Tab").setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+        menu.add(0, MENU_ID_ADD_TAB, 0, "Add Tab").setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
         return true
     }
 

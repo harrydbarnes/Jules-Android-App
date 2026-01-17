@@ -80,3 +80,5 @@ Distributed under the MIT License. See `LICENSE` for more information.
 ---
 
 > Built with ❤️ by Harry Barnes
+
+*Built by Harry Barnes. No affiliation to Jules or Google and any of their trademarks, only praise and admiration for the project.*
