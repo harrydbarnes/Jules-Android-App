@@ -15,4 +15,7 @@
     <string name="repo_url">https://github.com/harrydbarnes/Jules-Android-App</string>
     <string name="enter_repo_url">Enter Repo URL</string>
     <string name="load">Load</string>
+    <string name="setting_allow_unlimited_tabs">Allow Unlimited Tabs</string>
+    <string name="tab_limit_reached">Tab limit reached (%1$d). Enable more in Settings.</string>
+    <string name="repo_fallback_title">Repo</string>
 </resources>

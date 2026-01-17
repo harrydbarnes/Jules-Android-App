@@ -11,12 +11,12 @@ class SettingsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_settings)
 
         val switch = findViewById<SwitchMaterial>(R.id.switch_unlimited_tabs)
-        val prefs = getSharedPreferences("jules_prefs", Context.MODE_PRIVATE)
+        val prefs = getSharedPreferences(Constants.PREFS_NAME, Context.MODE_PRIVATE)
 
-        switch.isChecked = prefs.getBoolean("allow_unlimited_tabs", false)
+        switch.isChecked = prefs.getBoolean(Constants.PREF_ALLOW_UNLIMITED_TABS, false)
 
         switch.setOnCheckedChangeListener { _, isChecked ->
-            prefs.edit().putBoolean("allow_unlimited_tabs", isChecked).apply()
+            prefs.edit().putBoolean(Constants.PREF_ALLOW_UNLIMITED_TABS, isChecked).apply()
         }
     }
 }
