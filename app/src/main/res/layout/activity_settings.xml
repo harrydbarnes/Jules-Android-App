@@ -16,7 +16,7 @@
         android:id="@+id/switch_unlimited_tabs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Allow more than 3 tabs"
-        android:textSize="16sp" />
+        android:text="@string/setting_allow_unlimited_tabs"
+        android:textAppearance="?attr/textAppearanceBody1" />
 
 </LinearLayout>
