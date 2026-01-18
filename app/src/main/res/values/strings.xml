@@ -7,6 +7,7 @@
     <string name="new_tab">New Tab</string>
     <string name="load_home">Load Jules Home</string>
     <string name="recent_repos">Recent Repos</string>
+    <string name="no_recent_repos">No recent repos</string>
     <string name="about_title">About Jules Loader</string>
     <string name="about_desc">This app loads jules.google.com in a tabbed interface.
     \n\nOpen Source Libraries used:

@@ -23,14 +23,15 @@ class MainActivity : AppCompatActivity(), NewTabFragment.OnRepoSelectedListener,
 
     companion object {
         private const val MENU_ID_ADD_TAB = 100
+        private const val MENU_ID_RECENT_REPOS = 101
         private const val TAG = "MainActivity"
+        private const val ABOUT_BLANK = "about:blank"
     }
 
     data class TabInfo(var title: String, var url: String?, val id: Long = System.nanoTime())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTitle(R.string.app_title)
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
 
@@ -62,12 +63,17 @@ class MainActivity : AppCompatActivity(), NewTabFragment.OnRepoSelectedListener,
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
-        menu.add(0, MENU_ID_ADD_TAB, 0, "Add Tab").setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+        menu.add(0, MENU_ID_ADD_TAB, 0, getString(R.string.add_tab)).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+        menu.add(0, MENU_ID_RECENT_REPOS, 0, getString(R.string.recent_repos))
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            MENU_ID_RECENT_REPOS -> {
+                showRecentReposDialog()
+                true
+            }
             R.id.action_share -> {
                 val currentPosition = viewPager.currentItem
                 if (currentPosition >= 0 && currentPosition < tabs.size) {
@@ -96,7 +102,7 @@ class MainActivity : AppCompatActivity(), NewTabFragment.OnRepoSelectedListener,
                 if (!allowUnlimited && tabs.size >= Constants.DEFAULT_TAB_LIMIT) {
                      android.widget.Toast.makeText(this, getString(R.string.tab_limit_reached, Constants.DEFAULT_TAB_LIMIT), android.widget.Toast.LENGTH_SHORT).show()
                 } else {
-                    tabs.add(TabInfo(getString(R.string.new_tab), null))
+                    tabs.add(TabInfo(Constants.JULES_HOME_TITLE, Constants.JULES_HOME_URL))
                     adapter.notifyItemInserted(tabs.size - 1)
                     viewPager.currentItem = tabs.size - 1
                 }
@@ -130,21 +136,17 @@ class MainActivity : AppCompatActivity(), NewTabFragment.OnRepoSelectedListener,
             tab.url = url
             
             val isHome = url.contains(Constants.JULES_DOMAIN_PART)
-            var newTitle = if (isHome) Constants.JULES_HOME_TITLE else title ?: getString(R.string.repo_fallback_title)
+            var newTitle = title
+            if (newTitle.isNullOrEmpty() || newTitle == ABOUT_BLANK) {
+                newTitle = if (isHome) Constants.JULES_HOME_TITLE else getString(R.string.repo_fallback_title)
+            }
 
-            if (!isHome && url.contains(Constants.GITHUB_DOMAIN)) {
-                try {
-                    val uri = android.net.Uri.parse(url)
-                    val segments = uri.pathSegments
-                    if (segments.size >= 2) {
-                        val repoName = "${segments[0]}/${segments[1]}"
-                        newTitle = if (repoName.length > Constants.MAX_REPO_TITLE_LENGTH)
-                            repoName.take(Constants.MAX_REPO_TITLE_LENGTH) + Constants.REPO_TITLE_SUFFIX
-                        else repoName
-                    }
-                } catch (e: Exception) {
-                    android.util.Log.e(TAG, "Failed to parse repo name from URL: $url", e)
-                    // Fallback to title
+            if (url.contains(Constants.GITHUB_DOMAIN)) {
+                val repoName = extractRepoName(url)
+                if (repoName != null) {
+                    newTitle = if (repoName.length > Constants.MAX_REPO_TITLE_LENGTH)
+                        repoName.take(Constants.MAX_REPO_TITLE_LENGTH) + Constants.REPO_TITLE_SUFFIX
+                    else repoName
                 }
             }
             
@@ -153,7 +155,8 @@ class MainActivity : AppCompatActivity(), NewTabFragment.OnRepoSelectedListener,
                 adapter.notifyItemChanged(position)
             }
 
-            if (!isHome) {
+            // Add to recent repos if it's not the exact home page
+            if (url != Constants.JULES_HOME_URL && url != "${Constants.JULES_HOME_URL}/") {
                 lifecycleScope.launch {
                     RepoManager.addRepo(this@MainActivity, url)
                 }
@@ -180,6 +183,39 @@ class MainActivity : AppCompatActivity(), NewTabFragment.OnRepoSelectedListener,
         
         override fun containsItem(itemId: Long): Boolean {
              return tabs.any { it.id == itemId }
+        }
+    }
+
+    private fun showRecentReposDialog() {
+        lifecycleScope.launch {
+            val repos = RepoManager.getRecentRepos(this@MainActivity)
+            if (repos.isEmpty()) {
+                android.widget.Toast.makeText(this@MainActivity, getString(R.string.no_recent_repos), android.widget.Toast.LENGTH_SHORT).show()
+                return@launch
+            }
+            val builder = androidx.appcompat.app.AlertDialog.Builder(this@MainActivity)
+            builder.setTitle(getString(R.string.recent_repos))
+            builder.setItems(repos.toTypedArray()) { _, which ->
+                val repoUrl = repos[which]
+                val repoName = extractRepoName(repoUrl) ?: repoUrl.substringAfterLast("/")
+                onRepoSelected(repoUrl, repoName)
+            }
+            builder.show()
+        }
+    }
+
+    private fun extractRepoName(url: String): String? {
+        return try {
+            val uri = android.net.Uri.parse(url)
+            val segments = uri.pathSegments
+            if (segments.size >= 2) {
+                "${segments[0]}/${segments[1]}"
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            android.util.Log.e(TAG, "Failed to parse repo name from URL: $url", e)
+            null
         }
     }
 }
