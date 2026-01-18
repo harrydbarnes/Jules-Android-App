@@ -20,6 +20,7 @@ object RepoManager {
                 else -> ""
             }
         } catch (e: Exception) {
+            android.util.Log.e("RepoManager", "Failed to parse repo name from URL: $url", e)
             url.substringAfterLast("/")
         }
     }
