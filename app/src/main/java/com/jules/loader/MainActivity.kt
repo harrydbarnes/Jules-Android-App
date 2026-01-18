@@ -4,12 +4,15 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity(), NewTabFragment.OnRepoSelectedListener, WebViewFragment.OnWebStateListener {
 
@@ -43,6 +46,18 @@ class MainActivity : AppCompatActivity(), NewTabFragment.OnRepoSelectedListener,
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = tabs[position].title
         }.attach()
+
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                val currentFragment = supportFragmentManager.findFragmentByTag("f" + adapter.getItemId(viewPager.currentItem))
+                if (currentFragment is WebViewFragment && currentFragment.canGoBack()) {
+                    currentFragment.goBack()
+                } else {
+                    isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
+                }
+            }
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -53,6 +68,20 @@ class MainActivity : AppCompatActivity(), NewTabFragment.OnRepoSelectedListener,
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            R.id.action_share -> {
+                val currentPosition = viewPager.currentItem
+                if (currentPosition >= 0 && currentPosition < tabs.size) {
+                    val currentUrl = tabs[currentPosition].url
+                    if (!currentUrl.isNullOrEmpty()) {
+                        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                            type = "text/plain"
+                            putExtra(Intent.EXTRA_TEXT, currentUrl)
+                        }
+                        startActivity(Intent.createChooser(shareIntent, getString(R.string.menu_share)))
+                    }
+                }
+                true
+            }
             R.id.action_settings -> {
                 startActivity(Intent(this, SettingsActivity::class.java))
                 true
@@ -90,15 +119,6 @@ class MainActivity : AppCompatActivity(), NewTabFragment.OnRepoSelectedListener,
         adapter.notifyItemChanged(position)
     }
 
-    override fun onBackPressed() {
-        val currentFragment = supportFragmentManager.findFragmentByTag("f" + adapter.getItemId(viewPager.currentItem))
-        if (currentFragment is WebViewFragment && currentFragment.canGoBack()) {
-            currentFragment.goBack()
-        } else {
-            super.onBackPressed()
-        }
-    }
-
     override fun onUrlChanged(url: String, title: String?) {
         val position = viewPager.currentItem
         if (position >= 0 && position < tabs.size) {
@@ -134,7 +154,9 @@ class MainActivity : AppCompatActivity(), NewTabFragment.OnRepoSelectedListener,
             }
 
             if (!isHome) {
-                RepoManager.addRepo(this, url)
+                lifecycleScope.launch {
+                    RepoManager.addRepo(this@MainActivity, url)
+                }
             }
         }
     }
