@@ -195,10 +195,9 @@ class MainActivity : AppCompatActivity(), NewTabFragment.OnRepoSelectedListener,
             }
             val builder = androidx.appcompat.app.AlertDialog.Builder(this@MainActivity)
             builder.setTitle(getString(R.string.recent_repos))
-            builder.setItems(repos.toTypedArray()) { _, which ->
-                val repoUrl = repos[which]
-                val repoName = extractRepoName(repoUrl) ?: repoUrl.substringAfterLast("/")
-                onRepoSelected(repoUrl, repoName)
+            val repoDisplayNames = repos.map { extractRepoName(it) ?: it.substringAfterLast('/') }.toTypedArray()
+            builder.setItems(repoDisplayNames) { _, which ->
+                onRepoSelected(repos[which], repoDisplayNames[which])
             }
             builder.show()
         }
