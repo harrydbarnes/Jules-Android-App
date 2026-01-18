@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import org.json.JSONArray
 import org.json.JSONException
 import kotlin.jvm.Synchronized
+import android.net.Uri
 
 object RepoManager {
     private const val PREFS_NAME = "jules_prefs"
@@ -84,5 +85,20 @@ object RepoManager {
         }
         // I/O is now outside the lock
         prefs.edit().putString(KEY_RECENT_REPOS, jsonToSave).apply()
+    }
+
+    fun getRepoNameFromUrl(url: String): String? {
+        if (url.contains(Constants.GITHUB_DOMAIN)) {
+            try {
+                val uri = Uri.parse(url)
+                val segments = uri.pathSegments
+                if (segments.size >= 2) {
+                    return "${segments[0]}/${segments[1]}"
+                }
+            } catch (e: Exception) {
+                // Ignore parse errors
+            }
+        }
+        return null
     }
 }

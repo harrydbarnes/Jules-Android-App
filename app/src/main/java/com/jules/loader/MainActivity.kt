@@ -21,6 +21,7 @@ class MainActivity : AppCompatActivity(), NewTabFragment.OnRepoSelectedListener,
     companion object {
         private const val MENU_ID_ADD_TAB = 100
         private const val TAG = "MainActivity"
+        private const val ABOUT_BLANK = "about:blank"
     }
 
     data class TabInfo(var title: String, var url: String?, val id: Long = System.nanoTime())
@@ -112,19 +113,12 @@ class MainActivity : AppCompatActivity(), NewTabFragment.OnRepoSelectedListener,
             val isHome = url.contains(Constants.JULES_DOMAIN_PART)
             var newTitle = if (isHome) Constants.JULES_HOME_TITLE else title ?: getString(R.string.repo_fallback_title)
 
-            if (!isHome && url.contains(Constants.GITHUB_DOMAIN)) {
-                try {
-                    val uri = android.net.Uri.parse(url)
-                    val segments = uri.pathSegments
-                    if (segments.size >= 2) {
-                        val repoName = "${segments[0]}/${segments[1]}"
-                        newTitle = if (repoName.length > Constants.MAX_REPO_TITLE_LENGTH)
-                            repoName.take(Constants.MAX_REPO_TITLE_LENGTH) + Constants.REPO_TITLE_SUFFIX
-                        else repoName
-                    }
-                } catch (e: Exception) {
-                    android.util.Log.e(TAG, "Failed to parse repo name from URL: $url", e)
-                    // Fallback to title
+            if (!isHome) {
+                val repoName = RepoManager.getRepoNameFromUrl(url)
+                if (repoName != null) {
+                    newTitle = if (repoName.length > Constants.MAX_REPO_TITLE_LENGTH)
+                        repoName.take(Constants.MAX_REPO_TITLE_LENGTH) + Constants.REPO_TITLE_SUFFIX
+                    else repoName
                 }
             }
             
@@ -148,7 +142,7 @@ class MainActivity : AppCompatActivity(), NewTabFragment.OnRepoSelectedListener,
             return if (tab.url == null) {
                 NewTabFragment.newInstance()
             } else {
-                WebViewFragment.newInstance(tab.url!!)
+                WebViewFragment.newInstance(tab.url ?: "")
             }
         }
 

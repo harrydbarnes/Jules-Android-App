@@ -45,7 +45,8 @@ class NewTabFragment : Fragment() {
         recycler.layoutManager = LinearLayoutManager(context)
         val repos = RepoManager.getRecentRepos(requireContext())
         recycler.adapter = RecentReposAdapter(repos) { repo ->
-            listener?.onRepoSelected(repo, repo.substringAfterLast("/")) 
+            val repoName = RepoManager.getRepoNameFromUrl(repo) ?: repo.substringAfterLast("/")
+            listener?.onRepoSelected(repo, repoName)
         }
     }
 
