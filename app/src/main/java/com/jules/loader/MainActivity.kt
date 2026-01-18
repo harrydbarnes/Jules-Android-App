@@ -63,7 +63,7 @@ class MainActivity : AppCompatActivity(), NewTabFragment.OnRepoSelectedListener,
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
-        menu.add(0, MENU_ID_ADD_TAB, 0, getString(R.string.add_tab)).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+        menu.add(0, MENU_ID_ADD_TAB, 0, getString(R.string.new_tab)).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
         menu.add(0, MENU_ID_RECENT_REPOS, 0, getString(R.string.recent_repos))
         return true
     }
@@ -142,12 +142,10 @@ class MainActivity : AppCompatActivity(), NewTabFragment.OnRepoSelectedListener,
             }
 
             if (url.contains(Constants.GITHUB_DOMAIN)) {
-                val repoName = extractRepoName(url)
-                if (repoName != null) {
-                    newTitle = if (repoName.length > Constants.MAX_REPO_TITLE_LENGTH)
-                        repoName.take(Constants.MAX_REPO_TITLE_LENGTH) + Constants.REPO_TITLE_SUFFIX
-                    else repoName
-                }
+                val repoName = RepoManager.getRepoNameFromUrl(url)
+                newTitle = if (repoName.length > Constants.MAX_REPO_TITLE_LENGTH)
+                    repoName.take(Constants.MAX_REPO_TITLE_LENGTH) + Constants.REPO_TITLE_SUFFIX
+                else repoName
             }
             
             if (tab.title != newTitle) {
@@ -195,26 +193,11 @@ class MainActivity : AppCompatActivity(), NewTabFragment.OnRepoSelectedListener,
             }
             val builder = androidx.appcompat.app.AlertDialog.Builder(this@MainActivity)
             builder.setTitle(getString(R.string.recent_repos))
-            val repoDisplayNames = repos.map { extractRepoName(it) ?: it.substringAfterLast('/') }.toTypedArray()
+            val repoDisplayNames = repos.map { RepoManager.getRepoNameFromUrl(it) }.toTypedArray()
             builder.setItems(repoDisplayNames) { _, which ->
                 onRepoSelected(repos[which], repoDisplayNames[which])
             }
             builder.show()
-        }
-    }
-
-    private fun extractRepoName(url: String): String? {
-        return try {
-            val uri = android.net.Uri.parse(url)
-            val segments = uri.pathSegments
-            if (segments.size >= 2) {
-                "${segments[0]}/${segments[1]}"
-            } else {
-                null
-            }
-        } catch (e: Exception) {
-            android.util.Log.e(TAG, "Failed to parse repo name from URL: $url", e)
-            null
         }
     }
 }

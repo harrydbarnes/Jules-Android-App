@@ -10,6 +10,20 @@ import org.json.JSONArray
 import org.json.JSONException
 
 object RepoManager {
+    fun getRepoNameFromUrl(url: String): String {
+        return try {
+            val uri = android.net.Uri.parse(url)
+            val segments = uri.pathSegments
+            if (segments.size >= 2) {
+                "${segments[0]}/${segments[1]}"
+            } else {
+                url.substringAfterLast("/")
+            }
+        } catch (e: Exception) {
+            url.substringAfterLast("/")
+        }
+    }
+
     private const val PREFS_NAME = "jules_prefs"
     private const val KEY_RECENT_REPOS = "recent_repos"
 
