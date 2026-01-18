@@ -63,7 +63,7 @@ class MainActivity : AppCompatActivity(), NewTabFragment.OnRepoSelectedListener,
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
-        menu.add(0, MENU_ID_ADD_TAB, 0, "Add Tab").setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+        menu.add(0, MENU_ID_ADD_TAB, 0, getString(R.string.add_tab)).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
         menu.add(0, MENU_ID_RECENT_REPOS, 0, getString(R.string.recent_repos))
         return true
     }
