@@ -49,7 +49,7 @@ class NewTabFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             val repos = RepoManager.getRecentRepos(requireContext())
             recycler.adapter = RecentReposAdapter(repos) { repo ->
-                listener?.onRepoSelected(repo, repo.substringAfterLast("/"))
+                listener?.onRepoSelected(repo, RepoManager.getRepoNameFromUrl(repo))
             }
         }
     }
