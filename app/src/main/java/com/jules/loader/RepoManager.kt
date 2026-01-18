@@ -14,10 +14,10 @@ object RepoManager {
         return try {
             val uri = android.net.Uri.parse(url)
             val segments = uri.pathSegments
-            if (segments.size >= 2) {
-                "${segments[0]}/${segments[1]}"
-            } else {
-                url.substringAfterLast("/")
+            when {
+                segments.size >= 2 -> "${segments[0]}/${segments[1]}"
+                segments.size == 1 -> segments[0]
+                else -> ""
             }
         } catch (e: Exception) {
             url.substringAfterLast("/")
