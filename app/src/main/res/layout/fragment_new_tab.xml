@@ -26,4 +26,15 @@
         android:layout_height="match_parent"
         android:layout_marginTop="8dp" />
 
+    <TextView
+        android:id="@+id/text_empty_state"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="@string/no_recent_repos_hint"
+        android:visibility="gone"
+        android:textAppearance="?attr/textAppearanceBody1"
+        android:textColor="?android:attr/textColorSecondary"
+        android:layout_marginTop="8dp" />
+
 </LinearLayout>

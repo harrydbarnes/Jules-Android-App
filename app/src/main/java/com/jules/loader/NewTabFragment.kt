@@ -44,12 +44,20 @@ class NewTabFragment : Fragment() {
         }
 
         val recycler = view.findViewById<RecyclerView>(R.id.recycler_recent_repos)
+        val emptyStateText = view.findViewById<TextView>(R.id.text_empty_state)
         recycler.layoutManager = LinearLayoutManager(context)
 
         viewLifecycleOwner.lifecycleScope.launch {
             val repos = RepoManager.getRecentRepos(requireContext())
-            recycler.adapter = RecentReposAdapter(repos) { repo ->
-                listener?.onRepoSelected(repo, RepoManager.getRepoNameFromUrl(repo))
+            if (repos.isEmpty()) {
+                recycler.visibility = View.GONE
+                emptyStateText.visibility = View.VISIBLE
+            } else {
+                recycler.visibility = View.VISIBLE
+                emptyStateText.visibility = View.GONE
+                recycler.adapter = RecentReposAdapter(repos) { repo ->
+                    listener?.onRepoSelected(repo, RepoManager.getRepoNameFromUrl(repo))
+                }
             }
         }
     }
