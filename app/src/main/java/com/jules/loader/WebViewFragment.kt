@@ -55,7 +55,8 @@ class WebViewFragment : Fragment() {
 
         webView.settings.javaScriptEnabled = true
         webView.settings.domStorageEnabled = true
-        webView.settings.domStorageEnabled = true
+        webView.settings.allowFileAccess = false
+        webView.settings.allowContentAccess = false
         // webView.settings.databaseEnabled = true // Deprecated in API level 18+
 
         webView.webChromeClient = object : WebChromeClient() {
