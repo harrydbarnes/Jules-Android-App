@@ -81,4 +81,19 @@ class WebViewFragment : Fragment() {
         }
         webView.loadUrl(url)
     }
+
+    override fun onDestroyView() {
+        val webView = view?.findViewById<WebView>(R.id.webview)
+        if (webView != null) {
+            // Load blank page to stop any active loading/JS
+            webView.loadUrl("about:blank")
+
+            // Remove from parent to allow garbage collection
+            (webView.parent as? ViewGroup)?.removeView(webView)
+
+            // Destroy the WebView
+            webView.destroy()
+        }
+        super.onDestroyView()
+    }
 }
