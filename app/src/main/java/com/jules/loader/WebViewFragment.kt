@@ -42,6 +42,16 @@ class WebViewFragment : Fragment() {
         webView?.goBack()
     }
 
+    override fun onDestroyView() {
+        val webView = view?.findViewById<WebView>(R.id.webview)
+        webView?.let {
+            (it.parent as? ViewGroup)?.removeView(it)
+            it.removeAllViews()
+            it.destroy()
+        }
+        super.onDestroyView()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val url = arguments?.getString(ARG_URL) ?: "https://jules.google.com"
@@ -54,7 +64,6 @@ class WebViewFragment : Fragment() {
         }
 
         webView.settings.javaScriptEnabled = true
-        webView.settings.domStorageEnabled = true
         webView.settings.domStorageEnabled = true
         // webView.settings.databaseEnabled = true // Deprecated in API level 18+
 
