@@ -2,202 +2,76 @@ package com.jules.loader
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
-import androidx.activity.OnBackPressedCallback
+import android.view.View
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.viewpager2.adapter.FragmentStateAdapter
-import androidx.viewpager2.widget.ViewPager2
-import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayoutMediator
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.appbar.MaterialToolbar
+import com.jules.loader.data.JulesRepository
+import com.jules.loader.ui.OnboardingActivity
+import com.jules.loader.ui.SessionAdapter
 import kotlinx.coroutines.launch
 
-class MainActivity : AppCompatActivity(), NewTabFragment.OnRepoSelectedListener, WebViewFragment.OnWebStateListener {
+class MainActivity : AppCompatActivity() {
 
-    private lateinit var viewPager: ViewPager2
-    private lateinit var tabLayout: TabLayout
-    private lateinit var adapter: TabsAdapter
-    private val tabs = mutableListOf<TabInfo>()
-
-    companion object {
-        private const val MENU_ID_ADD_TAB = 100
-        private const val MENU_ID_RECENT_REPOS = 101
-        private const val TAG = "MainActivity"
-        private const val ABOUT_BLANK = "about:blank"
-    }
-
-    data class TabInfo(var title: String, var url: String?, val id: Long = System.nanoTime())
+    private lateinit var repository: JulesRepository
+    private lateinit var adapter: SessionAdapter
+    private lateinit var skeletonLayout: View
+    private lateinit var errorText: TextView
+    private lateinit var recyclerView: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        setSupportActionBar(findViewById(R.id.toolbar))
 
-        if (tabs.isEmpty()) {
-            tabs.add(TabInfo(Constants.JULES_HOME_TITLE, Constants.JULES_HOME_URL))
+        repository = JulesRepository(this)
+
+        if (repository.getApiKey().isNullOrEmpty()) {
+            startActivity(Intent(this, OnboardingActivity::class.java))
+            finish()
+            return
         }
 
-        viewPager = findViewById(R.id.view_pager)
-        tabLayout = findViewById(R.id.tab_layout)
-        adapter = TabsAdapter(this, tabs)
-        viewPager.adapter = adapter
+        val toolbar = findViewById<MaterialToolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        supportActionBar?.title = getString(R.string.sessions_title)
 
-        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
-            tab.text = tabs[position].title
-        }.attach()
+        recyclerView = findViewById(R.id.sessionsRecyclerView)
+        skeletonLayout = findViewById(R.id.skeletonLayout)
+        errorText = findViewById(R.id.errorText)
 
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                val currentFragment = supportFragmentManager.findFragmentByTag("f" + adapter.getItemId(viewPager.currentItem))
-                if (currentFragment is WebViewFragment && currentFragment.canGoBack()) {
-                    currentFragment.goBack()
-                } else {
-                    isEnabled = false
-                    onBackPressedDispatcher.onBackPressed()
-                }
-            }
-        })
+        adapter = SessionAdapter()
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = adapter
+
+        loadSessions()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_main, menu)
-        menu.add(0, MENU_ID_ADD_TAB, 0, getString(R.string.new_tab)).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
-        menu.add(0, MENU_ID_RECENT_REPOS, 0, getString(R.string.recent_repos))
-        return true
-    }
+    private fun loadSessions() {
+        skeletonLayout.visibility = View.VISIBLE
+        errorText.visibility = View.GONE
+        recyclerView.visibility = View.GONE
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            MENU_ID_RECENT_REPOS -> {
-                showRecentReposDialog()
-                true
-            }
-            R.id.action_share -> {
-                val currentPosition = viewPager.currentItem
-                if (currentPosition >= 0 && currentPosition < tabs.size) {
-                    val currentUrl = tabs[currentPosition].url
-                    if (!currentUrl.isNullOrEmpty()) {
-                        val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                            type = "text/plain"
-                            putExtra(Intent.EXTRA_TEXT, currentUrl)
-                        }
-                        startActivity(Intent.createChooser(shareIntent, getString(R.string.menu_share)))
-                    }
-                }
-                true
-            }
-            R.id.action_settings -> {
-                startActivity(Intent(this, SettingsActivity::class.java))
-                true
-            }
-            R.id.action_about -> {
-                startActivity(Intent(this, AboutActivity::class.java))
-                true
-            }
-            MENU_ID_ADD_TAB -> { // Add Tab
-                val prefs = getSharedPreferences(Constants.PREFS_NAME, android.content.Context.MODE_PRIVATE)
-                val allowUnlimited = prefs.getBoolean(Constants.PREF_ALLOW_UNLIMITED_TABS, false)
-                if (!allowUnlimited && tabs.size >= Constants.DEFAULT_TAB_LIMIT) {
-                     android.widget.Toast.makeText(this, getString(R.string.tab_limit_reached, Constants.DEFAULT_TAB_LIMIT), android.widget.Toast.LENGTH_SHORT).show()
-                } else {
-                    tabs.add(TabInfo(Constants.JULES_HOME_TITLE, Constants.JULES_HOME_URL))
-                    adapter.notifyItemInserted(tabs.size - 1)
-                    viewPager.currentItem = tabs.size - 1
-                }
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
-    override fun onRepoSelected(url: String, name: String) {
-        val position = viewPager.currentItem
-        // Replace current "New Tab" with WebView
-        // We create a new TabInfo to ensure ID changes if we want to force recreation, 
-        // OR we keep ID and just update content. 
-        // If we keep ID, FragmentStateAdapter might keep the old NewTabFragment unless we force it to invalidate.
-        // It's safer to replace the object in the list with a new ID so the adapter treats it as a new item.
-        
-        val newTab = TabInfo(name, url) // New ID generated
-        tabs[position] = newTab
-        adapter.notifyItemChanged(position)
-    }
-
-    override fun onUrlChanged(url: String, title: String?) {
-        val position = viewPager.currentItem
-        if (position >= 0 && position < tabs.size) {
-            val tab = tabs[position]
-            
-            // Simple check: Only update if the URL actually changed or we need to capture title
-            // Also, only strictly exclude the exact home page from "Recent Repos"
-            
-            tab.url = url
-            
-            val isHome = url.contains(Constants.JULES_DOMAIN_PART)
-            var newTitle = title
-            if (newTitle.isNullOrEmpty() || newTitle == ABOUT_BLANK) {
-                newTitle = if (isHome) Constants.JULES_HOME_TITLE else getString(R.string.repo_fallback_title)
-            }
-
-            if (url.contains(Constants.GITHUB_DOMAIN)) {
-                val repoName = RepoManager.getRepoNameFromUrl(url)
-                newTitle = if (repoName.length > Constants.MAX_REPO_TITLE_LENGTH)
-                    repoName.take(Constants.MAX_REPO_TITLE_LENGTH) + Constants.REPO_TITLE_SUFFIX
-                else repoName
-            }
-            
-            if (tab.title != newTitle) {
-                tab.title = newTitle
-                adapter.notifyItemChanged(position)
-            }
-
-            // Add to recent repos if it's not the exact home page
-            if (url != Constants.JULES_HOME_URL && url != "${Constants.JULES_HOME_URL}/") {
-                lifecycleScope.launch {
-                    RepoManager.addRepo(this@MainActivity, url)
-                }
-            }
-        }
-    }
-    
-    // Inner class for Adapter
-    inner class TabsAdapter(activity: AppCompatActivity, private val tabs: List<TabInfo>) : FragmentStateAdapter(activity) {
-        override fun getItemCount(): Int = tabs.size
-
-        override fun createFragment(position: Int): Fragment {
-            val tab = tabs[position]
-            return if (tab.url == null) {
-                NewTabFragment.newInstance()
-            } else {
-                WebViewFragment.newInstance(tab.url!!)
-            }
-        }
-
-        override fun getItemId(position: Int): Long {
-            return tabs[position].id
-        }
-        
-        override fun containsItem(itemId: Long): Boolean {
-             return tabs.any { it.id == itemId }
-        }
-    }
-
-    private fun showRecentReposDialog() {
         lifecycleScope.launch {
-            val repos = RepoManager.getRecentRepos(this@MainActivity)
-            if (repos.isEmpty()) {
-                android.widget.Toast.makeText(this@MainActivity, getString(R.string.no_recent_repos), android.widget.Toast.LENGTH_SHORT).show()
-                return@launch
+            try {
+                val sessions = repository.getSessions()
+                adapter.submitList(sessions)
+
+                if (sessions.isEmpty()) {
+                    errorText.text = getString(R.string.no_sessions)
+                    errorText.visibility = View.VISIBLE
+                } else {
+                    recyclerView.visibility = View.VISIBLE
+                }
+            } catch (e: Exception) {
+                errorText.text = getString(R.string.error_loading_sessions, e.localizedMessage)
+                errorText.visibility = View.VISIBLE
+                e.printStackTrace()
+            } finally {
+                skeletonLayout.visibility = View.GONE
             }
-            val builder = androidx.appcompat.app.AlertDialog.Builder(this@MainActivity)
-            builder.setTitle(getString(R.string.recent_repos))
-            val repoDisplayNames = repos.map { RepoManager.getRepoNameFromUrl(it) }.toTypedArray()
-            builder.setItems(repoDisplayNames) { _, which ->
-                onRepoSelected(repos[which], repoDisplayNames[which])
-            }
-            builder.show()
         }
     }
 }

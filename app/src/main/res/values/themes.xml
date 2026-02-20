@@ -1,17 +1,24 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.JulesLoader" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.Octopus" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/jules_purple</item>
-        <item name="colorPrimaryVariant">@color/jules_purple_dark</item>
-        <item name="colorOnPrimary">@android:color/white</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/jules_purple_light</item>
+        <item name="colorOnPrimaryContainer">@color/black</item>
+
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_700</item>
-        <item name="colorOnSecondary">@android:color/black</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <item name="colorSecondaryContainer">@color/teal_700</item>
+        <item name="colorOnSecondaryContainer">@color/white</item>
+
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
         <item name="android:navigationBarColor">@color/jules_purple</item>
     </style>
+
+    <!-- Alias for backward compatibility if needed, though we update Manifest -->
+    <style name="Theme.JulesLoader" parent="Theme.Octopus" />
 </resources>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:strokeWidth="0dp"
+    app:cardBackgroundColor="?attr/colorSurfaceVariant">
+
+    <!-- Skeleton layout, simpler version just using alpha/color -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <View
+            android:layout_width="150dp"
+            android:layout_height="24dp"
+            android:background="?attr/colorOnSurfaceVariant"
+            android:alpha="0.1" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="16dp"
+            android:layout_marginTop="12dp"
+            android:background="?attr/colorOnSurfaceVariant"
+            android:alpha="0.1" />
+
+        <View
+            android:layout_width="200dp"
+            android:layout_height="16dp"
+            android:layout_marginTop="4dp"
+            android:background="?attr/colorOnSurfaceVariant"
+            android:alpha="0.1" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>
