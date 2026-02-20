@@ -14,7 +14,7 @@ class JulesRepository(private val context: Context) {
     private val prefs: SharedPreferences = context.getSharedPreferences("jules_prefs", Context.MODE_PRIVATE)
 
     private val client = OkHttpClient.Builder()
-        .addInterceptor(HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY })
+.addInterceptor(HttpLoggingInterceptor().apply { level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE })
         .build()
 
     private val retrofit = Retrofit.Builder()
