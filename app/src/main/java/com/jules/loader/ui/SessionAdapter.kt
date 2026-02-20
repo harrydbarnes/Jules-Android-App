@@ -66,8 +66,8 @@ class SessionAdapter : ListAdapter<Session, SessionAdapter.SessionViewHolder>(Se
 
             itemView.setOnClickListener {
                 val intent = Intent(context, TaskDetailActivity::class.java)
-                intent.putExtra("EXTRA_SESSION_ID", session.id)
-                intent.putExtra("EXTRA_SESSION_TITLE", session.title)
+                intent.putExtra(TaskDetailActivity.EXTRA_SESSION_ID, session.id)
+                intent.putExtra(TaskDetailActivity.EXTRA_SESSION_TITLE, session.title)
                 context.startActivity(intent)
             }
         }

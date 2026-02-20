@@ -3,28 +3,25 @@ package com.jules.loader
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.appbar.MaterialToolbar
 import com.jules.loader.data.JulesRepository
+import com.jules.loader.databinding.ActivityMainBinding
 import com.jules.loader.ui.OnboardingActivity
 import com.jules.loader.ui.SessionAdapter
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityMainBinding
     private lateinit var repository: JulesRepository
     private lateinit var adapter: SessionAdapter
-    private lateinit var skeletonLayout: View
-    private lateinit var errorText: TextView
-    private lateinit var recyclerView: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         repository = JulesRepository(this)
 
@@ -34,24 +31,18 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        val toolbar = findViewById<MaterialToolbar>(R.id.toolbar)
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.title = getString(R.string.sessions_title)
 
-        recyclerView = findViewById(R.id.sessionsRecyclerView)
-        skeletonLayout = findViewById(R.id.skeletonLayout)
-        errorText = findViewById(R.id.errorText)
-
         adapter = SessionAdapter()
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = adapter
+        binding.sessionsRecyclerView.layoutManager = LinearLayoutManager(this)
+        binding.sessionsRecyclerView.adapter = adapter
 
-        val fab = findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fab)
-        fab.setOnClickListener {
+        binding.fab.setOnClickListener {
             it.performHapticFeedback(android.view.HapticFeedbackConstants.CONFIRM) // Haptic
             val intent = Intent(this, com.jules.loader.ui.CreateTaskActivity::class.java)
             val options = android.app.ActivityOptions.makeSceneTransitionAnimation(
-                this, fab, "shared_element_container"
+                this, binding.fab, "shared_element_container"
             )
             startActivity(intent, options.toBundle())
         }
@@ -60,9 +51,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadSessions() {
-        skeletonLayout.visibility = View.VISIBLE
-        errorText.visibility = View.GONE
-        recyclerView.visibility = View.GONE
+        binding.skeletonLayout.visibility = View.VISIBLE
+        binding.errorText.visibility = View.GONE
+        binding.sessionsRecyclerView.visibility = View.GONE
 
         lifecycleScope.launch {
             try {
@@ -70,17 +61,17 @@ class MainActivity : AppCompatActivity() {
                 adapter.submitList(sessions)
 
                 if (sessions.isEmpty()) {
-                    errorText.text = getString(R.string.no_sessions)
-                    errorText.visibility = View.VISIBLE
+                    binding.errorText.text = getString(R.string.no_sessions)
+                    binding.errorText.visibility = View.VISIBLE
                 } else {
-                    recyclerView.visibility = View.VISIBLE
+                    binding.sessionsRecyclerView.visibility = View.VISIBLE
                 }
             } catch (e: Exception) {
-                errorText.text = getString(R.string.error_loading_sessions, e.localizedMessage)
-                errorText.visibility = View.VISIBLE
+                binding.errorText.text = getString(R.string.error_loading_sessions, e.localizedMessage)
+                binding.errorText.visibility = View.VISIBLE
                 android.util.Log.e("MainActivity", "Error loading sessions", e)
             } finally {
-                skeletonLayout.visibility = View.GONE
+                binding.skeletonLayout.visibility = View.GONE
             }
         }
     }

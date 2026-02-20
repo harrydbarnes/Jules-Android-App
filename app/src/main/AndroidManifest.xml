@@ -24,12 +24,12 @@
         
         <activity
             android:name=".ui.OnboardingActivity"
-            android:label="Onboarding"
+            android:label="@string/title_onboarding"
             android:theme="@style/Theme.Octopus" />
 
         <activity
             android:name=".ui.CreateTaskActivity"
-            android:label="New Task"
+            android:label="@string/title_create_task"
             android:theme="@style/Theme.Octopus"
             android:exported="true">
             <intent-filter>
@@ -41,7 +41,7 @@
 
         <activity
             android:name=".ui.TaskDetailActivity"
-            android:label="Task Details"
+            android:label="@string/title_task_detail"
             android:theme="@style/Theme.Octopus" />
 
     </application>
