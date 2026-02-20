@@ -8,6 +8,8 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import android.view.Window
+import com.google.android.material.transition.platform.MaterialContainerTransform
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.jules.loader.R
 import com.jules.loader.databinding.ActivityTaskDetailBinding
@@ -22,9 +24,26 @@ class TaskDetailActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        window.requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS)
+
+        // Configure Shared Element Transition
+        setEnterSharedElementCallback(com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback())
+
+        window.sharedElementEnterTransition = MaterialContainerTransform().apply {
+            addTarget(android.R.id.content)
+            duration = 300L
+        }
+        window.sharedElementReturnTransition = MaterialContainerTransform().apply {
+            addTarget(android.R.id.content)
+            duration = 250L
+        }
+
         super.onCreate(savedInstanceState)
         binding = ActivityTaskDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        val sessionId = intent.getStringExtra(EXTRA_SESSION_ID)
+        binding.root.transitionName = "shared_element_container_${sessionId}"
 
         val title = intent.getStringExtra(EXTRA_SESSION_TITLE)
         binding.detailTitle.text = title ?: "Task Details"

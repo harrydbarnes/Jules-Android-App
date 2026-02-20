@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        repository = JulesRepository(this)
+        repository = JulesRepository(applicationContext)
 
         if (repository.getApiKey().isNullOrEmpty()) {
             startActivity(Intent(this, OnboardingActivity::class.java))
@@ -38,6 +38,16 @@ class MainActivity : AppCompatActivity() {
         binding.sessionsRecyclerView.layoutManager = LinearLayoutManager(this)
         binding.sessionsRecyclerView.adapter = adapter
 
+        binding.sessionsRecyclerView.addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: androidx.recyclerview.widget.RecyclerView, dx: Int, dy: Int) {
+                if (dy > 0) {
+                    binding.fab.shrink()
+                } else if (dy < 0) {
+                    binding.fab.extend()
+                }
+            }
+        })
+
         binding.fab.setOnClickListener {
             it.performHapticFeedback(android.view.HapticFeedbackConstants.CONFIRM) // Haptic
             val intent = Intent(this, com.jules.loader.ui.CreateTaskActivity::class.java)
@@ -50,6 +60,32 @@ class MainActivity : AppCompatActivity() {
         loadSessions()
     }
 
+    override fun onCreateOptionsMenu(menu: android.view.Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_settings -> {
+                startActivity(Intent(this, com.jules.loader.ui.SettingsActivity::class.java))
+                true
+            }
+            R.id.action_about -> {
+                startActivity(Intent(this, com.jules.loader.ui.AboutActivity::class.java))
+                true
+            }
+            R.id.action_share -> {
+                val shareIntent = Intent(Intent.ACTION_SEND)
+                shareIntent.type = "text/plain"
+                shareIntent.putExtra(Intent.EXTRA_TEXT, "Check out Octopus for Jules!")
+                startActivity(Intent.createChooser(shareIntent, "Share via"))
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
     private fun loadSessions() {
         binding.skeletonLayout.visibility = View.VISIBLE
         binding.errorText.visibility = View.GONE
@@ -58,7 +94,9 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 val sessions = repository.getSessions()
-                adapter.submitList(sessions)
+                adapter.submitList(sessions) {
+                    binding.sessionsRecyclerView.scheduleLayoutAnimation()
+                }
 
                 if (sessions.isEmpty()) {
                     binding.errorText.text = getString(R.string.no_sessions)
@@ -66,8 +104,12 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     binding.sessionsRecyclerView.visibility = View.VISIBLE
                 }
-            } catch (e: Exception) {
+            } catch (e: java.io.IOException) {
                 binding.errorText.text = getString(R.string.error_loading_sessions, e.localizedMessage)
+                binding.errorText.visibility = View.VISIBLE
+                android.util.Log.e("MainActivity", "Error loading sessions", e)
+            } catch (e: retrofit2.HttpException) {
+                binding.errorText.text = getString(R.string.error_loading_sessions, e.message())
                 binding.errorText.visibility = View.VISIBLE
                 android.util.Log.e("MainActivity", "Error loading sessions", e)
             } finally {

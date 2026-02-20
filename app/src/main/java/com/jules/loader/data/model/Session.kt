@@ -10,6 +10,7 @@ data class Session(
     val id: String,
     val title: String?,
     val prompt: String?,
+    val status: String?,
     val sourceContext: SourceContext?
 )
 

@@ -12,6 +12,8 @@ import com.jules.loader.R
 import com.jules.loader.data.model.Session
 
 import android.content.Intent
+import android.app.Activity
+import androidx.core.app.ActivityOptionsCompat
 
 class SessionAdapter : ListAdapter<Session, SessionAdapter.SessionViewHolder>(SessionDiffCallback()) {
 
@@ -36,9 +38,7 @@ class SessionAdapter : ListAdapter<Session, SessionAdapter.SessionViewHolder>(Se
             title.text = session.title ?: context.getString(R.string.untitled_session)
             prompt.text = session.prompt ?: context.getString(R.string.no_prompt)
 
-            // Simulate random status for demo purposes
-            val statuses = listOf("Reasoning", "Executing Tests", "PR Open", "Idle")
-            val status = statuses[kotlin.math.abs(session.id.hashCode()) % statuses.size]
+            val status = session.status ?: "Idle"
             statusChip.text = status
 
             // Set status color
@@ -64,11 +64,24 @@ class SessionAdapter : ListAdapter<Session, SessionAdapter.SessionViewHolder>(Se
             }
             sourceChip.text = cleanSource
 
+            itemView.transitionName = "shared_element_container_${session.id}"
+
             itemView.setOnClickListener {
                 val intent = Intent(context, TaskDetailActivity::class.java)
                 intent.putExtra(TaskDetailActivity.EXTRA_SESSION_ID, session.id)
                 intent.putExtra(TaskDetailActivity.EXTRA_SESSION_TITLE, session.title)
-                context.startActivity(intent)
+
+                val activity = context as? Activity
+                if (activity != null) {
+                    val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                        activity,
+                        itemView,
+                        "shared_element_container_${session.id}"
+                    )
+                    context.startActivity(intent, options.toBundle())
+                } else {
+                    context.startActivity(intent)
+                }
             }
         }
     }
