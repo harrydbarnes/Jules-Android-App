@@ -19,4 +19,12 @@
         android:text="@string/setting_allow_unlimited_tabs"
         android:textAppearance="?attr/textAppearanceBody1" />
 
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/switch_dynamic_colours"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/setting_use_dynamic_colours"
+        android:textAppearance="?attr/textAppearanceBody1" />
+
 </LinearLayout>
