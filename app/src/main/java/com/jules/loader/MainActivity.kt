@@ -78,7 +78,7 @@ class MainActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 errorText.text = getString(R.string.error_loading_sessions, e.localizedMessage)
                 errorText.visibility = View.VISIBLE
-                e.printStackTrace()
+                android.util.Log.e("MainActivity", "Error loading sessions", e)
             } finally {
                 skeletonLayout.visibility = View.GONE
             }
