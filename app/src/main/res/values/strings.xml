@@ -39,4 +39,9 @@
     <string name="untitled_session">Untitled Session</string>
     <string name="no_prompt">No prompt</string>
     <string name="unknown_source">Unknown Source</string>
+
+    <!-- Activity Titles -->
+    <string name="title_onboarding">Onboarding</string>
+    <string name="title_create_task">New Task</string>
+    <string name="title_task_detail">Task Details</string>
 </resources>

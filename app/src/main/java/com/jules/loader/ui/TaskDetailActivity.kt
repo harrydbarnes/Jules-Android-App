@@ -1,6 +1,5 @@
 package com.jules.loader.ui
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,25 +10,32 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.jules.loader.R
+import com.jules.loader.databinding.ActivityTaskDetailBinding
 
 class TaskDetailActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityTaskDetailBinding
+
+    companion object {
+        const val EXTRA_SESSION_ID = "EXTRA_SESSION_ID"
+        const val EXTRA_SESSION_TITLE = "EXTRA_SESSION_TITLE"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_task_detail)
+        binding = ActivityTaskDetailBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        val title = intent.getStringExtra("EXTRA_SESSION_TITLE")
-        findViewById<TextView>(R.id.detailTitle).text = title ?: "Task Details"
+        val title = intent.getStringExtra(EXTRA_SESSION_TITLE)
+        binding.detailTitle.text = title ?: "Task Details"
 
         // Setup Log Bottom Sheet
-        val bottomSheet = findViewById<View>(R.id.logBottomSheet)
-        val behavior = BottomSheetBehavior.from(bottomSheet)
+        val behavior = BottomSheetBehavior.from(binding.logBottomSheet)
         behavior.state = BottomSheetBehavior.STATE_COLLAPSED
 
         // Setup Log RecyclerView
-        val logRecycler = findViewById<RecyclerView>(R.id.logRecyclerView)
-        logRecycler.layoutManager = LinearLayoutManager(this)
-        logRecycler.adapter = LogAdapter(generateFakeLogs())
+        binding.logRecyclerView.layoutManager = LinearLayoutManager(this)
+        binding.logRecyclerView.adapter = LogAdapter(generateFakeLogs())
     }
 
     private fun generateFakeLogs(): List<String> {
@@ -48,7 +54,7 @@ class TaskDetailActivity : AppCompatActivity() {
 
         override fun onBindViewHolder(holder: LogViewHolder, position: Int) {
             holder.text.text = logs[position]
-            holder.text.setTextColor(holder.itemView.context.getColor(android.R.color.white))
+            // Removed hardcoded text color
         }
 
         override fun getItemCount() = logs.size
