@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="jules_purple">#6200EE</color>
-    <color name="jules_purple_dark">#3700B3</color>
-    <color name="jules_purple_light">#BB86FC</color>
+    <color name="jules_purple">#673AB7</color>
+    <color name="jules_purple_dark">#512DA8</color>
+    <color name="jules_purple_light">#D1C4E9</color>
+
+    <color name="octopus_midnight">#121212</color>
+    <color name="octopus_surface">#1F1B24</color>
+
+    <color name="status_pr_open">#E040FB</color>
+    <color name="status_tests_passing">#00E676</color>
+
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>

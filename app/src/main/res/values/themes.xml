@@ -7,6 +7,21 @@
         <item name="colorPrimaryContainer">@color/jules_purple_light</item>
         <item name="colorOnPrimaryContainer">@color/black</item>
 
+        <!-- Surface & Background -->
+        <item name="android:colorBackground">@color/octopus_midnight</item>
+        <item name="colorSurface">@color/octopus_surface</item>
+        <item name="colorOnSurface">@color/white</item>
+        <item name="colorSurfaceVariant">@color/octopus_surface</item>
+        <item name="colorOnSurfaceVariant">@color/white</item>
+
+        <!-- Shapes -->
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.Octopus.SmallComponent</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.Octopus.MediumComponent</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.Octopus.LargeComponent</item>
+
+        <!-- Typography -->
+        <item name="textAppearanceDisplayLarge">@style/TextAppearance.Octopus.DisplayLarge</item>
+
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/teal_200</item>
         <item name="colorOnSecondary">@color/black</item>
@@ -14,9 +29,29 @@
         <item name="colorOnSecondaryContainer">@color/white</item>
 
         <!-- Status bar color. -->
-        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <item name="android:statusBarColor">@color/octopus_midnight</item>
         <!-- Customize your theme here. -->
-        <item name="android:navigationBarColor">@color/jules_purple</item>
+        <item name="android:navigationBarColor">@color/octopus_midnight</item>
+    </style>
+
+    <style name="ShapeAppearance.Octopus.SmallComponent" parent="ShapeAppearance.Material3.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">12dp</item>
+    </style>
+
+    <style name="ShapeAppearance.Octopus.MediumComponent" parent="ShapeAppearance.Material3.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">20dp</item>
+    </style>
+
+    <style name="ShapeAppearance.Octopus.LargeComponent" parent="ShapeAppearance.Material3.LargeComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">28dp</item>
+    </style>
+
+    <style name="TextAppearance.Octopus.DisplayLarge" parent="TextAppearance.Material3.DisplayLarge">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/jules_purple_light</item>
     </style>
 
     <!-- Alias for backward compatibility if needed, though we update Manifest -->

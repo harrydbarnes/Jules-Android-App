@@ -46,6 +46,16 @@ class MainActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
 
+        val fab = findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fab)
+        fab.setOnClickListener {
+            it.performHapticFeedback(android.view.HapticFeedbackConstants.CONFIRM) // Haptic
+            val intent = Intent(this, com.jules.loader.ui.CreateTaskActivity::class.java)
+            val options = android.app.ActivityOptions.makeSceneTransitionAnimation(
+                this, fab, "shared_element_container"
+            )
+            startActivity(intent, options.toBundle())
+        }
+
         loadSessions()
     }
 

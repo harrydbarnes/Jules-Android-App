@@ -55,4 +55,15 @@
 
     </FrameLayout>
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_octopus"
+        android:contentDescription="New Task"
+        android:transitionName="shared_element_container"
+        app:shapeAppearanceOverlay="@style/ShapeAppearance.Octopus.MediumComponent" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
