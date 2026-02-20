@@ -71,12 +71,17 @@ class SessionAdapter : ListAdapter<Session, SessionAdapter.SessionViewHolder>(Se
                 intent.putExtra(TaskDetailActivity.EXTRA_SESSION_ID, session.id)
                 intent.putExtra(TaskDetailActivity.EXTRA_SESSION_TITLE, session.title)
 
-                val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                    context as Activity,
-                    itemView,
-                    "shared_element_container_${session.id}"
-                )
-                context.startActivity(intent, options.toBundle())
+                val activity = context as? Activity
+                if (activity != null) {
+                    val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                        activity,
+                        itemView,
+                        "shared_element_container_${session.id}"
+                    )
+                    context.startActivity(intent, options.toBundle())
+                } else {
+                    context.startActivity(intent)
+                }
             }
         }
     }

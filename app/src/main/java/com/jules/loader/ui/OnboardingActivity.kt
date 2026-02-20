@@ -29,6 +29,7 @@ class OnboardingActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityOnboardingBinding
     private var detectedApiKey: String? = null
+    private val repository: JulesRepository by lazy { JulesRepository(applicationContext) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,11 +57,12 @@ class OnboardingActivity : AppCompatActivity() {
                 // Heuristic for Jules API Key (Google API Key starts with AIza)
                 if (!text.isNullOrEmpty() && text.startsWith("AIza") && text.length > 20) {
                      detectedApiKey = text
+                     val lastPage = (binding.viewPager.adapter?.itemCount ?: 1) - 1
                      // Notify adapter to update view if visible, or it will be picked up on bind
-                     binding.viewPager.adapter?.notifyItemChanged(2)
+                     binding.viewPager.adapter?.notifyItemChanged(lastPage)
 
                      // Scroll to last page if found
-                     binding.viewPager.currentItem = 2
+                     binding.viewPager.currentItem = lastPage
                 }
             }
         } catch (e: Exception) {
@@ -130,8 +132,7 @@ class OnboardingActivity : AppCompatActivity() {
                     if (key.isNullOrEmpty()) {
                         Toast.makeText(this@OnboardingActivity, R.string.error_enter_api_key, Toast.LENGTH_SHORT).show()
                     } else {
-                        val repo = JulesRepository(applicationContext)
-                        repo.saveApiKey(key)
+                        repository.saveApiKey(key)
                         startActivity(Intent(this@OnboardingActivity, MainActivity::class.java))
                         finish()
                     }

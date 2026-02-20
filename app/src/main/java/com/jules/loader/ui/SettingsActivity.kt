@@ -17,7 +17,7 @@ class SettingsActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = getString(com.jules.loader.R.string.menu_settings)
 
-        val prefs = getSharedPreferences("settings", Context.MODE_PRIVATE)
+        val prefs = getSharedPreferences("jules_settings", Context.MODE_PRIVATE)
 
         binding.switchUnlimitedTabs.isChecked = prefs.getBoolean("allow_unlimited_tabs", false)
         binding.switchUnlimitedTabs.setOnCheckedChangeListener { _, isChecked ->

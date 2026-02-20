@@ -46,6 +46,22 @@ class WebViewFragment : Fragment() {
         settings.domStorageEnabled = true
 
         webView.webViewClient = object : WebViewClient() {
+            override fun shouldOverrideUrlLoading(view: WebView?, request: android.webkit.WebResourceRequest?): Boolean {
+                val url = request?.url?.toString() ?: return false
+                // Allow only Google and Jules domains
+                return if (url.contains("google.com") || url.contains("jules.google.com") || url.contains("accounts.google.com")) {
+                    false // Load in WebView
+                } else {
+                    // Open external links in browser
+                    try {
+                        startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url)))
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                    true
+                }
+            }
+
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
                 swipeRefresh.isRefreshing = false
