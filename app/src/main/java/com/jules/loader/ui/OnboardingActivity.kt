@@ -34,7 +34,7 @@ class OnboardingActivity : BaseActivity() {
         binding = ActivityOnboardingBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val adapter = OnboardingAdapter()
+        val adapter = OnboardingAdapter(this)
         binding.viewPager.adapter = adapter
 
         TabLayoutMediator(binding.tabLayout, binding.viewPager) { _, _ -> }.attach()
@@ -78,30 +78,34 @@ class OnboardingActivity : BaseActivity() {
         }
     }
 
-    private inner class OnboardingAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    private class OnboardingAdapter(private val activity: OnboardingActivity) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-        private val slides = listOf(
-            SlideData(getString(R.string.onboarding_manage_sessions_title), getString(R.string.onboarding_manage_sessions_desc)),
-            SlideData(getString(R.string.onboarding_live_logs_title), getString(R.string.onboarding_live_logs_desc)),
-            SlideData(getString(R.string.onboarding_theme_title), getString(R.string.onboarding_theme_desc)),
-            SlideData("", "") // Placeholder for API slide
+        companion object {
+            private const val VIEW_TYPE_SLIDE = 0
+            private const val VIEW_TYPE_API = 1
+            private const val VIEW_TYPE_THEME = 2
+        }
+
+        private val textSlides = listOf(
+            SlideData(activity.getString(R.string.onboarding_manage_sessions_title), activity.getString(R.string.onboarding_manage_sessions_desc)),
+            SlideData(activity.getString(R.string.onboarding_live_logs_title), activity.getString(R.string.onboarding_live_logs_desc))
         )
 
         override fun getItemViewType(position: Int): Int {
             return when (position) {
-                slides.size - 1 -> 1 // API
-                slides.size - 2 -> 2 // Theme
-                else -> 0
+                textSlides.size -> VIEW_TYPE_THEME // Theme
+                textSlides.size + 1 -> VIEW_TYPE_API // API
+                else -> VIEW_TYPE_SLIDE
             }
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
             return when (viewType) {
-                1 -> {
+                VIEW_TYPE_API -> {
                     val view = LayoutInflater.from(parent.context).inflate(R.layout.item_onboarding_api, parent, false)
                     ApiViewHolder(view)
                 }
-                2 -> {
+                VIEW_TYPE_THEME -> {
                     val view = LayoutInflater.from(parent.context).inflate(R.layout.item_onboarding_theme, parent, false)
                     ThemeViewHolder(view)
                 }
@@ -114,7 +118,7 @@ class OnboardingActivity : BaseActivity() {
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
             if (holder is SlideViewHolder) {
-                holder.bind(slides[position])
+                holder.bind(textSlides[position])
             } else if (holder is ApiViewHolder) {
                 holder.bind()
             } else if (holder is ThemeViewHolder) {
@@ -122,7 +126,7 @@ class OnboardingActivity : BaseActivity() {
             }
         }
 
-        override fun getItemCount(): Int = slides.size
+        override fun getItemCount(): Int = textSlides.size + 2 // +Theme, +API
 
         inner class SlideViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             private val title: TextView = itemView.findViewById(R.id.title)
@@ -138,7 +142,8 @@ class OnboardingActivity : BaseActivity() {
             private val radioGroup: RadioGroup = itemView.findViewById(R.id.themeRadioGroup)
 
             fun bind() {
-                val currentTheme = ThemeUtils.getSelectedTheme(this@OnboardingActivity)
+                val currentTheme = ThemeUtils.getSelectedTheme(activity)
+                radioGroup.setOnCheckedChangeListener(null)
                 if (currentTheme == ThemeUtils.THEME_SQUID) {
                     radioGroup.check(R.id.radioSquid)
                 } else {
@@ -147,9 +152,9 @@ class OnboardingActivity : BaseActivity() {
 
                 radioGroup.setOnCheckedChangeListener { _, checkedId ->
                     val newTheme = if (checkedId == R.id.radioSquid) ThemeUtils.THEME_SQUID else ThemeUtils.THEME_OCTOPUS
-                    if (newTheme != ThemeUtils.getSelectedTheme(this@OnboardingActivity)) {
-                        ThemeUtils.setSelectedTheme(this@OnboardingActivity, newTheme)
-                        recreate()
+                    if (newTheme != ThemeUtils.getSelectedTheme(activity)) {
+                        ThemeUtils.setSelectedTheme(activity, newTheme)
+                        activity.recreate()
                     }
                 }
             }
@@ -161,23 +166,23 @@ class OnboardingActivity : BaseActivity() {
             private val saveButton: Button = itemView.findViewById(R.id.saveButton)
 
             fun bind() {
-                if (detectedApiKey != null) {
-                    input.setText(detectedApiKey)
+                if (activity.detectedApiKey != null) {
+                    input.setText(activity.detectedApiKey)
                 }
 
                 getKeyLink.setOnClickListener {
                     val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://jules.google.com/settings/api"))
-                    startActivity(browserIntent)
+                    activity.startActivity(browserIntent)
                 }
 
                 saveButton.setOnClickListener {
                     val key = input.text?.toString()?.trim()
                     if (key.isNullOrEmpty()) {
-                        Toast.makeText(this@OnboardingActivity, R.string.error_enter_api_key, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(activity, R.string.error_enter_api_key, Toast.LENGTH_SHORT).show()
                     } else {
-                        repository.saveApiKey(key)
-                        startActivity(Intent(this@OnboardingActivity, MainActivity::class.java))
-                        finish()
+                        activity.repository.saveApiKey(key)
+                        activity.startActivity(Intent(activity, MainActivity::class.java))
+                        activity.finish()
                     }
                 }
             }
