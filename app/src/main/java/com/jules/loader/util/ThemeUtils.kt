@@ -26,7 +26,7 @@ object ThemeUtils {
 
     fun getSelectedTheme(context: Context): String {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        return prefs.getString(KEY_THEME_PREFERENCE, THEME_OCTOPUS) ?: THEME_OCTOPUS
+        return prefs.getString(KEY_THEME_PREFERENCE, THEME_OCTOPUS)!!
     }
 
     fun setSelectedTheme(context: Context, theme: String) {
