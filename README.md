@@ -1,21 +1,14 @@
-# 🐙 Jules Loader
+# 🐙 Octopus for Jules
 
-**Jules Loader** is a native Android application designed to provide a seamless, multi-tabbed browsing experience for [jules.google.com](https://jules.google.com). Built with Kotlin and Material Design, it allows users to navigate repositories and web content efficiently on mobile devices.
+**Octopus for Jules** is a native Android client for Jules, allowing users to view sessions and create tasks efficiently. Built with Kotlin and Material Design 3, it provides a seamless experience for managing your Jules interactions.
 
 ## ✨ Features
 
-* **Multi-Tab Interface**: Browse multiple pages or repositories simultaneously using a dynamic tabbed view powered by `ViewPager2` and `TabLayout`. 📑
-* **Quick Access**: Instantly load the Jules Home page with a single tap from the "New Tab" screen. 🏠
-* **Recent History**: Automatically tracks and saves your recently visited repositories/URLs. The list is managed locally using `SharedPreferences`, ensuring your history persists between sessions. 🕒
-* **Full WebView Support**: Features a robust `WebView` implementation with JavaScript, DOM storage, and database support enabled. It also includes a progress bar for page load status. 🌐
-* **Material Design**: Clean and modern UI using Android's Material Components. 🎨
-
-## 📱 Screenshots
-
-| New Tab | Web View |
-|:---:|:---:|
-| 📷 | 📷 |
-| *Recent Repos & Load Home* | *Tabbed Browsing Interface* |
+* **Session Management**: View your active Jules sessions with real-time status updates. 📋
+* **Task Creation**: Easily create new tasks directly from the app or share text from other apps to start a task. ✍️
+* **Secure Authentication**: Your Jules API Key is stored securely using `EncryptedSharedPreferences`. 🔒
+* **Material Design 3**: Modern UI with dynamic color support, adapting to your device's wallpaper. 🎨
+* **Dark Mode**: Full support for dark theme. 🌙
 
 ## 🛠️ Tech Stack
 
@@ -24,13 +17,13 @@ This project is built using modern Android development practices:
 * **Language**: [Kotlin](https://kotlinlang.org/) (v1.9.0)
 * **Minimum SDK**: 24 (Android 7.0)
 * **Target SDK**: 34 (Android 14)
-* **Architecture**: Fragments & Activities
+* **Architecture**: MVVM with Repository Pattern
 * **Key Libraries**:
-    * [AndroidX AppCompat](https://developer.android.com/jetpack/androidx/releases/appcompat)
+    * [Retrofit](https://square.github.io/retrofit/) (Networking)
+    * [Coroutines](https://kotlinlang.org/docs/coroutines-overview.html) (Asynchronous programming)
+    * [EncryptedSharedPreferences](https://developer.android.com/reference/androidx/security/crypto/EncryptedSharedPreferences) (Security)
     * [Material Components](https://github.com/material-components/material-components-android)
-    * [ConstraintLayout](https://developer.android.com/reference/androidx/constraintlayout/widget/ConstraintLayout)
-    * [ViewPager2](https://developer.android.com/jetpack/androidx/releases/viewpager2) (for tabs)
-    * [WebKit](https://developer.android.com/reference/androidx/webkit/WebView)
+    * [Lottie](https://airbnb.io/lottie/#/android) (Animations)
 
 ## 🚀 Getting Started
 
@@ -38,7 +31,7 @@ To build and run this app locally, follow these steps:
 
 1.  **Clone the repository**
     ```bash
-    git clone [https://github.com/yourusername/jules-loader.git](https://github.com/yourusername/jules-loader.git)
+    git clone https://github.com/harrydbarnes/Jules-Android-App.git
     ```
 
 2.  **Open in Android Studio**
@@ -56,12 +49,10 @@ To build and run this app locally, follow these steps:
 
 ## 📖 Usage
 
-1.  **Launch the App**: You will start on a "New Tab" page.
-2.  **Load Content**: Click **"Load Jules Home"** to start browsing or select a repo from the "Recent Repos" list.
-3.  **Manage Tabs**:
-    * Use the **Top Menu** (three dots) and select **"Add Tab"** to open a new browsing session.
-    * Swipe left or right to switch between open tabs.
-4.  **Navigation**: The app supports standard back navigation within the WebView.
+1.  **Launch the App**: On first launch, you will be guided through the **Onboarding** flow to securely save your Jules API Key.
+2.  **View Sessions**: Once set up, you will see a list of your active Jules sessions.
+3.  **Create Task**: Tap the **FAB (Floating Action Button)** to create a new task.
+4.  **Settings**: Access settings via the top menu to manage preferences.
 
 ## 🤝 Contributing
 
