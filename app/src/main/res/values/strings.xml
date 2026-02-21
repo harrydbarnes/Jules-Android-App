@@ -20,6 +20,10 @@
     <string name="enter_repo_url">Enter Repo URL</string>
     <string name="load">Load</string>
     <string name="setting_use_dynamic_colours">Use Dynamic Colours</string>
+    <string name="setting_theme">App Theme</string>
+    <string name="theme_octopus">Octopus</string>
+    <string name="theme_squid">Squid</string>
+    <string name="theme_dynamic_warning">Dynamic Colours override App Theme.</string>
     <string name="tab_limit_reached">Tab limit reached (%1$d). Enable more in Settings.</string>
     <string name="repo_fallback_title">Repo</string>
     <string name="about_attribution">By Harry Barnes, built by &amp; for Jules, by Google</string>

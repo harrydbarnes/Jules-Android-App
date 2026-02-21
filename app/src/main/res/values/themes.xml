@@ -56,4 +56,43 @@
 
     <!-- Alias for backward compatibility if needed, though we update Manifest -->
     <style name="Theme.JulesLoader" parent="Theme.Octopus" />
+
+    <style name="Theme.Squid" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/ivory</item>
+        <item name="colorOnPrimary">@color/pitch_black</item>
+        <item name="colorPrimaryContainer">@color/ivory</item>
+        <item name="colorOnPrimaryContainer">@color/pitch_black</item>
+
+        <!-- Surface & Background -->
+        <item name="android:colorBackground">@color/pitch_black</item>
+        <item name="colorSurface">@color/pitch_black</item>
+        <item name="colorOnSurface">@color/ivory</item>
+        <item name="colorSurfaceVariant">@color/pitch_black</item>
+        <item name="colorOnSurfaceVariant">@color/ivory</item>
+
+        <!-- Shapes -->
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.Octopus.SmallComponent</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.Octopus.MediumComponent</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.Octopus.LargeComponent</item>
+
+        <!-- Typography -->
+        <item name="textAppearanceDisplayLarge">@style/TextAppearance.Squid.DisplayLarge</item>
+
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/ivory</item>
+        <item name="colorOnSecondary">@color/pitch_black</item>
+        <item name="colorSecondaryContainer">@color/ivory</item>
+        <item name="colorOnSecondaryContainer">@color/pitch_black</item>
+
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">@color/pitch_black</item>
+        <!-- Customize your theme here. -->
+        <item name="android:navigationBarColor">@color/pitch_black</item>
+    </style>
+
+    <style name="TextAppearance.Squid.DisplayLarge" parent="TextAppearance.Material3.DisplayLarge">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/ivory</item>
+    </style>
 </resources>

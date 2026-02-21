@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.View
 import android.view.Window
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.transition.platform.MaterialContainerTransform
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
@@ -12,7 +11,7 @@ import com.jules.loader.data.JulesRepository
 import com.jules.loader.databinding.ActivityCreateTaskBinding
 import kotlinx.coroutines.launch
 
-class CreateTaskActivity : AppCompatActivity() {
+class CreateTaskActivity : BaseActivity() {
 
     private lateinit var binding: ActivityCreateTaskBinding
     private lateinit var repository: JulesRepository

@@ -1,10 +1,9 @@
 package com.jules.loader.ui
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import com.jules.loader.databinding.ActivityAboutBinding
 
-class AboutActivity : AppCompatActivity() {
+class AboutActivity : BaseActivity() {
 
     private lateinit var binding: ActivityAboutBinding
 
