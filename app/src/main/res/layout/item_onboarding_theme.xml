@@ -44,6 +44,13 @@
             android:layout_height="wrap_content"
             android:text="@string/theme_squid"
             android:padding="8dp"/>
+
+        <RadioButton
+            android:id="@+id/radioCuttlefish"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/theme_cuttlefish"
+            android:padding="8dp"/>
     </RadioGroup>
 
 </LinearLayout>

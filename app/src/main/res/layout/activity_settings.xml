@@ -12,25 +12,6 @@
         android:textAppearance="?attr/textAppearanceHeadlineSmall"
         android:layout_marginBottom="24dp"/>
 
-    <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/switch_dynamic_colours"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="@string/setting_use_dynamic_colours"
-        android:textAppearance="?attr/textAppearanceBodyLarge" />
-
-    <TextView
-        android:id="@+id/text_dynamic_warning"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/theme_dynamic_warning"
-        android:textAppearance="?attr/textAppearanceBodySmall"
-        android:textColor="?android:attr/textColorSecondary"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="16dp"
-        android:visibility="gone"/>
-
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -56,6 +37,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/theme_squid" />
+
+        <RadioButton
+            android:id="@+id/radio_cuttlefish"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/theme_cuttlefish" />
 
     </RadioGroup>
 

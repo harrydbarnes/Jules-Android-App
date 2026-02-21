@@ -13,16 +13,7 @@ object ThemeUtils {
 
     const val THEME_OCTOPUS = "octopus"
     const val THEME_SQUID = "squid"
-
-    fun isDynamicColorsEnabled(context: Context): Boolean {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        return prefs.getBoolean(KEY_USE_DYNAMIC_COLOURS, true)
-    }
-
-    fun setDynamicColorsEnabled(context: Context, enabled: Boolean) {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit { putBoolean(KEY_USE_DYNAMIC_COLOURS, enabled) }
-    }
+    const val THEME_CUTTLEFISH = "cuttlefish"
 
     fun getSelectedTheme(context: Context): String {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -36,7 +27,6 @@ object ThemeUtils {
 
     fun applyTheme(activity: Activity) {
         val theme = getSelectedTheme(activity)
-        val isDynamic = isDynamicColorsEnabled(activity)
 
         // Set the base theme first
         if (theme == THEME_SQUID) {
@@ -45,9 +35,20 @@ object ThemeUtils {
             activity.setTheme(R.style.Theme_Octopus)
         }
 
-        // Apply dynamic colors overlay if enabled
-        if (isDynamic) {
+        // Apply dynamic colors overlay if Cuttlefish
+        if (theme == THEME_CUTTLEFISH) {
             DynamicColors.applyToActivityIfAvailable(activity)
         }
+    }
+
+    // Deprecated methods kept for temporary compatibility until SettingsActivity is updated
+    fun isDynamicColorsEnabled(context: Context): Boolean {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        return prefs.getBoolean(KEY_USE_DYNAMIC_COLOURS, true)
+    }
+
+    fun setDynamicColorsEnabled(context: Context, enabled: Boolean) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit { putBoolean(KEY_USE_DYNAMIC_COLOURS, enabled) }
     }
 }

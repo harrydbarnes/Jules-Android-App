@@ -24,16 +24,6 @@
             android:layout_marginBottom="8dp"/>
 
         <TextView
-            android:id="@+id/text_repo_link"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/repo_url"
-            android:autoLink="web"
-            android:textColorLink="@color/jules_purple"
-            android:textAppearance="?attr/textAppearanceBodyLarge"
-            android:layout_marginBottom="24dp"/>
-
-        <TextView
             android:id="@+id/text_citations"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -41,6 +31,24 @@
             android:textAppearance="?attr/textAppearanceBodyMedium"
             android:layout_marginTop="8dp"
             android:alpha="0.8"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/source_code"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:layout_marginTop="24dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/text_repo_link"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/repo_url"
+            android:autoLink="web"
+            android:textColorLink="@color/jules_purple"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:layout_marginBottom="24dp"/>
 
         <TextView
             android:layout_width="match_parent"
