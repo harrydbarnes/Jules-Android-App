@@ -16,7 +16,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
 
-class JulesRepository(private val context: Context) {
+class JulesRepository private constructor(private val context: Context) {
 
     private val prefs: SharedPreferences by lazy {
         try {
@@ -70,6 +70,15 @@ class JulesRepository(private val context: Context) {
     companion object {
         private const val PREFS_FILE_NAME = "jules_prefs"
         private const val KEY_API_KEY = "jules_api_key"
+
+        @Volatile
+        private var INSTANCE: JulesRepository? = null
+
+        fun getInstance(context: Context): JulesRepository {
+            return INSTANCE ?: synchronized(this) {
+                INSTANCE ?: JulesRepository(context.applicationContext).also { INSTANCE = it }
+            }
+        }
     }
 
     fun saveApiKey(key: String) {
@@ -80,26 +89,30 @@ class JulesRepository(private val context: Context) {
         return prefs.getString(KEY_API_KEY, null)
     }
 
+    private fun requireApiKey(): String {
+        return getApiKey() ?: throw IllegalStateException("API Key not found")
+    }
+
     suspend fun getSessions(): List<Session> {
-        val apiKey = getApiKey() ?: throw IllegalStateException("API Key not found")
+        val apiKey = requireApiKey()
         // Handle pagination later if needed, for now just get first page
         val response = service.listSessions(apiKey)
         return response.sessions ?: emptyList()
     }
 
     suspend fun createSession(prompt: String): Session {
-        val apiKey = getApiKey() ?: throw IllegalStateException("API Key not found")
+        val apiKey = requireApiKey()
         val request = CreateSessionRequest(prompt = prompt)
         return service.createSession(apiKey, request)
     }
 
     suspend fun getActivities(sessionId: String): List<ActivityLog> {
-        val apiKey = getApiKey() ?: throw IllegalStateException("API Key not found")
+        val apiKey = requireApiKey()
         return service.listActivities(apiKey, sessionId).activities ?: emptyList()
     }
 
     suspend fun getSources(): List<SourceContext> {
-        val apiKey = getApiKey() ?: throw IllegalStateException("API Key not found")
+        val apiKey = requireApiKey()
         return service.listSources(apiKey).sources ?: emptyList()
     }
 }

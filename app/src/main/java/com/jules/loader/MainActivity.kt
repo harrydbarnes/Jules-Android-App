@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        repository = JulesRepository(applicationContext)
+        repository = JulesRepository.getInstance(applicationContext)
 
         if (repository.getApiKey().isNullOrEmpty()) {
             startActivity(Intent(this, OnboardingActivity::class.java))

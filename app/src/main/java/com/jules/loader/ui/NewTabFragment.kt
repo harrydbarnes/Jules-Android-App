@@ -7,7 +7,9 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.jules.loader.R
 import com.jules.loader.data.JulesRepository
@@ -30,13 +32,13 @@ class NewTabFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        repository = JulesRepository(requireContext().applicationContext)
+        repository = JulesRepository.getInstance(requireContext().applicationContext)
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_recent_repos)
         val emptyState = view.findViewById<TextView>(R.id.text_empty_state)
 
         recyclerView.layoutManager = LinearLayoutManager(context)
-        adapter = SourcesAdapter(emptyList())
+        adapter = SourcesAdapter()
         recyclerView.adapter = adapter
 
         view.findViewById<View>(R.id.btn_load_home).setOnClickListener {
@@ -50,7 +52,7 @@ class NewTabFragment : Fragment() {
                 if (sources.isNotEmpty()) {
                     recyclerView.visibility = View.VISIBLE
                     emptyState.visibility = View.GONE
-                    adapter.updateSources(sources)
+                    adapter.submitList(sources)
                 } else {
                     recyclerView.visibility = View.GONE
                     emptyState.visibility = View.VISIBLE
@@ -62,15 +64,10 @@ class NewTabFragment : Fragment() {
         }
     }
 
-    class SourcesAdapter(private var sources: List<SourceContext>) : RecyclerView.Adapter<SourcesAdapter.SourceViewHolder>() {
+    class SourcesAdapter : ListAdapter<SourceContext, SourcesAdapter.SourceViewHolder>(SourceDiffCallback()) {
 
         class SourceViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             val repoName: TextView = view.findViewById(R.id.text_repo_name)
-        }
-
-        fun updateSources(newSources: List<SourceContext>) {
-            sources = newSources
-            notifyDataSetChanged()
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SourceViewHolder {
@@ -79,7 +76,7 @@ class NewTabFragment : Fragment() {
         }
 
         override fun onBindViewHolder(holder: SourceViewHolder, position: Int) {
-            val source = sources[position]
+            val source = getItem(position)
             // Extract repo name if it's a URL or just show raw string
             val displayText = if (source.source.contains("github.com/")) {
                 source.source.substringAfter("github.com/")
@@ -89,6 +86,14 @@ class NewTabFragment : Fragment() {
             holder.repoName.text = displayText
         }
 
-        override fun getItemCount() = sources.size
+        class SourceDiffCallback : DiffUtil.ItemCallback<SourceContext>() {
+            override fun areItemsTheSame(oldItem: SourceContext, newItem: SourceContext): Boolean {
+                return oldItem.source == newItem.source
+            }
+
+            override fun areContentsTheSame(oldItem: SourceContext, newItem: SourceContext): Boolean {
+                return oldItem == newItem
+            }
+        }
     }
 }

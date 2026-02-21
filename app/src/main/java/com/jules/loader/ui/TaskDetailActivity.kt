@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import android.view.Window
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import com.google.android.material.transition.platform.MaterialContainerTransform
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.jules.loader.R
@@ -30,6 +32,7 @@ class TaskDetailActivity : AppCompatActivity() {
     companion object {
         const val EXTRA_SESSION_ID = "EXTRA_SESSION_ID"
         const val EXTRA_SESSION_TITLE = "EXTRA_SESSION_TITLE"
+        private const val POLLING_INTERVAL_MS = 3000L
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,7 +54,7 @@ class TaskDetailActivity : AppCompatActivity() {
         binding = ActivityTaskDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        repository = JulesRepository(applicationContext)
+        repository = JulesRepository.getInstance(applicationContext)
         sessionId = intent.getStringExtra(EXTRA_SESSION_ID)
         binding.root.transitionName = "shared_element_container_${sessionId}"
 
@@ -64,7 +67,7 @@ class TaskDetailActivity : AppCompatActivity() {
 
         // Setup Log RecyclerView
         binding.logRecyclerView.layoutManager = LinearLayoutManager(this)
-        logAdapter = LogAdapter(emptyList())
+        logAdapter = LogAdapter()
         binding.logRecyclerView.adapter = logAdapter
 
         sessionId?.let { id ->
@@ -77,24 +80,19 @@ class TaskDetailActivity : AppCompatActivity() {
             while (isActive) { // Poll while the activity is alive
                 try {
                     val logs = repository.getActivities(id)
-                    logAdapter.updateLogs(logs)
+                    logAdapter.submitList(logs)
                 } catch (e: Exception) {
                     // Handle network error silently during polling or show a small error indicator
                     android.util.Log.e("TaskDetailActivity", "Error polling logs", e)
                 }
-                delay(3000) // Poll every 3 seconds
+                delay(POLLING_INTERVAL_MS)
             }
         }
     }
 
-    class LogAdapter(private var logs: List<ActivityLog>) : RecyclerView.Adapter<LogAdapter.LogViewHolder>() {
+    class LogAdapter : ListAdapter<ActivityLog, LogAdapter.LogViewHolder>(LogDiffCallback()) {
         class LogViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             val text: TextView = view.findViewById(android.R.id.text1)
-        }
-
-        fun updateLogs(newLogs: List<ActivityLog>) {
-            logs = newLogs
-            notifyDataSetChanged() // For better performance, consider using DiffUtil here
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LogViewHolder {
@@ -103,10 +101,18 @@ class TaskDetailActivity : AppCompatActivity() {
         }
 
         override fun onBindViewHolder(holder: LogViewHolder, position: Int) {
-            val log = logs[position]
+            val log = getItem(position)
             holder.text.text = "[${log.type}] ${log.description}"
         }
 
-        override fun getItemCount() = logs.size
+        class LogDiffCallback : DiffUtil.ItemCallback<ActivityLog>() {
+            override fun areItemsTheSame(oldItem: ActivityLog, newItem: ActivityLog): Boolean {
+                return oldItem.id == newItem.id
+            }
+
+            override fun areContentsTheSame(oldItem: ActivityLog, newItem: ActivityLog): Boolean {
+                return oldItem == newItem
+            }
+        }
     }
 }

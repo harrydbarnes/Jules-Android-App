@@ -40,7 +40,7 @@ class CreateTaskActivity : AppCompatActivity() {
         // Ensure transition name is set on the root view if not already in XML (it is in XML)
         binding.root.transitionName = "shared_element_container"
 
-        repository = JulesRepository(applicationContext)
+        repository = JulesRepository.getInstance(applicationContext)
 
         binding.btnStartTask.setOnClickListener {
             val prompt = binding.taskInput.text.toString().trim()

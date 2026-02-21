@@ -29,7 +29,7 @@ class OnboardingActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityOnboardingBinding
     private var detectedApiKey: String? = null
-    private val repository: JulesRepository by lazy { JulesRepository(applicationContext) }
+    private val repository: JulesRepository by lazy { JulesRepository.getInstance(applicationContext) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
