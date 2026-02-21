@@ -15,7 +15,7 @@
         android:layout_marginBottom="24dp"
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
-        app:lottie_url="https://lottie.host/83e84323-8324-4235-9856-425501865293/63829.json" />
+        app:lottie_rawRes="@raw/onboarding_animation" />
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
