@@ -5,7 +5,7 @@
 ## ✨ Features
 
 * **Session Management**: View and manage your active Jules sessions in a clean list interface. 📋
-* **Task Creation**: Create new tasks with custom prompts and optional source contexts directly from the app or via sharing from other apps. ➕
+* **Task Creation**: Create new tasks with custom prompts directly from the app or via sharing from other apps. ➕
 * **Live Activity Logs**: Monitor task progress in real-time with live activity logs and status updates. ⚡
 * **Repository Integration**: Easily access and attach your connected repositories to new tasks. 📦
 * **Material Design 3**: A modern, cohesive UI that adapts to your device's theme. 🎨
