@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.RadioGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
@@ -20,9 +21,7 @@ import com.jules.loader.MainActivity
 import com.jules.loader.R
 import com.jules.loader.data.JulesRepository
 import com.jules.loader.databinding.ActivityOnboardingBinding
-
-import android.os.Handler
-import android.os.Looper
+import com.jules.loader.util.ThemeUtils
 
 class OnboardingActivity : BaseActivity() {
 
@@ -39,6 +38,16 @@ class OnboardingActivity : BaseActivity() {
         binding.viewPager.adapter = adapter
 
         TabLayoutMediator(binding.tabLayout, binding.viewPager) { _, _ -> }.attach()
+
+        if (savedInstanceState != null) {
+            val position = savedInstanceState.getInt("current_page", 0)
+            binding.viewPager.setCurrentItem(position, false)
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt("current_page", binding.viewPager.currentItem)
     }
 
     override fun onResume() {
@@ -72,22 +81,34 @@ class OnboardingActivity : BaseActivity() {
     private inner class OnboardingAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         private val slides = listOf(
-            SlideData("Multi-tab browsing", "Open multiple sessions and switch between them easily."),
-            SlideData("Quick repository access", "Access your recent repositories with a single tap."),
+            SlideData(getString(R.string.onboarding_manage_sessions_title), getString(R.string.onboarding_manage_sessions_desc)),
+            SlideData(getString(R.string.onboarding_live_logs_title), getString(R.string.onboarding_live_logs_desc)),
+            SlideData(getString(R.string.onboarding_theme_title), getString(R.string.onboarding_theme_desc)),
             SlideData("", "") // Placeholder for API slide
         )
 
         override fun getItemViewType(position: Int): Int {
-            return if (position == slides.size - 1) 1 else 0
+            return when (position) {
+                slides.size - 1 -> 1 // API
+                slides.size - 2 -> 2 // Theme
+                else -> 0
+            }
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-            return if (viewType == 1) {
-                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_onboarding_api, parent, false)
-                ApiViewHolder(view)
-            } else {
-                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_onboarding_page, parent, false)
-                SlideViewHolder(view)
+            return when (viewType) {
+                1 -> {
+                    val view = LayoutInflater.from(parent.context).inflate(R.layout.item_onboarding_api, parent, false)
+                    ApiViewHolder(view)
+                }
+                2 -> {
+                    val view = LayoutInflater.from(parent.context).inflate(R.layout.item_onboarding_theme, parent, false)
+                    ThemeViewHolder(view)
+                }
+                else -> {
+                    val view = LayoutInflater.from(parent.context).inflate(R.layout.item_onboarding_page, parent, false)
+                    SlideViewHolder(view)
+                }
             }
         }
 
@@ -95,6 +116,8 @@ class OnboardingActivity : BaseActivity() {
             if (holder is SlideViewHolder) {
                 holder.bind(slides[position])
             } else if (holder is ApiViewHolder) {
+                holder.bind()
+            } else if (holder is ThemeViewHolder) {
                 holder.bind()
             }
         }
@@ -111,6 +134,27 @@ class OnboardingActivity : BaseActivity() {
             }
         }
 
+        inner class ThemeViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            private val radioGroup: RadioGroup = itemView.findViewById(R.id.themeRadioGroup)
+
+            fun bind() {
+                val currentTheme = ThemeUtils.getSelectedTheme(this@OnboardingActivity)
+                if (currentTheme == ThemeUtils.THEME_SQUID) {
+                    radioGroup.check(R.id.radioSquid)
+                } else {
+                    radioGroup.check(R.id.radioOctopus)
+                }
+
+                radioGroup.setOnCheckedChangeListener { _, checkedId ->
+                    val newTheme = if (checkedId == R.id.radioSquid) ThemeUtils.THEME_SQUID else ThemeUtils.THEME_OCTOPUS
+                    if (newTheme != ThemeUtils.getSelectedTheme(this@OnboardingActivity)) {
+                        ThemeUtils.setSelectedTheme(this@OnboardingActivity, newTheme)
+                        recreate()
+                    }
+                }
+            }
+        }
+
         inner class ApiViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             private val input: TextInputEditText = itemView.findViewById(R.id.apiKeyInput)
             private val getKeyLink: TextView = itemView.findViewById(R.id.getKeyLink)
@@ -122,7 +166,7 @@ class OnboardingActivity : BaseActivity() {
                 }
 
                 getKeyLink.setOnClickListener {
-                    val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://jules.google.com/settings#api"))
+                    val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://jules.google.com/settings/api"))
                     startActivity(browserIntent)
                 }
 

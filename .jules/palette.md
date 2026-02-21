@@ -5,3 +5,7 @@
 ## 2024-06-11 - Settings Interaction: Dynamic vs. Manual Themes
 **Learning:** When a global system preference (like Dynamic Colors) overrides a manual app setting (like Theme selection), disabling the overridden setting's UI is critical for user clarity. It visually communicates the hierarchy and prevents frustration from ineffective inputs.
 **Action:** Ensure conflicting settings are mutually exclusive or hierarchically disabled in the UI.
+
+## 2026-02-21 - Theme Selection in ViewPager Onboarding
+**Learning:** When implementing theme selection that requires `recreate()` within a ViewPager flow (like Onboarding), the default behavior resets the pager to the first item.
+**Action:** Ensure `currentItem` is saved in `onSaveInstanceState` and explicitly restored in `onCreate` to maintain the user's position and provide a seamless transition despite the Activity restart.
