@@ -144,14 +144,18 @@ class OnboardingActivity : BaseActivity() {
             fun bind() {
                 val currentTheme = ThemeUtils.getSelectedTheme(activity)
                 radioGroup.setOnCheckedChangeListener(null)
-                if (currentTheme == ThemeUtils.THEME_SQUID) {
-                    radioGroup.check(R.id.radioSquid)
-                } else {
-                    radioGroup.check(R.id.radioOctopus)
+                when (currentTheme) {
+                    ThemeUtils.THEME_SQUID -> radioGroup.check(R.id.radioSquid)
+                    ThemeUtils.THEME_CUTTLEFISH -> radioGroup.check(R.id.radioCuttlefish)
+                    else -> radioGroup.check(R.id.radioOctopus)
                 }
 
                 radioGroup.setOnCheckedChangeListener { _, checkedId ->
-                    val newTheme = if (checkedId == R.id.radioSquid) ThemeUtils.THEME_SQUID else ThemeUtils.THEME_OCTOPUS
+                    val newTheme = when (checkedId) {
+                        R.id.radioSquid -> ThemeUtils.THEME_SQUID
+                        R.id.radioCuttlefish -> ThemeUtils.THEME_CUTTLEFISH
+                        else -> ThemeUtils.THEME_OCTOPUS
+                    }
                     if (newTheme != ThemeUtils.getSelectedTheme(activity)) {
                         ThemeUtils.setSelectedTheme(activity, newTheme)
                         activity.recreate()
@@ -173,6 +177,16 @@ class OnboardingActivity : BaseActivity() {
                 getKeyLink.setOnClickListener {
                     val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://jules.google.com/settings/api"))
                     activity.startActivity(browserIntent)
+                }
+
+                input.setOnEditorActionListener { _, actionId, event ->
+                    if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_DONE ||
+                        (event != null && event.keyCode == android.view.KeyEvent.KEYCODE_ENTER && event.action == android.view.KeyEvent.ACTION_DOWN)) {
+                        saveButton.performClick()
+                        true
+                    } else {
+                        false
+                    }
                 }
 
                 saveButton.setOnClickListener {
