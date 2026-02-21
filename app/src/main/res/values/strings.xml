@@ -10,13 +10,16 @@
     <string name="no_recent_repos">No recent repos</string>
     <string name="about_title">About Octopus for Jules</string>
     <string name="about_desc">Octopus for Jules is a client for the Jules API, allowing you to manage sessions, create tasks, and view live activity logs.\n\nSource Code:</string>
-    <string name="about_citations">Open Source Libraries used:
-    \n- AndroidX
-    \n- Material Components
-    \n- Retrofit
-    \n- OkHttp
-    \n- Gson</string>
-    <string name="repo_url">https://github.com/harrydbarnes/Jules-Android-App</string>
+    <string name="about_citations"><![CDATA[Open Source Libraries used:<br/><br/>
+<a href="https://developer.android.com/jetpack/androidx">AndroidX</a> - Core Android Libraries<br/>
+<a href="https://github.com/material-components/material-components-android">Material Components</a> - UI Components<br/>
+<a href="https://github.com/square/retrofit">Retrofit</a> - Type-safe HTTP Client<br/>
+<a href="https://github.com/square/okhttp">OkHttp</a> - HTTP Client<br/>
+<a href="https://github.com/google/gson">Gson</a> - JSON Serialization<br/>
+<a href="https://github.com/airbnb/lottie-android">Lottie</a> - Animation Rendering<br/>
+<a href="https://github.com/Kotlin/kotlinx.coroutines">Kotlin Coroutines</a> - Asynchronous Programming<br/>
+<a href="https://developer.android.com/jetpack/androidx/releases/security">Security Crypto</a> - Encrypted Shared Preferences]]></string>
+    <string name="repo_url">https://github.com/harrydbarnes/Octopus-forJules</string>
     <string name="enter_repo_url">Enter Repo URL</string>
     <string name="load">Load</string>
     <string name="setting_use_dynamic_colours">Use Dynamic Colours</string>

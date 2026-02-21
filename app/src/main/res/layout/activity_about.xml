@@ -34,6 +34,7 @@
             android:layout_marginBottom="24dp"/>
 
         <TextView
+            android:id="@+id/text_citations"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/about_citations"

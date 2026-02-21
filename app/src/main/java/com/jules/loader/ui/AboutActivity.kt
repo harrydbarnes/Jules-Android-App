@@ -1,6 +1,8 @@
 package com.jules.loader.ui
 
 import android.os.Bundle
+import android.text.method.LinkMovementMethod
+import androidx.core.text.HtmlCompat
 import com.jules.loader.databinding.ActivityAboutBinding
 
 class AboutActivity : BaseActivity() {
@@ -14,6 +16,12 @@ class AboutActivity : BaseActivity() {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = getString(com.jules.loader.R.string.menu_about)
+
+        binding.textCitations.text = HtmlCompat.fromHtml(
+            getString(com.jules.loader.R.string.about_citations),
+            HtmlCompat.FROM_HTML_MODE_LEGACY
+        )
+        binding.textCitations.movementMethod = LinkMovementMethod.getInstance()
     }
 
     override fun onSupportNavigateUp(): Boolean {
