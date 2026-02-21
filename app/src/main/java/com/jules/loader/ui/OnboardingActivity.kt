@@ -80,6 +80,10 @@ class OnboardingActivity : BaseActivity() {
 
     private inner class OnboardingAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+        private val VIEW_TYPE_SLIDE = 0
+        private val VIEW_TYPE_API = 1
+        private val VIEW_TYPE_THEME = 2
+
         private val slides = listOf(
             SlideData(getString(R.string.onboarding_manage_sessions_title), getString(R.string.onboarding_manage_sessions_desc)),
             SlideData(getString(R.string.onboarding_live_logs_title), getString(R.string.onboarding_live_logs_desc)),
@@ -89,19 +93,19 @@ class OnboardingActivity : BaseActivity() {
 
         override fun getItemViewType(position: Int): Int {
             return when (position) {
-                slides.size - 1 -> 1 // API
-                slides.size - 2 -> 2 // Theme
-                else -> 0
+                slides.size - 1 -> VIEW_TYPE_API // API
+                slides.size - 2 -> VIEW_TYPE_THEME // Theme
+                else -> VIEW_TYPE_SLIDE
             }
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
             return when (viewType) {
-                1 -> {
+                VIEW_TYPE_API -> {
                     val view = LayoutInflater.from(parent.context).inflate(R.layout.item_onboarding_api, parent, false)
                     ApiViewHolder(view)
                 }
-                2 -> {
+                VIEW_TYPE_THEME -> {
                     val view = LayoutInflater.from(parent.context).inflate(R.layout.item_onboarding_theme, parent, false)
                     ThemeViewHolder(view)
                 }
@@ -139,6 +143,7 @@ class OnboardingActivity : BaseActivity() {
 
             fun bind() {
                 val currentTheme = ThemeUtils.getSelectedTheme(this@OnboardingActivity)
+                radioGroup.setOnCheckedChangeListener(null)
                 if (currentTheme == ThemeUtils.THEME_SQUID) {
                     radioGroup.check(R.id.radioSquid)
                 } else {
