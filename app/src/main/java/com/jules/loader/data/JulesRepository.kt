@@ -6,7 +6,10 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
 import com.jules.loader.BuildConfig
 import com.jules.loader.data.api.JulesService
+import com.jules.loader.data.model.ActivityLog
+import com.jules.loader.data.model.CreateSessionRequest
 import com.jules.loader.data.model.Session
+import com.jules.loader.data.model.SourceContext
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -82,5 +85,21 @@ class JulesRepository(private val context: Context) {
         // Handle pagination later if needed, for now just get first page
         val response = service.listSessions(apiKey)
         return response.sessions ?: emptyList()
+    }
+
+    suspend fun createSession(prompt: String): Session {
+        val apiKey = getApiKey() ?: throw IllegalStateException("API Key not found")
+        val request = CreateSessionRequest(prompt = prompt)
+        return service.createSession(apiKey, request)
+    }
+
+    suspend fun getActivities(sessionId: String): List<ActivityLog> {
+        val apiKey = getApiKey() ?: throw IllegalStateException("API Key not found")
+        return service.listActivities(apiKey, sessionId).activities ?: emptyList()
+    }
+
+    suspend fun getSources(): List<SourceContext> {
+        val apiKey = getApiKey() ?: throw IllegalStateException("API Key not found")
+        return service.listSources(apiKey).sources ?: emptyList()
     }
 }
