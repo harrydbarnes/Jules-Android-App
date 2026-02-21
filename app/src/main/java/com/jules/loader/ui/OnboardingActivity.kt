@@ -29,6 +29,12 @@ class OnboardingActivity : BaseActivity() {
     private var detectedApiKey: String? = null
     private val repository: JulesRepository by lazy { JulesRepository.getInstance(applicationContext) }
 
+    companion object {
+        private const val VIEW_TYPE_SLIDE = 0
+        private const val VIEW_TYPE_API = 1
+        private const val VIEW_TYPE_THEME = 2
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityOnboardingBinding.inflate(layoutInflater)
@@ -79,10 +85,6 @@ class OnboardingActivity : BaseActivity() {
     }
 
     private inner class OnboardingAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
-        private val VIEW_TYPE_SLIDE = 0
-        private val VIEW_TYPE_API = 1
-        private val VIEW_TYPE_THEME = 2
 
         private val slides = listOf(
             SlideData(getString(R.string.onboarding_manage_sessions_title), getString(R.string.onboarding_manage_sessions_desc)),
