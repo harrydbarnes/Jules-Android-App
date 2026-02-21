@@ -5,10 +5,11 @@
 ## ✨ Features
 
 * **Session Management**: View and manage your active Jules sessions in a clean list interface. 📋
-* **Task Creation**: Create new tasks with custom prompts and optional source contexts directly from the app. ➕
+* **Task Creation**: Create new tasks with custom prompts directly from the app or via sharing from other apps. ➕
 * **Live Activity Logs**: Monitor task progress in real-time with live activity logs and status updates. ⚡
 * **Repository Integration**: Easily access and attach your connected repositories to new tasks. 📦
 * **Material Design 3**: A modern, cohesive UI that adapts to your device's theme. 🎨
+* **Seamless Onboarding**: Interactive onboarding flow with clipboard detection for effortless API key setup. 🚀
 
 ## 📱 Screenshots
 
@@ -32,6 +33,8 @@ This project is built using modern Android development practices:
     * [AndroidX AppCompat](https://developer.android.com/jetpack/androidx/releases/appcompat)
     * [Material Components](https://github.com/material-components/material-components-android)
     * [EncryptedSharedPreferences](https://developer.android.com/reference/androidx/security/crypto/EncryptedSharedPreferences) (Security)
+    * [Lottie](https://airbnb.io/lottie/#/android) (Animations)
+    * [ViewBinding](https://developer.android.com/topic/libraries/view-binding)
 
 ## 🚀 Getting Started
 
