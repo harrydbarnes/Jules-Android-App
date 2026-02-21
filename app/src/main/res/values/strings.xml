@@ -8,16 +8,17 @@
     <string name="load_home">Load Jules Home</string>
     <string name="recent_repos">Recent Repos</string>
     <string name="no_recent_repos">No recent repos</string>
-    <string name="about_title">About Jules Loader</string>
-    <string name="about_desc">This app loads jules.google.com in a tabbed interface.
-    \n\nSource Code:</string>
+    <string name="about_title">About Octopus for Jules</string>
+    <string name="about_desc">Octopus for Jules is a client for the Jules API, allowing you to manage sessions, create tasks, and view live activity logs.\n\nSource Code:</string>
     <string name="about_citations">Open Source Libraries used:
     \n- AndroidX
-    \n- Material Components</string>
+    \n- Material Components
+    \n- Retrofit
+    \n- OkHttp
+    \n- Gson</string>
     <string name="repo_url">https://github.com/harrydbarnes/Jules-Android-App</string>
     <string name="enter_repo_url">Enter Repo URL</string>
     <string name="load">Load</string>
-    <string name="setting_allow_unlimited_tabs">Allow Unlimited Tabs</string>
     <string name="setting_use_dynamic_colours">Use Dynamic Colours</string>
     <string name="tab_limit_reached">Tab limit reached (%1$d). Enable more in Settings.</string>
     <string name="repo_fallback_title">Repo</string>
@@ -25,7 +26,7 @@
     <string name="no_recent_repos_hint">You haven\'t visited any repositories yet.</string>
 
     <!-- Onboarding -->
-    <string name="welcome_message">Welcome to Jules Client</string>
+    <string name="welcome_message">Welcome to Octopus for Jules</string>
     <string name="api_key_hint">Jules API Key</string>
     <string name="get_api_key">Get your API key here</string>
     <string name="save_continue">Save &amp; Continue</string>

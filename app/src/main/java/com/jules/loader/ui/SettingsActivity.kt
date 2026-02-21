@@ -19,11 +19,6 @@ class SettingsActivity : AppCompatActivity() {
 
         val prefs = getSharedPreferences("jules_settings", Context.MODE_PRIVATE)
 
-        binding.switchUnlimitedTabs.isChecked = prefs.getBoolean("allow_unlimited_tabs", false)
-        binding.switchUnlimitedTabs.setOnCheckedChangeListener { _, isChecked ->
-            prefs.edit().putBoolean("allow_unlimited_tabs", isChecked).apply()
-        }
-
         binding.switchDynamicColours.isChecked = prefs.getBoolean("use_dynamic_colours", true)
         binding.switchDynamicColours.setOnCheckedChangeListener { _, isChecked ->
             prefs.edit().putBoolean("use_dynamic_colours", isChecked).apply()
