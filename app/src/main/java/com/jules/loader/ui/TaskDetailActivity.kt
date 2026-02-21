@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import android.view.Window
@@ -22,7 +21,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
-class TaskDetailActivity : AppCompatActivity() {
+class TaskDetailActivity : BaseActivity() {
 
     private lateinit var binding: ActivityTaskDetailBinding
     private lateinit var repository: JulesRepository

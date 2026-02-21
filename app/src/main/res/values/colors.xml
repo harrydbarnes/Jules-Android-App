@@ -7,6 +7,9 @@
     <color name="octopus_midnight">#121212</color>
     <color name="octopus_surface">#1F1B24</color>
 
+    <color name="pitch_black">#000000</color>
+    <color name="ivory">#FFFFF0</color>
+
     <color name="status_pr_open">#E040FB</color>
     <color name="status_tests_passing">#00E676</color>
 

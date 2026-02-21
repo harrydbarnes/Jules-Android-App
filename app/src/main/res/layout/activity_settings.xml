@@ -20,4 +20,43 @@
         android:text="@string/setting_use_dynamic_colours"
         android:textAppearance="?attr/textAppearanceBodyLarge" />
 
+    <TextView
+        android:id="@+id/text_dynamic_warning"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/theme_dynamic_warning"
+        android:textAppearance="?attr/textAppearanceBodySmall"
+        android:textColor="?android:attr/textColorSecondary"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="16dp"
+        android:visibility="gone"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/setting_theme"
+        android:textAppearance="?attr/textAppearanceBodyLarge"
+        android:layout_marginTop="16dp"/>
+
+    <RadioGroup
+        android:id="@+id/radio_group_theme"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="8dp">
+
+        <RadioButton
+            android:id="@+id/radio_octopus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/theme_octopus" />
+
+        <RadioButton
+            android:id="@+id/radio_squid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/theme_squid" />
+
+    </RadioGroup>
+
 </LinearLayout>
