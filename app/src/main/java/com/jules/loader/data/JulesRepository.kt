@@ -21,11 +21,13 @@ class JulesRepository private constructor(private val context: Context) {
     private val prefs: SharedPreferences by lazy {
         try {
             createEncryptedSharedPreferences()
-        } catch (e: Exception) {
-            // Handle corrupted or incompatible file (e.g., plain text file exists)
-            // Delete the old file and recreate
+        } catch (e: Throwable) {
+            // Handle critical failures (e.g. UnsatisfiedLinkError for native crashes, or key store issues)
+            e.printStackTrace()
+            // Delete potentially corrupted file
             deleteSharedPreferences()
-            createEncryptedSharedPreferences()
+            // Fallback to standard SharedPreferences (insecure but functional)
+            context.getSharedPreferences("jules_prefs_fallback", Context.MODE_PRIVATE)
         }
     }
 
