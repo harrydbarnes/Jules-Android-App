@@ -34,7 +34,7 @@
         android:background="@android:color/transparent"
         app:tabGravity="center"
         app:tabIndicatorHeight="4dp"
-        app:tabIndicatorColor="?attr/colorSecondary"
+        app:tabIndicator="@drawable/tab_indicator_pill"
         app:tabIndicatorFullWidth="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
