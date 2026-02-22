@@ -8,6 +8,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.transition.platform.MaterialContainerTransform
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
 import android.widget.ArrayAdapter
+import androidx.core.widget.addTextChangedListener
 import com.jules.loader.data.JulesRepository
 import com.jules.loader.data.model.SourceContext
 import com.jules.loader.databinding.ActivityCreateTaskBinding
@@ -18,6 +19,10 @@ class CreateTaskActivity : BaseActivity() {
     private lateinit var binding: ActivityCreateTaskBinding
     private lateinit var repository: JulesRepository
     private var availableSources: List<SourceContext> = emptyList()
+
+    companion object {
+        private val TAG = CreateTaskActivity::class.java.simpleName
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Set up shared element transition
@@ -102,8 +107,15 @@ class CreateTaskActivity : BaseActivity() {
                         binding.branchInput.setText(branch)
                     }
                 }
+
+                binding.repoInput.addTextChangedListener {
+                    if (it.isNullOrBlank()) {
+                        binding.branchInput.setText("")
+                    }
+                }
             } catch (e: Exception) {
-                android.util.Log.e("CreateTaskActivity", "Failed to load sources", e)
+                android.util.Log.e(TAG, "Failed to load sources", e)
+                Toast.makeText(this@CreateTaskActivity, "Failed to load repositories", Toast.LENGTH_SHORT).show()
             }
         }
     }
