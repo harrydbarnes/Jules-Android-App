@@ -35,9 +35,9 @@
         <!-- Surface & Background -->
         <item name="android:colorBackground">@color/pitch_black</item>
         <item name="colorSurface">@color/pitch_black</item>
-        <item name="colorOnSurface">@color/squid_white</item>
+        <item name="colorOnSurface">@color/ivory</item>
         <item name="colorSurfaceVariant">@color/pitch_black</item>
-        <item name="colorOnSurfaceVariant">@color/squid_white</item>
+        <item name="colorOnSurfaceVariant">@color/ivory</item>
 
         <!-- Shapes -->
         <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.Octopus.SmallComponent</item>
