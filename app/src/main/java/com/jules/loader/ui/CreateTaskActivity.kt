@@ -7,7 +7,9 @@ import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.transition.platform.MaterialContainerTransform
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
+import android.widget.ArrayAdapter
 import com.jules.loader.data.JulesRepository
+import com.jules.loader.data.model.SourceContext
 import com.jules.loader.databinding.ActivityCreateTaskBinding
 import kotlinx.coroutines.launch
 
@@ -15,6 +17,7 @@ class CreateTaskActivity : BaseActivity() {
 
     private lateinit var binding: ActivityCreateTaskBinding
     private lateinit var repository: JulesRepository
+    private var availableSources: List<SourceContext> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Set up shared element transition
@@ -41,6 +44,8 @@ class CreateTaskActivity : BaseActivity() {
 
         repository = JulesRepository.getInstance(applicationContext)
 
+        setupRepoSelector()
+
         binding.btnStartTask.setOnClickListener {
             val prompt = binding.taskInput.text.toString().trim()
             if (prompt.isNotEmpty()) {
@@ -63,15 +68,42 @@ class CreateTaskActivity : BaseActivity() {
         binding.btnStartTask.isEnabled = false
         binding.btnStartTask.text = "Starting..."
 
+        val repo = binding.repoInput.text.toString().takeIf { it.isNotBlank() }
+        val branch = binding.branchInput.text.toString().takeIf { it.isNotBlank() }
+
         lifecycleScope.launch {
             try {
-                repository.createSession(prompt)
+                repository.createSession(prompt, repo, branch)
                 Toast.makeText(this@CreateTaskActivity, "Task started successfully", Toast.LENGTH_SHORT).show()
                 finish() // Return to MainActivity where the list will refresh
             } catch (e: Exception) {
                 binding.btnStartTask.isEnabled = true
                 binding.btnStartTask.text = "Start Octopus"
                 Toast.makeText(this@CreateTaskActivity, "Error: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    private fun setupRepoSelector() {
+        lifecycleScope.launch {
+            try {
+                availableSources = repository.getSources()
+                val sourceNames = availableSources.map { it.source }
+                val adapter = ArrayAdapter(
+                    this@CreateTaskActivity,
+                    android.R.layout.simple_dropdown_item_1line,
+                    sourceNames
+                )
+                binding.repoInput.setAdapter(adapter)
+
+                binding.repoInput.setOnItemClickListener { _, _, position, _ ->
+                    val selectedSource = availableSources.getOrNull(position)
+                    selectedSource?.githubRepoContext?.startingBranch?.let { branch ->
+                        binding.branchInput.setText(branch)
+                    }
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("CreateTaskActivity", "Failed to load sources", e)
             }
         }
     }

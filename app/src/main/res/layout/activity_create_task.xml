@@ -16,6 +16,38 @@
         android:layout_marginBottom="24dp" />
 
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/repoInputLayout"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Repository (Optional)"
+        android:layout_marginBottom="16dp"
+        app:shapeAppearance="@style/ShapeAppearance.Octopus.MediumComponent">
+
+        <AutoCompleteTextView
+            android:id="@+id/repoInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/branchInputLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Branch (Optional)"
+        android:layout_marginBottom="16dp"
+        app:shapeAppearance="@style/ShapeAppearance.Octopus.MediumComponent">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/branchInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:maxLines="1" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Describe the task for Jules..."
