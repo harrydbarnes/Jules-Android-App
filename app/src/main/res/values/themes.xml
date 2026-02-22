@@ -1,6 +1,22 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme with common attributes -->
+    <style name="Theme.Jules.Base" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Shapes -->
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.Jules.SmallComponent</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.Jules.MediumComponent</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.Jules.LargeComponent</item>
+
+        <!-- Menu Popup -->
+        <item name="actionBarPopupTheme">@style/ThemeOverlay.Material3.Dark</item>
+
+        <!-- Dynamic Text Colors -->
+        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="android:textColorPrimary">?attr/colorOnSurface</item>
+        <item name="android:textColorSecondary">?attr/colorOnSurfaceVariant</item>
+    </style>
+
     <!-- Base application theme. -->
-    <style name="Theme.Octopus" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Theme.Octopus" parent="Theme.Jules.Base">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/jules_purple</item>
         <item name="colorOnPrimary">@color/white</item>
@@ -13,11 +29,6 @@
         <item name="colorOnSurface">@color/octopus_white</item>
         <item name="colorSurfaceVariant">@color/octopus_surface</item>
         <item name="colorOnSurfaceVariant">@color/octopus_white</item>
-
-        <!-- Shapes -->
-        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.Octopus.SmallComponent</item>
-        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.Octopus.MediumComponent</item>
-        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.Octopus.LargeComponent</item>
 
         <!-- Typography -->
         <item name="textAppearanceDisplayLarge">@style/TextAppearance.Octopus.DisplayLarge</item>
@@ -32,23 +43,19 @@
         <item name="android:statusBarColor">@color/octopus_midnight</item>
         <!-- Customize your theme here. -->
         <item name="android:navigationBarColor">@color/octopus_midnight</item>
-
-        <item name="android:textColor">@color/octopus_white</item>
-        <item name="android:textColorPrimary">@color/octopus_white</item>
-        <item name="android:textColorSecondary">@color/octopus_white</item>
     </style>
 
-    <style name="ShapeAppearance.Octopus.SmallComponent" parent="ShapeAppearance.Material3.SmallComponent">
+    <style name="ShapeAppearance.Jules.SmallComponent" parent="ShapeAppearance.Material3.SmallComponent">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">12dp</item>
     </style>
 
-    <style name="ShapeAppearance.Octopus.MediumComponent" parent="ShapeAppearance.Material3.MediumComponent">
+    <style name="ShapeAppearance.Jules.MediumComponent" parent="ShapeAppearance.Material3.MediumComponent">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">20dp</item>
     </style>
 
-    <style name="ShapeAppearance.Octopus.LargeComponent" parent="ShapeAppearance.Material3.LargeComponent">
+    <style name="ShapeAppearance.Jules.LargeComponent" parent="ShapeAppearance.Material3.LargeComponent">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">28dp</item>
     </style>
@@ -61,7 +68,7 @@
     <!-- Alias for backward compatibility if needed, though we update Manifest -->
     <style name="Theme.JulesLoader" parent="Theme.Octopus" />
 
-    <style name="Theme.Squid" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Theme.Squid" parent="Theme.Jules.Base">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/ivory</item>
         <item name="colorOnPrimary">@color/pitch_black</item>
@@ -74,11 +81,6 @@
         <item name="colorOnSurface">@color/ivory</item>
         <item name="colorSurfaceVariant">@color/pitch_black</item>
         <item name="colorOnSurfaceVariant">@color/ivory</item>
-
-        <!-- Shapes -->
-        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.Octopus.SmallComponent</item>
-        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.Octopus.MediumComponent</item>
-        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.Octopus.LargeComponent</item>
 
         <!-- Typography -->
         <item name="textAppearanceDisplayLarge">@style/TextAppearance.Squid.DisplayLarge</item>
@@ -93,10 +95,6 @@
         <item name="android:statusBarColor">@color/pitch_black</item>
         <!-- Customize your theme here. -->
         <item name="android:navigationBarColor">@color/pitch_black</item>
-
-        <item name="android:textColor">@color/ivory</item>
-        <item name="android:textColorPrimary">@color/ivory</item>
-        <item name="android:textColorSecondary">@color/ivory</item>
     </style>
 
     <style name="TextAppearance.Squid.DisplayLarge" parent="TextAppearance.Material3.DisplayLarge">

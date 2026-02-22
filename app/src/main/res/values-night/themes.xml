@@ -1,5 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="Theme.Octopus" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Theme.Octopus" parent="Theme.Jules.Base">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/jules_purple_light</item>
         <item name="colorOnPrimary">@color/black</item>
@@ -21,15 +21,11 @@
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
         <item name="android:navigationBarColor">@color/jules_purple_dark</item>
-
-        <item name="android:textColor">@color/octopus_white</item>
-        <item name="android:textColorPrimary">@color/octopus_white</item>
-        <item name="android:textColorSecondary">@color/octopus_white</item>
     </style>
 
     <style name="Theme.JulesLoader" parent="Theme.Octopus" />
 
-    <style name="Theme.Squid" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Theme.Squid" parent="Theme.Jules.Base">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/ivory</item>
         <item name="colorOnPrimary">@color/pitch_black</item>
@@ -42,11 +38,6 @@
         <item name="colorOnSurface">@color/ivory</item>
         <item name="colorSurfaceVariant">@color/pitch_black</item>
         <item name="colorOnSurfaceVariant">@color/ivory</item>
-
-        <!-- Shapes -->
-        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.Octopus.SmallComponent</item>
-        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.Octopus.MediumComponent</item>
-        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.Octopus.LargeComponent</item>
 
         <!-- Typography -->
         <item name="textAppearanceDisplayLarge">@style/TextAppearance.Squid.DisplayLarge</item>
@@ -61,9 +52,5 @@
         <item name="android:statusBarColor">@color/pitch_black</item>
         <!-- Customize your theme here. -->
         <item name="android:navigationBarColor">@color/pitch_black</item>
-
-        <item name="android:textColor">@color/ivory</item>
-        <item name="android:textColorPrimary">@color/ivory</item>
-        <item name="android:textColorSecondary">@color/ivory</item>
     </style>
 </resources>

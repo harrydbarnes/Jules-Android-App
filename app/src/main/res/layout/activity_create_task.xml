@@ -19,7 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Describe the task for Jules..."
-        app:shapeAppearance="@style/ShapeAppearance.Octopus.MediumComponent">
+        app:shapeAppearance="@style/ShapeAppearance.Jules.MediumComponent">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/taskInput"
