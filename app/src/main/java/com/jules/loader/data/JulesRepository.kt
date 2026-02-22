@@ -67,6 +67,8 @@ class JulesRepository private constructor(private val context: Context) {
 
     private val service = retrofit.create(JulesService::class.java)
 
+    private var cachedSessions: List<Session>? = null
+
     companion object {
         private const val PREFS_FILE_NAME = "jules_prefs"
         private const val KEY_API_KEY = "jules_api_key"
@@ -93,11 +95,18 @@ class JulesRepository private constructor(private val context: Context) {
         return getApiKey() ?: throw IllegalStateException("API Key not found")
     }
 
-    suspend fun getSessions(): List<Session> {
+    fun hasCachedSessions(): Boolean = cachedSessions != null
+
+    suspend fun getSessions(forceRefresh: Boolean = false): List<Session> {
+        if (!forceRefresh && cachedSessions != null) {
+            return cachedSessions ?: emptyList()
+        }
         val apiKey = requireApiKey()
         // Handle pagination later if needed, for now just get first page
         val response = service.listSessions(apiKey)
-        return response.sessions ?: emptyList()
+        val sessions = response.sessions ?: emptyList()
+        cachedSessions = sessions
+        return sessions
     }
 
     suspend fun createSession(prompt: String): Session {

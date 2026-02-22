@@ -59,6 +59,10 @@ class MainActivity : BaseActivity() {
             startActivity(intent, options.toBundle())
         }
 
+        binding.swipeRefresh.setOnRefreshListener {
+            loadSessions(forceRefresh = true)
+        }
+
         loadSessions()
     }
 
@@ -77,13 +81,6 @@ class MainActivity : BaseActivity() {
                 startActivity(Intent(this, com.jules.loader.ui.AboutActivity::class.java))
                 true
             }
-            R.id.action_share -> {
-                val shareIntent = Intent(Intent.ACTION_SEND)
-                shareIntent.type = "text/plain"
-                shareIntent.putExtra(Intent.EXTRA_TEXT, "Check out Octopus for Jules!")
-                startActivity(Intent.createChooser(shareIntent, "Share via"))
-                true
-            }
             R.id.action_gift -> {
                 val url = "https://jules.google/docs/changelog"
                 val customTabsIntent = CustomTabsIntent.Builder().build()
@@ -94,16 +91,21 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private fun loadSessions() {
-        binding.skeletonLayout.visibility = View.VISIBLE
-        binding.errorText.visibility = View.GONE
-        binding.sessionsRecyclerView.visibility = View.GONE
+    private fun loadSessions(forceRefresh: Boolean = false) {
+        val isFirstLoad = !forceRefresh && !repository.hasCachedSessions()
+        if (isFirstLoad) {
+            binding.skeletonLayout.visibility = View.VISIBLE
+            binding.errorText.visibility = View.GONE
+            binding.sessionsRecyclerView.visibility = View.GONE
+        }
 
         lifecycleScope.launch {
             try {
-                val sessions = repository.getSessions()
+                val sessions = repository.getSessions(forceRefresh)
                 adapter.submitList(sessions) {
-                    binding.sessionsRecyclerView.scheduleLayoutAnimation()
+                    if (isFirstLoad) {
+                        binding.sessionsRecyclerView.scheduleLayoutAnimation()
+                    }
                 }
 
                 if (sessions.isEmpty()) {
@@ -122,6 +124,7 @@ class MainActivity : BaseActivity() {
                 android.util.Log.e("MainActivity", "Error loading sessions", e)
             } finally {
                 binding.skeletonLayout.visibility = View.GONE
+                binding.swipeRefresh.isRefreshing = false
             }
         }
     }
