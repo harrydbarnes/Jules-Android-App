@@ -34,6 +34,7 @@ class CreateTaskViewModel(private val repository: JulesRepository) : ViewModel()
                 val sources = repository.getSources()
                 _availableSources.value = sources
             } catch (e: Exception) {
+                android.util.Log.e("CreateTaskViewModel", "Failed to load repositories", e)
                 _errorEvent.emit("Failed to load repositories")
             }
         }
@@ -46,6 +47,7 @@ class CreateTaskViewModel(private val repository: JulesRepository) : ViewModel()
                 repository.createSession(prompt, repoUrl, branch)
                 _taskCreatedEvent.emit(Unit)
             } catch (e: Exception) {
+                android.util.Log.e("CreateTaskViewModel", "Error creating session", e)
                 _errorEvent.emit("Error: ${e.localizedMessage}")
             } finally {
                 _isLoading.value = false

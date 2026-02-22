@@ -5,8 +5,10 @@ import android.view.Window
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.transition.platform.MaterialContainerTransform
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
 import com.jules.loader.data.JulesRepository
@@ -74,43 +76,48 @@ class CreateTaskActivity : BaseActivity() {
 
     private fun observeViewModel() {
         lifecycleScope.launch {
-            viewModel.availableSources.collectLatest { sources ->
-                availableSources = sources
-                val sourceNames = sources.map { it.source }
-                val adapter = ArrayAdapter(
-                    this@CreateTaskActivity,
-                    android.R.layout.simple_dropdown_item_1line,
-                    sourceNames
-                )
-                binding.repoInput.setAdapter(adapter)
-            }
-        }
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.availableSources.collectLatest { sources ->
+                        availableSources = sources
+                        val sourceNames = sources.map { it.source }
+                        val adapter = ArrayAdapter(
+                            this@CreateTaskActivity,
+                            android.R.layout.simple_dropdown_item_1line,
+                            sourceNames
+                        )
+                        binding.repoInput.setAdapter(adapter)
+                    }
+                }
 
-        lifecycleScope.launch {
-            viewModel.isLoading.collectLatest { isLoading ->
-                binding.btnStartTask.isEnabled = !isLoading
-                binding.btnStartTask.text = if (isLoading) "Starting..." else "Start Octopus"
-            }
-        }
+                launch {
+                    viewModel.isLoading.collectLatest { isLoading ->
+                        binding.btnStartTask.isEnabled = !isLoading
+                        binding.btnStartTask.text = if (isLoading) "Starting..." else "Start Octopus"
+                    }
+                }
 
-        lifecycleScope.launch {
-            viewModel.errorEvent.collectLatest { errorMessage ->
-                Toast.makeText(this@CreateTaskActivity, errorMessage, Toast.LENGTH_LONG).show()
-                android.util.Log.e(TAG, errorMessage)
-            }
-        }
+                launch {
+                    viewModel.errorEvent.collect { errorMessage ->
+                        Toast.makeText(this@CreateTaskActivity, errorMessage, Toast.LENGTH_LONG).show()
+                        android.util.Log.e(TAG, errorMessage)
+                    }
+                }
 
-        lifecycleScope.launch {
-            viewModel.taskCreatedEvent.collectLatest {
-                Toast.makeText(this@CreateTaskActivity, "Task started successfully", Toast.LENGTH_SHORT).show()
-                finish()
+                launch {
+                    viewModel.taskCreatedEvent.collect {
+                        Toast.makeText(this@CreateTaskActivity, "Task started successfully", Toast.LENGTH_SHORT).show()
+                        finish()
+                    }
+                }
             }
         }
     }
 
     private fun setupRepoSelector() {
-        binding.repoInput.setOnItemClickListener { _, _, position, _ ->
-            val selectedSource = availableSources.getOrNull(position)
+        binding.repoInput.setOnItemClickListener { parent, _, position, _ ->
+            val selectedSourceName = parent.getItemAtPosition(position) as String
+            val selectedSource = availableSources.find { it.source == selectedSourceName }
             selectedSource?.githubRepoContext?.startingBranch?.let { branch ->
                 binding.branchInput.setText(branch)
             }
