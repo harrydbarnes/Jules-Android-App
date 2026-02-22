@@ -20,43 +20,50 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <FrameLayout
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/sessionsRecyclerView"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:padding="16dp"
-            android:layoutAnimation="@anim/layout_animation_fall_down"
-            tools:listitem="@layout/item_session" />
+            android:layout_height="match_parent">
 
-        <LinearLayout
-            android:id="@+id/skeletonLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp"
-            android:visibility="gone">
-            <include layout="@layout/item_session_skeleton" />
-            <include layout="@layout/item_session_skeleton" />
-            <include layout="@layout/item_session_skeleton" />
-            <include layout="@layout/item_session_skeleton" />
-            <include layout="@layout/item_session_skeleton" />
-        </LinearLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/sessionsRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:padding="16dp"
+                android:layoutAnimation="@anim/layout_animation_fall_down"
+                tools:listitem="@layout/item_session" />
 
-        <TextView
-            android:id="@+id/errorText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:visibility="gone"
-            android:text="Failed to load sessions" />
+            <LinearLayout
+                android:id="@+id/skeletonLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:visibility="gone">
+                <include layout="@layout/item_session_skeleton" />
+                <include layout="@layout/item_session_skeleton" />
+                <include layout="@layout/item_session_skeleton" />
+                <include layout="@layout/item_session_skeleton" />
+                <include layout="@layout/item_session_skeleton" />
+            </LinearLayout>
 
-    </FrameLayout>
+            <TextView
+                android:id="@+id/errorText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="gone"
+                android:text="Failed to load sessions" />
+
+        </FrameLayout>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/fab"
