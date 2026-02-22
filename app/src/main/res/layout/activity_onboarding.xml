@@ -33,8 +33,12 @@
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         app:tabGravity="center"
+        app:tabIndicatorHeight="4dp"
+        app:tabIndicator="@drawable/tab_indicator_pill"
+        app:tabIndicatorFullWidth="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="48dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

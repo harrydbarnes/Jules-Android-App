@@ -10,9 +10,9 @@
         <!-- Surface & Background -->
         <item name="android:colorBackground">@color/octopus_midnight</item>
         <item name="colorSurface">@color/octopus_surface</item>
-        <item name="colorOnSurface">@color/white</item>
+        <item name="colorOnSurface">@color/octopus_white</item>
         <item name="colorSurfaceVariant">@color/octopus_surface</item>
-        <item name="colorOnSurfaceVariant">@color/white</item>
+        <item name="colorOnSurfaceVariant">@color/octopus_white</item>
 
         <!-- Shapes -->
         <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.Octopus.SmallComponent</item>
@@ -67,9 +67,9 @@
         <!-- Surface & Background -->
         <item name="android:colorBackground">@color/pitch_black</item>
         <item name="colorSurface">@color/pitch_black</item>
-        <item name="colorOnSurface">@color/ivory</item>
+        <item name="colorOnSurface">@color/squid_white</item>
         <item name="colorSurfaceVariant">@color/pitch_black</item>
-        <item name="colorOnSurfaceVariant">@color/ivory</item>
+        <item name="colorOnSurfaceVariant">@color/squid_white</item>
 
         <!-- Shapes -->
         <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.Octopus.SmallComponent</item>

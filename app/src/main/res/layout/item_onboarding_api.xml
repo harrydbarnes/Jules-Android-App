@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:text="@string/welcome_message"
         android:textAppearance="?attr/textAppearanceHeadlineSmall"
+        android:textColor="?attr/colorOnSurface"
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="32dp" />
 
