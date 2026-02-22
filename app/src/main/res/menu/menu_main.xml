@@ -7,6 +7,11 @@
         android:icon="@android:drawable/ic_menu_share"
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/action_gift"
+        android:title="@string/menu_gift"
+        android:icon="@drawable/ic_gift"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/action_settings"
         android:title="@string/menu_settings"
         app:showAsAction="never" />

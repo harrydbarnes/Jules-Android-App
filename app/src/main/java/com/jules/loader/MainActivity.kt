@@ -1,8 +1,10 @@
 package com.jules.loader
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.jules.loader.data.JulesRepository
@@ -80,6 +82,12 @@ class MainActivity : BaseActivity() {
                 shareIntent.type = "text/plain"
                 shareIntent.putExtra(Intent.EXTRA_TEXT, "Check out Octopus for Jules!")
                 startActivity(Intent.createChooser(shareIntent, "Share via"))
+                true
+            }
+            R.id.action_gift -> {
+                val url = "https://jules.google/docs/changelog"
+                val customTabsIntent = CustomTabsIntent.Builder().build()
+                customTabsIntent.launchUrl(this, Uri.parse(url))
                 true
             }
             else -> super.onOptionsItemSelected(item)
