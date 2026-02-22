@@ -4,6 +4,7 @@
     <string name="menu_settings">Settings</string>
     <string name="menu_about">About</string>
     <string name="menu_share">Share</string>
+    <string name="menu_gift">Changelog</string>
     <string name="new_tab">New Tab</string>
     <string name="load_home">Load Jules Home</string>
     <string name="recent_repos">Recent Repos</string>
