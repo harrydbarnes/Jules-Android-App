@@ -21,7 +21,6 @@ class CreateTaskActivity : BaseActivity() {
 
     private lateinit var binding: ActivityCreateTaskBinding
     private lateinit var viewModel: CreateTaskViewModel
-    private var availableSources: List<SourceContext> = emptyList()
 
     companion object {
         private val TAG = CreateTaskActivity::class.java.simpleName
@@ -79,7 +78,6 @@ class CreateTaskActivity : BaseActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.availableSources.collectLatest { sources ->
-                        availableSources = sources
                         val sourceNames = sources.map { it.source }
                         val adapter = ArrayAdapter(
                             this@CreateTaskActivity,
@@ -100,7 +98,6 @@ class CreateTaskActivity : BaseActivity() {
                 launch {
                     viewModel.errorEvent.collect { errorMessage ->
                         Toast.makeText(this@CreateTaskActivity, errorMessage, Toast.LENGTH_LONG).show()
-                        android.util.Log.e(TAG, errorMessage)
                     }
                 }
 
@@ -116,7 +113,7 @@ class CreateTaskActivity : BaseActivity() {
 
     private fun setupRepoSelector() {
         binding.repoInput.setOnItemClickListener { _, _, position, _ ->
-            val selectedSource = availableSources.getOrNull(position)
+            val selectedSource = viewModel.availableSources.value.getOrNull(position)
             selectedSource?.githubRepoContext?.startingBranch?.let { branch ->
                 binding.branchInput.setText(branch)
             }
