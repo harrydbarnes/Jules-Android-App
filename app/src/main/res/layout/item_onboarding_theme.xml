@@ -36,22 +36,16 @@
         <RadioButton
             android:id="@+id/radioOctopus"
             style="@style/Onboarding.RadioButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:text="@string/theme_octopus"/>
 
         <RadioButton
             android:id="@+id/radioSquid"
             style="@style/Onboarding.RadioButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:text="@string/theme_squid"/>
 
         <RadioButton
             android:id="@+id/radioCuttlefish"
             style="@style/Onboarding.RadioButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:text="@string/theme_cuttlefish"/>
     </RadioGroup>
 
