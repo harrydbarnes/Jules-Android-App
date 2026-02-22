@@ -70,6 +70,6 @@
         app:iconTint="?attr/colorOnSecondaryContainer"
         app:backgroundTint="?attr/colorSecondaryContainer"
         android:transitionName="shared_element_container"
-        app:shapeAppearanceOverlay="@style/ShapeAppearance.Octopus.MediumComponent" />
+        app:shapeAppearanceOverlay="@style/ShapeAppearance.Jules.MediumComponent" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
