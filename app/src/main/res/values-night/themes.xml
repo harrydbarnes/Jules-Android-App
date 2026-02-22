@@ -22,9 +22,11 @@
         <!-- Customize your theme here. -->
         <item name="android:navigationBarColor">@color/jules_purple_dark</item>
 
-        <item name="android:textColor">@color/octopus_white</item>
-        <item name="android:textColorPrimary">@color/octopus_white</item>
-        <item name="android:textColorSecondary">@color/octopus_white</item>
+        <item name="actionBarPopupTheme">@style/ThemeOverlay.Material3.Dark</item>
+
+        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="android:textColorPrimary">?attr/colorOnSurface</item>
+        <item name="android:textColorSecondary">?attr/colorOnSurfaceVariant</item>
     </style>
 
     <style name="Theme.JulesLoader" parent="Theme.Octopus" />
@@ -62,8 +64,10 @@
         <!-- Customize your theme here. -->
         <item name="android:navigationBarColor">@color/pitch_black</item>
 
-        <item name="android:textColor">@color/ivory</item>
-        <item name="android:textColorPrimary">@color/ivory</item>
-        <item name="android:textColorSecondary">@color/ivory</item>
+        <item name="actionBarPopupTheme">@style/ThemeOverlay.Material3.Dark</item>
+
+        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="android:textColorPrimary">?attr/colorOnSurface</item>
+        <item name="android:textColorSecondary">?attr/colorOnSurfaceVariant</item>
     </style>
 </resources>

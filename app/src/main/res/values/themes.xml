@@ -33,9 +33,11 @@
         <!-- Customize your theme here. -->
         <item name="android:navigationBarColor">@color/octopus_midnight</item>
 
-        <item name="android:textColor">@color/octopus_white</item>
-        <item name="android:textColorPrimary">@color/octopus_white</item>
-        <item name="android:textColorSecondary">@color/octopus_white</item>
+        <item name="actionBarPopupTheme">@style/ThemeOverlay.Material3.Dark</item>
+
+        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="android:textColorPrimary">?attr/colorOnSurface</item>
+        <item name="android:textColorSecondary">?attr/colorOnSurfaceVariant</item>
     </style>
 
     <style name="ShapeAppearance.Octopus.SmallComponent" parent="ShapeAppearance.Material3.SmallComponent">
@@ -94,9 +96,11 @@
         <!-- Customize your theme here. -->
         <item name="android:navigationBarColor">@color/pitch_black</item>
 
-        <item name="android:textColor">@color/ivory</item>
-        <item name="android:textColorPrimary">@color/ivory</item>
-        <item name="android:textColorSecondary">@color/ivory</item>
+        <item name="actionBarPopupTheme">@style/ThemeOverlay.Material3.Dark</item>
+
+        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="android:textColorPrimary">?attr/colorOnSurface</item>
+        <item name="android:textColorSecondary">?attr/colorOnSurfaceVariant</item>
     </style>
 
     <style name="TextAppearance.Squid.DisplayLarge" parent="TextAppearance.Material3.DisplayLarge">
