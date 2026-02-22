@@ -25,12 +25,6 @@ class MainActivity : BaseActivity() {
 
         repository = JulesRepository.getInstance(applicationContext)
 
-        if (repository.getApiKey().isNullOrEmpty()) {
-            startActivity(Intent(this, OnboardingActivity::class.java))
-            finish()
-            return
-        }
-
         setSupportActionBar(binding.toolbar)
         supportActionBar?.title = getString(R.string.sessions_title)
 
@@ -57,7 +51,24 @@ class MainActivity : BaseActivity() {
             startActivity(intent, options.toBundle())
         }
 
-        loadSessions()
+        // Show loading state initially
+        binding.skeletonLayout.visibility = View.VISIBLE
+        binding.sessionsRecyclerView.visibility = View.GONE
+        binding.fab.visibility = View.GONE
+
+        lifecycleScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            val apiKey = repository.getApiKey()
+
+            kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                if (apiKey.isNullOrEmpty()) {
+                    startActivity(Intent(this@MainActivity, OnboardingActivity::class.java))
+                    finish()
+                } else {
+                    binding.fab.visibility = View.VISIBLE
+                    loadSessions()
+                }
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: android.view.Menu?): Boolean {
