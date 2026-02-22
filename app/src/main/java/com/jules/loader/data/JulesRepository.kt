@@ -99,7 +99,7 @@ class JulesRepository private constructor(private val context: Context) {
 
     suspend fun getSessions(forceRefresh: Boolean = false): List<Session> {
         if (!forceRefresh && cachedSessions != null) {
-            return cachedSessions!!
+            return cachedSessions ?: emptyList()
         }
         val apiKey = requireApiKey()
         // Handle pagination later if needed, for now just get first page
