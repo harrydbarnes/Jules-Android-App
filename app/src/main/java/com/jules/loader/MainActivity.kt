@@ -57,7 +57,11 @@ class MainActivity : BaseActivity() {
             startActivity(intent, options.toBundle())
         }
 
-        loadSessions()
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            loadSessions(forceRefresh = true, animate = false)
+        }
+
+        loadSessions(animate = savedInstanceState == null)
     }
 
     override fun onCreateOptionsMenu(menu: android.view.Menu?): Boolean {
@@ -75,27 +79,28 @@ class MainActivity : BaseActivity() {
                 startActivity(Intent(this, com.jules.loader.ui.AboutActivity::class.java))
                 true
             }
-            R.id.action_share -> {
-                val shareIntent = Intent(Intent.ACTION_SEND)
-                shareIntent.type = "text/plain"
-                shareIntent.putExtra(Intent.EXTRA_TEXT, "Check out Octopus for Jules!")
-                startActivity(Intent.createChooser(shareIntent, "Share via"))
-                true
-            }
             else -> super.onOptionsItemSelected(item)
         }
     }
 
-    private fun loadSessions() {
-        binding.skeletonLayout.visibility = View.VISIBLE
+    private fun loadSessions(forceRefresh: Boolean = false, animate: Boolean = true) {
+        val isPullToRefresh = binding.swipeRefreshLayout.isRefreshing
+        if (!forceRefresh && repository.hasCachedData()) {
+            binding.skeletonLayout.visibility = View.GONE
+        } else if (!isPullToRefresh) {
+            binding.skeletonLayout.visibility = View.VISIBLE
+            binding.sessionsRecyclerView.visibility = View.GONE
+        }
+
         binding.errorText.visibility = View.GONE
-        binding.sessionsRecyclerView.visibility = View.GONE
 
         lifecycleScope.launch {
             try {
-                val sessions = repository.getSessions()
+                val sessions = repository.getSessions(forceRefresh)
                 adapter.submitList(sessions) {
-                    binding.sessionsRecyclerView.scheduleLayoutAnimation()
+                    if (animate) {
+                        binding.sessionsRecyclerView.scheduleLayoutAnimation()
+                    }
                 }
 
                 if (sessions.isEmpty()) {
@@ -114,6 +119,7 @@ class MainActivity : BaseActivity() {
                 android.util.Log.e("MainActivity", "Error loading sessions", e)
             } finally {
                 binding.skeletonLayout.visibility = View.GONE
+                binding.swipeRefreshLayout.isRefreshing = false
             }
         }
     }
