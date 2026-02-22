@@ -115,9 +115,8 @@ class CreateTaskActivity : BaseActivity() {
     }
 
     private fun setupRepoSelector() {
-        binding.repoInput.setOnItemClickListener { parent, _, position, _ ->
-            val selectedSourceName = parent.getItemAtPosition(position) as String
-            val selectedSource = availableSources.find { it.source == selectedSourceName }
+        binding.repoInput.setOnItemClickListener { _, _, position, _ ->
+            val selectedSource = availableSources.getOrNull(position)
             selectedSource?.githubRepoContext?.startingBranch?.let { branch ->
                 binding.branchInput.setText(branch)
             }

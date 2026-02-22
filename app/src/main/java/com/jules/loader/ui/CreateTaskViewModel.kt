@@ -24,6 +24,10 @@ class CreateTaskViewModel(private val repository: JulesRepository) : ViewModel()
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
+    companion object {
+        private val TAG = CreateTaskViewModel::class.java.simpleName
+    }
+
     init {
         loadSources()
     }
@@ -34,7 +38,7 @@ class CreateTaskViewModel(private val repository: JulesRepository) : ViewModel()
                 val sources = repository.getSources()
                 _availableSources.value = sources
             } catch (e: Exception) {
-                android.util.Log.e("CreateTaskViewModel", "Failed to load repositories", e)
+                android.util.Log.e(TAG, "Failed to load repositories", e)
                 _errorEvent.emit("Failed to load repositories")
             }
         }
@@ -47,8 +51,8 @@ class CreateTaskViewModel(private val repository: JulesRepository) : ViewModel()
                 repository.createSession(prompt, repoUrl, branch)
                 _taskCreatedEvent.emit(Unit)
             } catch (e: Exception) {
-                android.util.Log.e("CreateTaskViewModel", "Error creating session", e)
-                _errorEvent.emit("Error: ${e.localizedMessage}")
+                android.util.Log.e(TAG, "Error creating session", e)
+                _errorEvent.emit("Failed to create task")
             } finally {
                 _isLoading.value = false
             }
