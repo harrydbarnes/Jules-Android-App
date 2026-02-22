@@ -7,7 +7,6 @@
     <application
         android:name=".JulesApplication"
         android:allowBackup="true"
-        android:extractNativeLibs="true"
         android:icon="@drawable/ic_octopus"
         android:label="@string/app_name"
         android:roundIcon="@drawable/ic_octopus"
