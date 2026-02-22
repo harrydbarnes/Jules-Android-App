@@ -28,17 +28,14 @@ object ThemeUtils {
     fun applyTheme(activity: Activity) {
         val theme = getSelectedTheme(activity)
 
-        // Set the base theme first
+        // Set the base theme
         if (theme == THEME_SQUID) {
             activity.setTheme(R.style.Theme_Squid)
         } else {
             activity.setTheme(R.style.Theme_Octopus)
         }
 
-        // Apply dynamic colors overlay if Cuttlefish
-        if (theme == THEME_CUTTLEFISH) {
-            DynamicColors.applyToActivityIfAvailable(activity)
-        }
+        // Dynamic colors overlay is now handled globally in JulesApplication
     }
 
     // Deprecated methods kept for temporary compatibility until SettingsActivity is updated

@@ -17,12 +17,14 @@
             android:name=".ui.SettingsActivity"
             android:label="@string/menu_settings"
             android:theme="@style/Theme.Octopus"
+            android:exported="false"
             android:parentActivityName=".MainActivity" />
 
         <activity
             android:name=".ui.AboutActivity"
             android:label="@string/menu_about"
             android:theme="@style/Theme.Octopus"
+            android:exported="false"
             android:parentActivityName=".MainActivity" />
         
         <activity
@@ -38,6 +40,7 @@
         <activity
             android:name=".ui.OnboardingActivity"
             android:label="@string/title_onboarding"
+            android:exported="false"
             android:theme="@style/Theme.Octopus" />
 
         <activity
@@ -55,6 +58,7 @@
         <activity
             android:name=".ui.TaskDetailActivity"
             android:label="@string/title_task_detail"
+            android:exported="false"
             android:theme="@style/Theme.Octopus" />
 
     </application>

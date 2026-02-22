@@ -13,7 +13,7 @@ open class BaseActivity : AppCompatActivity() {
         // Must apply theme before super.onCreate()
         currentTheme = ThemeUtils.getSelectedTheme(this)
         isDynamic = ThemeUtils.isDynamicColorsEnabled(this)
-        ThemeUtils.applyTheme(this)
+        ThemeUtils.applyTheme(this) // Applies base theme (Octopus/Squid) only. Dynamic Colors handled in Application.
 
         super.onCreate(savedInstanceState)
     }
