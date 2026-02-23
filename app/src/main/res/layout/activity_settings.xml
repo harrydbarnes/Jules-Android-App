@@ -28,20 +28,17 @@
 
         <RadioButton
             android:id="@+id/radio_octopus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/Settings.RadioButton"
             android:text="@string/theme_octopus" />
 
         <RadioButton
             android:id="@+id/radio_squid"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/Settings.RadioButton"
             android:text="@string/theme_squid" />
 
         <RadioButton
             android:id="@+id/radio_cuttlefish"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/Settings.RadioButton"
             android:text="@string/theme_cuttlefish" />
 
     </RadioGroup>
