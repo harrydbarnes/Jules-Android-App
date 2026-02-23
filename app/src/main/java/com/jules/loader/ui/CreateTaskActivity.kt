@@ -96,8 +96,8 @@ class CreateTaskActivity : BaseActivity() {
                 }
 
                 launch {
-                    viewModel.errorEvent.collect { errorMessage ->
-                        Toast.makeText(this@CreateTaskActivity, errorMessage, Toast.LENGTH_LONG).show()
+                    viewModel.errorEvent.collect { errorResId ->
+                        Toast.makeText(this@CreateTaskActivity, errorResId, Toast.LENGTH_LONG).show()
                     }
                 }
 
@@ -112,11 +112,11 @@ class CreateTaskActivity : BaseActivity() {
     }
 
     private fun setupRepoSelector() {
-        binding.repoInput.setOnItemClickListener { _, _, position, _ ->
-            val selectedSource = viewModel.availableSources.value.getOrNull(position)
-            selectedSource?.githubRepoContext?.startingBranch?.let { branch ->
-                binding.branchInput.setText(branch)
-            }
+        binding.repoInput.setOnItemClickListener { parent, _, position, _ ->
+            val selectedSourceName = parent.getItemAtPosition(position) as String
+            val selectedSource = viewModel.availableSources.value.find { it.source == selectedSourceName }
+            val branch = selectedSource?.githubRepoContext?.startingBranch ?: ""
+            binding.branchInput.setText(branch)
         }
 
         binding.repoInput.addTextChangedListener {

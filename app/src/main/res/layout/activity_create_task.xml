@@ -22,13 +22,14 @@
         android:layout_height="wrap_content"
         android:hint="Repository (Optional)"
         android:layout_marginBottom="16dp"
+        app:endIconMode="clear_text"
         app:shapeAppearance="@style/ShapeAppearance.Octopus.MediumComponent">
 
         <AutoCompleteTextView
             android:id="@+id/repoInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="none" />
+            android:inputType="text" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
