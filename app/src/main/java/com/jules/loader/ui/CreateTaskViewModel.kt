@@ -40,7 +40,7 @@ class CreateTaskViewModel(private val repository: JulesRepository) : ViewModel()
                 _availableSources.value = sources
             } catch (e: Exception) {
                 android.util.Log.e(TAG, "Failed to load repositories", e)
-                _errorEvent.emit(R.string.error_load_repositories)
+                _errorEvent.send(R.string.error_load_repositories)
             }
         }
     }
