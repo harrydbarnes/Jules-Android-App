@@ -43,8 +43,8 @@ class SessionAdapter : ListAdapter<Session, SessionAdapter.SessionViewHolder>(Se
 
             // Set status color
             when(status) {
-                "PR Open" -> statusChip.setChipBackgroundColorResource(R.color.status_pr_open)
-                "Executing Tests" -> statusChip.setChipBackgroundColorResource(R.color.status_tests_passing)
+                TaskDetailActivity.STATUS_PR_OPEN -> statusChip.setChipBackgroundColorResource(R.color.status_pr_open)
+                TaskDetailActivity.STATUS_EXECUTING_TESTS -> statusChip.setChipBackgroundColorResource(R.color.status_tests_passing)
                 else -> statusChip.setChipBackgroundColorResource(R.color.jules_purple_light)
             }
 

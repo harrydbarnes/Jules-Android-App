@@ -35,6 +35,8 @@ class TaskDetailActivity : BaseActivity() {
         const val EXTRA_SESSION_STATUS = "EXTRA_SESSION_STATUS"
         const val EXTRA_SESSION_SOURCE = "EXTRA_SESSION_SOURCE"
         const val EXTRA_SESSION_BRANCH = "EXTRA_SESSION_BRANCH"
+        const val STATUS_PR_OPEN = "PR Open"
+        const val STATUS_EXECUTING_TESTS = "Executing Tests"
         private const val POLLING_INTERVAL_MS = 3000L
     }
 
@@ -87,6 +89,12 @@ class TaskDetailActivity : BaseActivity() {
         binding.detailTitle.text = title ?: getString(R.string.untitled_session)
         binding.detailPrompt.text = prompt
         binding.detailStatusChip.text = status
+
+        when (status) {
+            STATUS_PR_OPEN -> binding.detailStatusChip.setChipBackgroundColorResource(R.color.status_pr_open)
+            STATUS_EXECUTING_TESTS -> binding.detailStatusChip.setChipBackgroundColorResource(R.color.status_tests_passing)
+            else -> binding.detailStatusChip.setChipBackgroundColorResource(R.color.jules_purple_light)
+        }
 
         if (source != null) {
             binding.detailSourceChip.visibility = View.VISIBLE
