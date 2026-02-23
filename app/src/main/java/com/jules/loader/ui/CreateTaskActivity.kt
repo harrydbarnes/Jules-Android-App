@@ -78,7 +78,7 @@ class CreateTaskActivity : BaseActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.availableSources.collectLatest { sources ->
-                        val sourceNames = sources.map { it.source }
+                        val sourceNames = sources.map { it.source }.distinct()
                         val adapter = ArrayAdapter(
                             this@CreateTaskActivity,
                             android.R.layout.simple_dropdown_item_1line,
@@ -114,9 +114,21 @@ class CreateTaskActivity : BaseActivity() {
     private fun setupRepoSelector() {
         binding.repoInput.setOnItemClickListener { parent, _, position, _ ->
             val selectedSourceName = parent.getItemAtPosition(position) as String
-            val selectedSource = viewModel.availableSources.value.find { it.source == selectedSourceName }
-            val branch = selectedSource?.githubRepoContext?.startingBranch ?: ""
-            binding.branchInput.setText(branch)
+            val matchingSources = viewModel.availableSources.value.filter { it.source == selectedSourceName }
+            val branches = matchingSources.mapNotNull { it.githubRepoContext?.startingBranch }.distinct()
+
+            val branchAdapter = ArrayAdapter(
+                this@CreateTaskActivity,
+                android.R.layout.simple_dropdown_item_1line,
+                branches
+            )
+            binding.branchInput.setAdapter(branchAdapter)
+
+            if (branches.isNotEmpty()) {
+                binding.branchInput.setText(branches.first(), false)
+            } else {
+                binding.branchInput.setText("")
+            }
         }
 
         binding.repoInput.addTextChangedListener {

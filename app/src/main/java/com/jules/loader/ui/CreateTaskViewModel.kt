@@ -16,11 +16,11 @@ class CreateTaskViewModel(private val repository: JulesRepository) : ViewModel()
     private val _availableSources = MutableStateFlow<List<SourceContext>>(emptyList())
     val availableSources: StateFlow<List<SourceContext>> = _availableSources
 
-    private val _errorEvent = kotlinx.coroutines.channels.Channel<Int>(kotlinx.coroutines.channels.Channel.BUFFERED)
-    val errorEvent: kotlinx.coroutines.flow.Flow<Int> = _errorEvent.receiveAsFlow()
+    private val _errorEvent = MutableSharedFlow<Int>()
+    val errorEvent: SharedFlow<Int> = _errorEvent
 
-    private val _taskCreatedEvent = kotlinx.coroutines.channels.Channel<Unit>(kotlinx.coroutines.channels.Channel.BUFFERED)
-    val taskCreatedEvent: kotlinx.coroutines.flow.Flow<Unit> = _taskCreatedEvent.receiveAsFlow()
+    private val _taskCreatedEvent = MutableSharedFlow<Unit>()
+    val taskCreatedEvent: SharedFlow<Unit> = _taskCreatedEvent
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
@@ -40,7 +40,7 @@ class CreateTaskViewModel(private val repository: JulesRepository) : ViewModel()
                 _availableSources.value = sources
             } catch (e: Exception) {
                 android.util.Log.e(TAG, "Failed to load repositories", e)
-                _errorEvent.send(R.string.error_load_repositories)
+                _errorEvent.emit(R.string.error_load_repositories)
             }
         }
     }
@@ -50,7 +50,7 @@ class CreateTaskViewModel(private val repository: JulesRepository) : ViewModel()
             _isLoading.value = true
             try {
                 repository.createSession(prompt, repoUrl, branch)
-                _taskCreatedEvent.send(Unit)
+                _taskCreatedEvent.emit(Unit)
             } catch (e: Exception) {
                 android.util.Log.e(TAG, "Error creating session", e)
                 _errorEvent.emit(R.string.error_create_task)

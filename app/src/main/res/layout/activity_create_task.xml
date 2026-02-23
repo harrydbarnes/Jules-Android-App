@@ -34,18 +34,19 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/branchInputLayout"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Branch (Optional)"
         android:layout_marginBottom="16dp"
+        app:endIconMode="clear_text"
         app:shapeAppearance="@style/ShapeAppearance.Octopus.MediumComponent">
 
-        <com.google.android.material.textfield.TextInputEditText
+        <AutoCompleteTextView
             android:id="@+id/branchInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="text"
-            android:maxLines="1" />
+            android:inputType="text" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
