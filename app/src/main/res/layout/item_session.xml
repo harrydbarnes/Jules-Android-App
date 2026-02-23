@@ -49,7 +49,9 @@
             android:layout_height="wrap_content"
             tools:text="Session Title"
             android:textAppearance="?attr/textAppearanceTitleLarge"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:maxLines="2"
+            android:ellipsize="end" />
 
         <TextView
             android:id="@+id/sessionPrompt"
@@ -62,7 +64,6 @@
             android:textAppearance="?attr/textAppearanceBodyLarge"
             android:textColor="?android:attr/textColorSecondary" />
 
-        <!-- Pulse / Waveform Placeholder -->
         <View
             android:id="@+id/pulseView"
             android:layout_width="match_parent"

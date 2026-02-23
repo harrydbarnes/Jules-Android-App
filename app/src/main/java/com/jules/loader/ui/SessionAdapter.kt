@@ -43,8 +43,8 @@ class SessionAdapter : ListAdapter<Session, SessionAdapter.SessionViewHolder>(Se
 
             // Set status color
             when(status) {
-                "PR Open" -> statusChip.setChipBackgroundColorResource(R.color.status_pr_open)
-                "Executing Tests" -> statusChip.setChipBackgroundColorResource(R.color.status_tests_passing)
+                TaskDetailActivity.STATUS_PR_OPEN -> statusChip.setChipBackgroundColorResource(R.color.status_pr_open)
+                TaskDetailActivity.STATUS_EXECUTING_TESTS -> statusChip.setChipBackgroundColorResource(R.color.status_tests_passing)
                 else -> statusChip.setChipBackgroundColorResource(R.color.jules_purple_light)
             }
 
@@ -67,9 +67,14 @@ class SessionAdapter : ListAdapter<Session, SessionAdapter.SessionViewHolder>(Se
             itemView.transitionName = "shared_element_container_${session.id}"
 
             itemView.setOnClickListener {
-                val intent = Intent(context, TaskDetailActivity::class.java)
-                intent.putExtra(TaskDetailActivity.EXTRA_SESSION_ID, session.id)
-                intent.putExtra(TaskDetailActivity.EXTRA_SESSION_TITLE, session.title)
+                val intent = Intent(context, TaskDetailActivity::class.java).apply {
+                    putExtra(TaskDetailActivity.EXTRA_SESSION_ID, session.id)
+                    putExtra(TaskDetailActivity.EXTRA_SESSION_TITLE, session.title)
+                    putExtra(TaskDetailActivity.EXTRA_SESSION_PROMPT, session.prompt)
+                    putExtra(TaskDetailActivity.EXTRA_SESSION_STATUS, session.status)
+                    putExtra(TaskDetailActivity.EXTRA_SESSION_SOURCE, session.sourceContext?.source)
+                    putExtra(TaskDetailActivity.EXTRA_SESSION_BRANCH, session.sourceContext?.githubRepoContext?.startingBranch)
+                }
 
                 val activity = context as? Activity
                 if (activity != null) {

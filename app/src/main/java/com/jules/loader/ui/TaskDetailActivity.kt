@@ -4,15 +4,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.view.Window
+import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
-import com.google.android.material.transition.platform.MaterialContainerTransform
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.transition.platform.MaterialContainerTransform
 import com.jules.loader.R
 import com.jules.loader.data.JulesRepository
 import com.jules.loader.data.model.ActivityLog
@@ -31,13 +31,17 @@ class TaskDetailActivity : BaseActivity() {
     companion object {
         const val EXTRA_SESSION_ID = "EXTRA_SESSION_ID"
         const val EXTRA_SESSION_TITLE = "EXTRA_SESSION_TITLE"
+        const val EXTRA_SESSION_PROMPT = "EXTRA_SESSION_PROMPT"
+        const val EXTRA_SESSION_STATUS = "EXTRA_SESSION_STATUS"
+        const val EXTRA_SESSION_SOURCE = "EXTRA_SESSION_SOURCE"
+        const val EXTRA_SESSION_BRANCH = "EXTRA_SESSION_BRANCH"
+        const val STATUS_PR_OPEN = "PR Open"
+        const val STATUS_EXECUTING_TESTS = "Executing Tests"
         private const val POLLING_INTERVAL_MS = 3000L
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         window.requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS)
-
-        // Configure Shared Element Transition
         setEnterSharedElementCallback(com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback())
 
         window.sharedElementEnterTransition = MaterialContainerTransform().apply {
@@ -57,8 +61,9 @@ class TaskDetailActivity : BaseActivity() {
         sessionId = intent.getStringExtra(EXTRA_SESSION_ID)
         binding.root.transitionName = "shared_element_container_${sessionId}"
 
-        val title = intent.getStringExtra(EXTRA_SESSION_TITLE)
-        binding.detailTitle.text = title ?: "Task Details"
+        binding.toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
+
+        populateSessionDetails()
 
         // Setup Log Bottom Sheet
         val behavior = BottomSheetBehavior.from(binding.logBottomSheet)
@@ -74,14 +79,45 @@ class TaskDetailActivity : BaseActivity() {
         }
     }
 
+    private fun populateSessionDetails() {
+        val title = intent.getStringExtra(EXTRA_SESSION_TITLE)
+        val prompt = intent.getStringExtra(EXTRA_SESSION_PROMPT) ?: getString(R.string.no_prompt)
+        val status = intent.getStringExtra(EXTRA_SESSION_STATUS) ?: "Initialising"
+        val source = intent.getStringExtra(EXTRA_SESSION_SOURCE)
+        val branch = intent.getStringExtra(EXTRA_SESSION_BRANCH)
+
+        binding.detailTitle.text = title ?: getString(R.string.untitled_session)
+        binding.detailPrompt.text = prompt
+        binding.detailStatusChip.text = status
+
+        when (status) {
+            STATUS_PR_OPEN -> binding.detailStatusChip.setChipBackgroundColorResource(R.color.status_pr_open)
+            STATUS_EXECUTING_TESTS -> binding.detailStatusChip.setChipBackgroundColorResource(R.color.status_tests_passing)
+            else -> binding.detailStatusChip.setChipBackgroundColorResource(R.color.jules_purple_light)
+        }
+
+        if (source != null) {
+            binding.detailSourceChip.visibility = View.VISIBLE
+            binding.detailSourceChip.text = source.removePrefix("sources/github/")
+        } else {
+            binding.detailSourceChip.visibility = View.GONE
+        }
+
+        if (branch != null) {
+            binding.detailBranchChip.visibility = View.VISIBLE
+            binding.detailBranchChip.text = branch
+        } else {
+            binding.detailBranchChip.visibility = View.GONE
+        }
+    }
+
     private fun startPollingLogs(id: String) {
         lifecycleScope.launch {
-            while (isActive) { // Poll while the activity is alive
+            while (isActive) {
                 try {
                     val logs = repository.getActivities(id)
                     logAdapter.submitList(logs)
                 } catch (e: Exception) {
-                    // Handle network error silently during polling or show a small error indicator
                     android.util.Log.e("TaskDetailActivity", "Error polling logs", e)
                 }
                 delay(POLLING_INTERVAL_MS)
@@ -91,17 +127,21 @@ class TaskDetailActivity : BaseActivity() {
 
     class LogAdapter : ListAdapter<ActivityLog, LogAdapter.LogViewHolder>(LogDiffCallback()) {
         class LogViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-            val text: TextView = view.findViewById(android.R.id.text1)
+            val typeText: TextView = view.findViewById(R.id.logType)
+            val descText: TextView = view.findViewById(R.id.logDescription)
+            val timeText: TextView = view.findViewById(R.id.logTimestamp)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LogViewHolder {
-            val view = LayoutInflater.from(parent.context).inflate(android.R.layout.simple_list_item_1, parent, false)
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_activity_log, parent, false)
             return LogViewHolder(view)
         }
 
         override fun onBindViewHolder(holder: LogViewHolder, position: Int) {
             val log = getItem(position)
-            holder.text.text = "[${log.type}] ${log.description}"
+            holder.typeText.text = log.type
+            holder.descText.text = log.description
+            holder.timeText.text = log.timestamp
         }
 
         class LogDiffCallback : DiffUtil.ItemCallback<ActivityLog>() {

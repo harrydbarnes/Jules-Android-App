@@ -1,46 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:fillViewport="true"
+    android:clipToPadding="false"
     android:padding="16dp">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/menu_settings"
-        android:textAppearance="?attr/textAppearanceHeadlineSmall"
-        android:layout_marginBottom="24dp"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/setting_theme"
-        android:textAppearance="?attr/textAppearanceBodyLarge"
-        android:layout_marginTop="16dp"/>
-
-    <RadioGroup
-        android:id="@+id/radio_group_theme"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="8dp">
+        android:orientation="vertical">
 
-        <RadioButton
-            android:id="@+id/radio_octopus"
-            style="@style/Settings.RadioButton"
-            android:text="@string/theme_octopus" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/menu_settings"
+            android:textAppearance="?attr/textAppearanceHeadlineMedium"
+            android:layout_marginBottom="24dp"/>
 
-        <RadioButton
-            android:id="@+id/radio_squid"
-            style="@style/Settings.RadioButton"
-            android:text="@string/theme_squid" />
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/Widget.Material3.CardView.Elevated"
+            app:cardBackgroundColor="?attr/colorSurface"
+            android:layout_marginBottom="16dp">
 
-        <RadioButton
-            android:id="@+id/radio_cuttlefish"
-            style="@style/Settings.RadioButton"
-            android:text="@string/theme_cuttlefish" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
 
-    </RadioGroup>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/setting_theme"
+                    android:textAppearance="?attr/textAppearanceTitleMedium"
+                    android:layout_marginBottom="12dp"/>
 
-</LinearLayout>
+                <RadioGroup
+                    android:id="@+id/radio_group_theme"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <RadioButton
+                        android:id="@+id/radio_octopus"
+                        style="@style/Settings.RadioButton"
+                        android:text="@string/theme_octopus" />
+
+                    <RadioButton
+                        android:id="@+id/radio_squid"
+                        style="@style/Settings.RadioButton"
+                        android:text="@string/theme_squid" />
+
+                    <RadioButton
+                        android:id="@+id/radio_cuttlefish"
+                        style="@style/Settings.RadioButton"
+                        android:text="@string/theme_cuttlefish" />
+
+                </RadioGroup>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+</ScrollView>

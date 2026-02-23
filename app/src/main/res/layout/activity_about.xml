@@ -10,8 +10,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingBottom="16dp">
+        android:orientation="vertical">
 
         <!-- App Info Card -->
         <com.google.android.material.card.MaterialCardView
@@ -125,7 +124,7 @@
                     android:text="@string/about_attribution"
                     android:textAppearance="?attr/textAppearanceLabelLarge"
                     android:textStyle="italic"
-                    android:alpha="0.7"/>
+                    android:alpha="0.6"/>
 
             </LinearLayout>
 
