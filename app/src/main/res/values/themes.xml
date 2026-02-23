@@ -7,7 +7,7 @@
         <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.Jules.LargeComponent</item>
 
         <!-- Menu Popup -->
-        <item name="actionBarPopupTheme">@style/ThemeOverlay.Material3.Dark</item>
+        <item name="actionBarPopupTheme">@style/ThemeOverlay.Jules.Popup</item>
 
         <!-- Dynamic Text Colors -->
         <item name="android:textColor">?attr/colorOnSurface</item>
@@ -100,5 +100,10 @@
     <style name="TextAppearance.Squid.DisplayLarge" parent="TextAppearance.Material3.DisplayLarge">
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/ivory</item>
+    </style>
+
+    <style name="ThemeOverlay.Jules.Popup" parent="ThemeOverlay.Material3.Dark">
+        <item name="android:colorBackground">?attr/colorSurface</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
 </resources>
