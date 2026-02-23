@@ -9,6 +9,7 @@
         <!-- Menu Popup -->
         <item name="actionBarPopupTheme">@style/ThemeOverlay.Jules.Popup</item>
         <item name="popupMenuStyle">@style/Widget.Jules.PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/Widget.Jules.PopupMenu</item>
         <item name="actionOverflowMenuStyle">@style/Widget.Jules.PopupMenu</item>
 
         <!-- Dynamic Text Colors -->
@@ -68,6 +69,7 @@
 
     <style name="Widget.Jules.PopupMenu" parent="Widget.Material3.PopupMenu">
         <item name="android:popupBackground">@drawable/bg_menu_rounded</item>
+        <item name="android:popupElevation">8dp</item>
         <item name="android:dropDownVerticalOffset">4dp</item>
         <item name="android:overlapAnchor">false</item>
     </style>
