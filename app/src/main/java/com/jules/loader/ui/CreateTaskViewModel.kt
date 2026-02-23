@@ -50,7 +50,7 @@ class CreateTaskViewModel(private val repository: JulesRepository) : ViewModel()
             _isLoading.value = true
             try {
                 repository.createSession(prompt, repoUrl, branch)
-                _taskCreatedEvent.emit(Unit)
+                _taskCreatedEvent.send(Unit)
             } catch (e: Exception) {
                 android.util.Log.e(TAG, "Error creating session", e)
                 _errorEvent.emit(R.string.error_create_task)
