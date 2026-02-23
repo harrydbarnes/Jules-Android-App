@@ -8,6 +8,7 @@ import com.jules.loader.BuildConfig
 import com.jules.loader.data.api.JulesService
 import com.jules.loader.data.model.ActivityLog
 import com.jules.loader.data.model.CreateSessionRequest
+import com.jules.loader.data.model.GithubRepoContext
 import com.jules.loader.data.model.Session
 import com.jules.loader.data.model.SourceContext
 import okhttp3.OkHttpClient
@@ -109,9 +110,15 @@ class JulesRepository private constructor(private val context: Context) {
         return sessions
     }
 
-    suspend fun createSession(prompt: String): Session {
+    suspend fun createSession(prompt: String, repoUrl: String? = null, branch: String? = null): Session {
         val apiKey = requireApiKey()
-        val request = CreateSessionRequest(prompt = prompt)
+        val sourceContext = if (repoUrl != null) {
+            SourceContext(
+                source = repoUrl,
+                githubRepoContext = GithubRepoContext(startingBranch = branch)
+            )
+        } else null
+        val request = CreateSessionRequest(prompt = prompt, sourceContext = sourceContext)
         return service.createSession(apiKey, request)
     }
 

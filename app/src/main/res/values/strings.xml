@@ -63,4 +63,6 @@
     <string name="title_onboarding">Onboarding</string>
     <string name="title_create_task">New Task</string>
     <string name="title_task_detail">Task Details</string>
+    <string name="error_load_repositories">Failed to load repositories</string>
+    <string name="error_create_task">Failed to create task</string>
 </resources>
