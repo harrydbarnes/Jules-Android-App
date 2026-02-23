@@ -15,6 +15,5 @@
 
     <style name="TextAppearance.Jules.Toolbar" parent="TextAppearance.Material3.TitleLarge">
         <item name="android:textStyle">bold</item>
-        <item name="android:fontFamily">google-sans</item>
     </style>
 </resources>
