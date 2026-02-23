@@ -93,6 +93,7 @@ class TaskDetailActivity : BaseActivity() {
         when (status) {
             STATUS_PR_OPEN -> binding.detailStatusChip.setChipBackgroundColorResource(R.color.status_pr_open)
             STATUS_EXECUTING_TESTS -> binding.detailStatusChip.setChipBackgroundColorResource(R.color.status_tests_passing)
+            "COMPLETED" -> binding.detailStatusChip.setChipBackgroundColorResource(R.color.status_tests_passing)
             else -> binding.detailStatusChip.setChipBackgroundColorResource(R.color.jules_purple_light)
         }
 
@@ -139,14 +140,20 @@ class TaskDetailActivity : BaseActivity() {
 
         override fun onBindViewHolder(holder: LogViewHolder, position: Int) {
             val log = getItem(position)
-            holder.typeText.text = log.type
-            holder.descText.text = log.description
-            holder.timeText.text = log.timestamp
+            holder.typeText.text = log.getResolvedType()
+            holder.descText.text = log.getResolvedDescription()
+            holder.timeText.text = log.timestamp ?: ""
         }
 
         class LogDiffCallback : DiffUtil.ItemCallback<ActivityLog>() {
             override fun areItemsTheSame(oldItem: ActivityLog, newItem: ActivityLog): Boolean {
-                return oldItem.id == newItem.id
+                val oldIdentifier = oldItem.name ?: oldItem.id
+                val newIdentifier = newItem.name ?: newItem.id
+                return if (oldIdentifier != null && newIdentifier != null) {
+                    oldIdentifier == newIdentifier
+                } else {
+                    oldItem === newItem
+                }
             }
 
             override fun areContentsTheSame(oldItem: ActivityLog, newItem: ActivityLog): Boolean {
