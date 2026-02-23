@@ -1,63 +1,131 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp">
+    android:fillViewport="true"
+    android:clipToPadding="false"
+    android:padding="16dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingBottom="16dp">
 
-        <TextView
+        <!-- App Info Card -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/about_title"
-            android:textAppearance="?attr/textAppearanceHeadlineMedium"
-            android:layout_marginBottom="16dp"/>
+            style="@style/Widget.Material3.Card.Elevated"
+            android:layout_marginBottom="16dp">
 
-        <TextView
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/about_title"
+                    android:textAppearance="?attr/textAppearanceHeadlineMedium"
+                    android:layout_marginBottom="8dp"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/about_desc"
+                    android:textAppearance="?attr/textAppearanceBodyLarge"/>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Citations Card -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/about_desc"
-            android:textAppearance="?attr/textAppearanceBodyLarge"
-            android:layout_marginBottom="8dp"/>
+            style="@style/Widget.Material3.Card.Elevated"
+            android:layout_marginBottom="16dp">
 
-        <TextView
-            android:id="@+id/text_citations"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/text_citations"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/about_citations"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:alpha="0.8"/>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Source Code Card -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/about_citations"
-            android:textAppearance="?attr/textAppearanceBodyMedium"
-            android:layout_marginTop="8dp"
-            android:alpha="0.8"/>
+            style="@style/Widget.Material3.Card.Elevated"
+            android:layout_marginBottom="16dp">
 
-        <TextView
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/source_code"
+                    android:textAppearance="?attr/textAppearanceTitleMedium"
+                    android:layout_marginBottom="8dp"/>
+
+                <TextView
+                    android:id="@+id/text_repo_link"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/repo_url"
+                    android:autoLink="web"
+                    android:textColorLink="?attr/colorPrimary"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"/>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Attribution Card -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/source_code"
-            android:textAppearance="?attr/textAppearanceBodyMedium"
-            android:layout_marginTop="24dp"
-            android:textStyle="bold" />
+            style="@style/Widget.Material3.Card.Outlined"
+            app:strokeColor="?attr/colorOutlineVariant"
+            android:layout_marginBottom="16dp">
 
-        <TextView
-            android:id="@+id/text_repo_link"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/repo_url"
-            android:autoLink="web"
-            android:textColorLink="@color/jules_purple"
-            android:textAppearance="?attr/textAppearanceBodyMedium"
-            android:layout_marginBottom="24dp"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/about_attribution"
-            android:textAppearance="?attr/textAppearanceLabelLarge"
-            android:layout_marginTop="32dp"
-            android:textStyle="italic"
-            android:alpha="0.6"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/about_attribution"
+                    android:textAppearance="?attr/textAppearanceLabelLarge"
+                    android:textStyle="italic"
+                    android:alpha="0.7"/>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
 </ScrollView>
