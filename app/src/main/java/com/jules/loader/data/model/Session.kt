@@ -13,7 +13,9 @@ data class Session(
     val title: String?,
     val prompt: String?,
     @SerializedName("state") val status: String?,
-    val sourceContext: SourceContext?
+    val sourceContext: SourceContext?,
+    val createTime: String?,
+    val updateTime: String?
 )
 
 data class SourceContext(

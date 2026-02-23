@@ -3,19 +3,26 @@ package com.jules.loader
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
+import android.view.inputmethod.InputMethodManager
+import android.widget.PopupMenu
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.chip.Chip
 import com.jules.loader.data.JulesRepository
 import com.jules.loader.data.model.Session
 import com.jules.loader.databinding.ActivityMainBinding
 import com.jules.loader.ui.BaseActivity
 import com.jules.loader.ui.OnboardingActivity
 import com.jules.loader.ui.SessionAdapter
-import com.jules.loader.ui.TaskDetailActivity
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 class MainActivity : BaseActivity() {
 
@@ -23,6 +30,11 @@ class MainActivity : BaseActivity() {
     private lateinit var repository: JulesRepository
     private lateinit var adapter: SessionAdapter
     private var allSessions: List<Session> = emptyList()
+
+    private var selectedRepo: String? = null
+    private var selectedStatus: String? = null
+    private var selectedDateRange: String? = null
+    private var searchQuery: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,53 +79,188 @@ class MainActivity : BaseActivity() {
             loadSessions(forceRefresh = true)
         }
 
+        setupSearch()
         setupFilters()
         loadSessions()
     }
 
-    private fun setupFilters() {
-        binding.filterCategoriesGroup.setOnCheckedStateChangeListener { _, checkedIds ->
-            if (checkedIds.contains(R.id.chipStatus)) {
-                binding.filterValuesScroll.visibility = View.VISIBLE
-            } else {
-                binding.filterValuesScroll.visibility = View.GONE
-            }
-            applyFilters()
+    private fun setupSearch() {
+        binding.btnSearch.setOnClickListener {
+            binding.filterContainer.visibility = View.GONE
+            binding.searchContainer.visibility = View.VISIBLE
+            binding.searchEditText.requestFocus()
+            val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.showSoftInput(binding.searchEditText, InputMethodManager.SHOW_IMPLICIT)
         }
 
-        binding.filterValuesGroup.setOnCheckedStateChangeListener { _, _ ->
-            applyFilters()
+        binding.btnSearchBack.setOnClickListener {
+            binding.searchContainer.visibility = View.GONE
+            binding.filterContainer.visibility = View.VISIBLE
+            val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(binding.searchEditText.windowToken, 0)
+            binding.searchEditText.setText("") // Clear search on close
         }
+
+        binding.btnSearchClear.setOnClickListener {
+            binding.searchEditText.setText("")
+        }
+
+        binding.searchEditText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                searchQuery = s.toString()
+                applyFilters()
+            }
+        })
+    }
+
+    private fun setupFilters() {
+        binding.chipRepo.setOnClickListener { showRepoMenu(it) }
+        binding.chipStatus.setOnClickListener { showStatusMenu(it) }
+        binding.chipDate.setOnClickListener { showDateMenu(it) }
+    }
+
+    private fun showRepoMenu(anchor: View) {
+        val popup = PopupMenu(this, anchor)
+        val repos = allSessions.mapNotNull { it.sourceContext?.githubRepoContext?.startingBranch ?: it.sourceContext?.source }
+            .distinct()
+            .sorted()
+
+        popup.menu.add(0, 0, 0, getString(R.string.filter_all))
+        repos.forEachIndexed { index, repo ->
+            val displayName = if (repo.startsWith("sources/github/")) repo.removePrefix("sources/github/") else repo
+            popup.menu.add(0, index + 1, index + 1, displayName)
+        }
+
+        popup.setOnMenuItemClickListener { item ->
+            selectedRepo = if (item.itemId == 0) null else repos[item.itemId - 1]
+            binding.chipRepo.text = if (selectedRepo == null) getString(R.string.filter_repo) else item.title
+            binding.chipRepo.isChecked = selectedRepo != null
+            applyFilters()
+            true
+        }
+        popup.show()
+    }
+
+    private fun showStatusMenu(anchor: View) {
+        val popup = PopupMenu(this, anchor)
+        val statuses = allSessions.mapNotNull { it.status }.distinct().sorted()
+
+        popup.menu.add(0, 0, 0, getString(R.string.filter_all))
+        statuses.forEachIndexed { index, status ->
+            popup.menu.add(0, index + 1, index + 1, status)
+        }
+
+        popup.setOnMenuItemClickListener { item ->
+            selectedStatus = if (item.itemId == 0) null else statuses[item.itemId - 1]
+            binding.chipStatus.text = selectedStatus ?: getString(R.string.filter_status)
+            binding.chipStatus.isChecked = selectedStatus != null
+            applyFilters()
+            true
+        }
+        popup.show()
+    }
+
+    private fun showDateMenu(anchor: View) {
+        val popup = PopupMenu(this, anchor)
+        popup.menu.add(0, 0, 0, getString(R.string.filter_all))
+        popup.menu.add(0, 1, 1, getString(R.string.date_today))
+        popup.menu.add(0, 2, 2, getString(R.string.date_yesterday))
+        popup.menu.add(0, 3, 3, getString(R.string.date_7_days))
+        popup.menu.add(0, 4, 4, getString(R.string.date_30_days))
+
+        popup.setOnMenuItemClickListener { item ->
+            selectedDateRange = if (item.itemId == 0) null else item.title.toString()
+            binding.chipDate.text = selectedDateRange ?: getString(R.string.filter_date)
+            binding.chipDate.isChecked = selectedDateRange != null
+            applyFilters()
+            true
+        }
+        popup.show()
     }
 
     private fun applyFilters() {
-        val selectedCategoryIds = binding.filterCategoriesGroup.checkedChipIds
-        if (selectedCategoryIds.isEmpty()) {
-             adapter.submitList(allSessions)
-             return
+        var filtered = allSessions
+
+        // 1. Search Filter
+        if (searchQuery.isNotEmpty()) {
+            val query = searchQuery.lowercase(Locale.getDefault())
+            filtered = filtered.filter { session ->
+                (session.title?.lowercase(Locale.getDefault())?.contains(query) == true) ||
+                (session.prompt?.lowercase(Locale.getDefault())?.contains(query) == true)
+            }
         }
 
-        var filteredList = allSessions
+        // 2. Repo Filter
+        selectedRepo?.let { repo ->
+             filtered = filtered.filter {
+                 (it.sourceContext?.githubRepoContext?.startingBranch == repo) || (it.sourceContext?.source == repo)
+             }
+        }
 
-        if (selectedCategoryIds.contains(R.id.chipStatus)) {
-            val selectedValueIds = binding.filterValuesGroup.checkedChipIds
-            if (selectedValueIds.isNotEmpty()) {
-                filteredList = filteredList.filter { session ->
-                    val status = session.status
-                    when {
-                        selectedValueIds.contains(R.id.chipCompleted) -> status == "COMPLETED"
-                        selectedValueIds.contains(R.id.chipInProgress) -> status == TaskDetailActivity.STATUS_PR_OPEN || status == TaskDetailActivity.STATUS_EXECUTING_TESTS
-                        selectedValueIds.contains(R.id.chipPending) -> status == "Initialising" || status == null || status == "Idle"
-                        selectedValueIds.contains(R.id.chipBlocked) -> status == "BLOCKED"
+        // 3. Status Filter
+        selectedStatus?.let { status ->
+            filtered = filtered.filter { it.status == status }
+        }
+
+        // 4. Date Filter
+        selectedDateRange?.let { range ->
+            val now = Calendar.getInstance()
+            filtered = filtered.filter { session ->
+                val date = parseDate(session.createTime)
+                if (date != null) {
+                    val sessionCal = Calendar.getInstance()
+                    sessionCal.time = date
+
+                    val diff = now.timeInMillis - sessionCal.timeInMillis
+                    val daysDiff = diff / (1000 * 60 * 60 * 24)
+
+                    when (range) {
+                        getString(R.string.date_today) -> isSameDay(now, sessionCal)
+                        getString(R.string.date_yesterday) -> isYesterday(now, sessionCal)
+                        getString(R.string.date_7_days) -> daysDiff in 0..7
+                        getString(R.string.date_30_days) -> daysDiff in 0..30
                         else -> true
                     }
+                } else {
+                    false
                 }
             }
         }
 
-        adapter.submitList(filteredList)
+        adapter.submitList(filtered)
     }
 
+    private fun parseDate(dateString: String?): Date? {
+        if (dateString == null) return null
+        val formats = listOf(
+            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+            "yyyy-MM-dd'T'HH:mm:ss'Z'",
+            "yyyy-MM-dd'T'HH:mm:ss"
+        )
+        for (format in formats) {
+            try {
+                val sdf = SimpleDateFormat(format, Locale.getDefault())
+                sdf.timeZone = TimeZone.getTimeZone("UTC")
+                return sdf.parse(dateString)
+            } catch (e: Exception) {
+                // Try next format
+            }
+        }
+        return null
+    }
+
+    private fun isSameDay(cal1: Calendar, cal2: Calendar): Boolean {
+        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+               cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
+    }
+
+    private fun isYesterday(now: Calendar, target: Calendar): Boolean {
+        val yesterday = now.clone() as Calendar
+        yesterday.add(Calendar.DAY_OF_YEAR, -1)
+        return isSameDay(yesterday, target)
+    }
 
     override fun onCreateOptionsMenu(menu: android.view.Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
@@ -152,15 +299,14 @@ class MainActivity : BaseActivity() {
             try {
                 allSessions = repository.getSessions(forceRefresh)
 
-                // If sessions are empty, show error/empty text immediately
                 if (allSessions.isEmpty()) {
                     binding.errorText.text = getString(R.string.no_sessions)
                     binding.errorText.visibility = View.VISIBLE
-                    adapter.submitList(emptyList()) // clear adapter
+                    adapter.submitList(emptyList())
                 } else {
                     binding.errorText.visibility = View.GONE
                     binding.sessionsRecyclerView.visibility = View.VISIBLE
-                    applyFilters() // Apply filters to non-empty list
+                    applyFilters()
                     if (isFirstLoad) {
                         binding.sessionsRecyclerView.scheduleLayoutAnimation()
                     }

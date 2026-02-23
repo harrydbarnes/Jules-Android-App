@@ -73,4 +73,10 @@
     <string name="status_pending">Pending</string>
     <string name="status_blocked">Blocked</string>
     <string name="filters_label">Filters</string>
+    <string name="search_hint">Search sessions...</string>
+    <string name="date_today">Today</string>
+    <string name="date_yesterday">Yesterday</string>
+    <string name="date_7_days">Last 7 days</string>
+    <string name="date_30_days">Last 30 days</string>
+    <string name="filter_all">All</string>
 </resources>
