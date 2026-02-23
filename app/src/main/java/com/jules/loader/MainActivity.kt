@@ -5,7 +5,10 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.transition.AutoTransition
+import android.transition.TransitionManager
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.PopupMenu
 import androidx.browser.customtabs.CustomTabsIntent
@@ -56,6 +59,9 @@ class MainActivity : BaseActivity() {
         binding.sessionsRecyclerView.layoutManager = LinearLayoutManager(this)
         binding.sessionsRecyclerView.adapter = adapter
 
+        // Set default item animator to ensure add/remove animations are smooth
+        binding.sessionsRecyclerView.itemAnimator = androidx.recyclerview.widget.DefaultItemAnimator()
+
         binding.sessionsRecyclerView.addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: androidx.recyclerview.widget.RecyclerView, dx: Int, dy: Int) {
                 if (dy > 0) {
@@ -86,6 +92,7 @@ class MainActivity : BaseActivity() {
 
     private fun setupSearch() {
         binding.btnSearch.setOnClickListener {
+            TransitionManager.beginDelayedTransition(binding.root as ViewGroup, AutoTransition())
             binding.filterContainer.visibility = View.GONE
             binding.searchContainer.visibility = View.VISIBLE
             binding.searchEditText.requestFocus()
@@ -94,6 +101,7 @@ class MainActivity : BaseActivity() {
         }
 
         binding.btnSearchBack.setOnClickListener {
+            TransitionManager.beginDelayedTransition(binding.root as ViewGroup, AutoTransition())
             binding.searchContainer.visibility = View.GONE
             binding.filterContainer.visibility = View.VISIBLE
             val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
