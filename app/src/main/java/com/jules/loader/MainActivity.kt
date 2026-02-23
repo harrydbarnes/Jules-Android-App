@@ -7,11 +7,14 @@ import android.view.View
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.chip.Chip
 import com.jules.loader.data.JulesRepository
+import com.jules.loader.data.model.Session
 import com.jules.loader.databinding.ActivityMainBinding
 import com.jules.loader.ui.BaseActivity
 import com.jules.loader.ui.OnboardingActivity
 import com.jules.loader.ui.SessionAdapter
+import com.jules.loader.ui.TaskDetailActivity
 import kotlinx.coroutines.launch
 
 class MainActivity : BaseActivity() {
@@ -19,6 +22,7 @@ class MainActivity : BaseActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var repository: JulesRepository
     private lateinit var adapter: SessionAdapter
+    private var allSessions: List<Session> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,8 +67,53 @@ class MainActivity : BaseActivity() {
             loadSessions(forceRefresh = true)
         }
 
+        setupFilters()
         loadSessions()
     }
+
+    private fun setupFilters() {
+        binding.filterCategoriesGroup.setOnCheckedStateChangeListener { _, checkedIds ->
+            if (checkedIds.contains(R.id.chipStatus)) {
+                binding.filterValuesScroll.visibility = View.VISIBLE
+            } else {
+                binding.filterValuesScroll.visibility = View.GONE
+            }
+            applyFilters()
+        }
+
+        binding.filterValuesGroup.setOnCheckedStateChangeListener { _, _ ->
+            applyFilters()
+        }
+    }
+
+    private fun applyFilters() {
+        val selectedCategoryIds = binding.filterCategoriesGroup.checkedChipIds
+        if (selectedCategoryIds.isEmpty()) {
+             adapter.submitList(allSessions)
+             return
+        }
+
+        var filteredList = allSessions
+
+        if (selectedCategoryIds.contains(R.id.chipStatus)) {
+            val selectedValueIds = binding.filterValuesGroup.checkedChipIds
+            if (selectedValueIds.isNotEmpty()) {
+                filteredList = filteredList.filter { session ->
+                    val status = session.status
+                    when {
+                        selectedValueIds.contains(R.id.chipCompleted) -> status == "COMPLETED"
+                        selectedValueIds.contains(R.id.chipInProgress) -> status == TaskDetailActivity.STATUS_PR_OPEN || status == TaskDetailActivity.STATUS_EXECUTING_TESTS
+                        selectedValueIds.contains(R.id.chipPending) -> status == "Initialising" || status == null || status == "Idle"
+                        selectedValueIds.contains(R.id.chipBlocked) -> status == "BLOCKED"
+                        else -> true
+                    }
+                }
+            }
+        }
+
+        adapter.submitList(filteredList)
+    }
+
 
     override fun onCreateOptionsMenu(menu: android.view.Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
@@ -101,18 +150,20 @@ class MainActivity : BaseActivity() {
 
         lifecycleScope.launch {
             try {
-                val sessions = repository.getSessions(forceRefresh)
-                adapter.submitList(sessions) {
+                allSessions = repository.getSessions(forceRefresh)
+
+                // If sessions are empty, show error/empty text immediately
+                if (allSessions.isEmpty()) {
+                    binding.errorText.text = getString(R.string.no_sessions)
+                    binding.errorText.visibility = View.VISIBLE
+                    adapter.submitList(emptyList()) // clear adapter
+                } else {
+                    binding.errorText.visibility = View.GONE
+                    binding.sessionsRecyclerView.visibility = View.VISIBLE
+                    applyFilters() // Apply filters to non-empty list
                     if (isFirstLoad) {
                         binding.sessionsRecyclerView.scheduleLayoutAnimation()
                     }
-                }
-
-                if (sessions.isEmpty()) {
-                    binding.errorText.text = getString(R.string.no_sessions)
-                    binding.errorText.visibility = View.VISIBLE
-                } else {
-                    binding.sessionsRecyclerView.visibility = View.VISIBLE
                 }
             } catch (e: java.io.IOException) {
                 binding.errorText.text = getString(R.string.error_loading_sessions, e.localizedMessage)
