@@ -138,7 +138,7 @@
                     android:padding="12dp"
                     android:src="@drawable/ic_arrow_back"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/app_name"/>
+                    android:contentDescription="@string/action_search_close"/>
 
                 <EditText
                     android:id="@+id/searchEditText"
