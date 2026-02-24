@@ -1,9 +1,16 @@
 package com.jules.loader.ui
 
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.speech.RecognitionListener
+import android.speech.RecognizerIntent
+import android.speech.SpeechRecognizer
 import android.view.Window
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -21,9 +28,14 @@ class CreateTaskActivity : BaseActivity() {
 
     private lateinit var binding: ActivityCreateTaskBinding
     private lateinit var viewModel: CreateTaskViewModel
+    private lateinit var speechRecognizer: SpeechRecognizer
+    private lateinit var speechRecognizerIntent: Intent
+    private var isListening = false
+    private var originalTextBeforeSpeech = ""
 
     companion object {
         private val TAG = CreateTaskActivity::class.java.simpleName
+        private const val PERMISSION_REQUEST_AUDIO = 100
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,6 +63,7 @@ class CreateTaskActivity : BaseActivity() {
         viewModel = ViewModelProvider(this, factory)[CreateTaskViewModel::class.java]
 
         setupRepoSelector()
+        setupVoiceInput()
         observeViewModel()
 
         binding.btnStartTask.setOnClickListener {
@@ -70,6 +83,20 @@ class CreateTaskActivity : BaseActivity() {
             if (sharedText != null) {
                 binding.taskInput.setText(sharedText)
             }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (::speechRecognizer.isInitialized) {
+            speechRecognizer.destroy()
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == PERMISSION_REQUEST_AUDIO && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            toggleListening()
         }
     }
 
@@ -112,6 +139,9 @@ class CreateTaskActivity : BaseActivity() {
     }
 
     private fun setupRepoSelector() {
+        binding.repoInput.setOnClickListener { binding.repoInput.showDropDown() }
+        binding.branchInput.setOnClickListener { binding.branchInput.showDropDown() }
+
         binding.repoInput.setOnItemClickListener { parent, _, position, _ ->
             val selectedSourceName = parent.getItemAtPosition(position) as String
             val matchingSources = viewModel.availableSources.value.filter { it.source == selectedSourceName }
@@ -136,5 +166,77 @@ class CreateTaskActivity : BaseActivity() {
                 binding.branchInput.setText("")
             }
         }
+    }
+
+    private fun setupVoiceInput() {
+        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
+        speechRecognizerIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
+        }
+
+        speechRecognizer.setRecognitionListener(object : RecognitionListener {
+            override fun onReadyForSpeech(params: Bundle?) {}
+            override fun onBeginningOfSpeech() {
+                isListening = true
+                originalTextBeforeSpeech = binding.taskInput.text?.toString() ?: ""
+                updateMicIconState(true)
+                binding.taskInput.hint = "Listening..."
+            }
+            override fun onRmsChanged(rmsdB: Float) {}
+            override fun onBufferReceived(buffer: ByteArray?) {}
+            override fun onEndOfSpeech() {
+                isListening = false
+                updateMicIconState(false)
+                binding.taskInput.hint = "Describe the task for Jules..."
+            }
+            override fun onError(error: Int) {
+                isListening = false
+                updateMicIconState(false)
+                binding.taskInput.hint = "Describe the task for Jules..."
+            }
+            override fun onResults(results: Bundle?) {
+                val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+                if (!matches.isNullOrEmpty()) {
+                    val spokenText = matches[0]
+                    val newText = if (originalTextBeforeSpeech.isBlank()) spokenText else "$originalTextBeforeSpeech $spokenText"
+                    binding.taskInput.setText(newText)
+                    binding.taskInput.setSelection(newText.length)
+                }
+            }
+            override fun onPartialResults(partialResults: Bundle?) {
+                val matches = partialResults?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+                if (!matches.isNullOrEmpty()) {
+                    val spokenText = matches[0]
+                    val newText = if (originalTextBeforeSpeech.isBlank()) spokenText else "$originalTextBeforeSpeech $spokenText"
+                    binding.taskInput.setText(newText)
+                    binding.taskInput.setSelection(newText.length)
+                }
+            }
+            override fun onEvent(eventType: Int, params: Bundle?) {}
+        })
+
+        binding.taskInputLayout.setEndIconOnClickListener {
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.RECORD_AUDIO), PERMISSION_REQUEST_AUDIO)
+            } else {
+                toggleListening()
+            }
+        }
+    }
+
+    private fun toggleListening() {
+        if (isListening) {
+            speechRecognizer.stopListening()
+        } else {
+            speechRecognizer.startListening(speechRecognizerIntent)
+        }
+    }
+
+    private fun updateMicIconState(listening: Boolean) {
+        val colorAttr = if (listening) com.google.android.material.R.attr.colorPrimary else com.google.android.material.R.attr.colorOnSurfaceVariant
+        val typedValue = android.util.TypedValue()
+        theme.resolveAttribute(colorAttr, typedValue, true)
+        binding.taskInputLayout.setEndIconTintList(android.content.res.ColorStateList.valueOf(typedValue.data))
     }
 }

@@ -51,6 +51,8 @@
                     android:layout_height="48dp"
                     android:padding="12dp"
                     android:layout_marginEnd="8dp"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:src="@drawable/ic_filter_list"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/filters_label"/>
@@ -74,7 +76,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/filter_repo"
-                            android:checkable="true"
+                            android:checkable="false"
                             app:checkedIconVisible="true"
                             app:chipIcon="@null"
                             app:closeIconVisible="false"/>
@@ -85,7 +87,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/filter_status"
-                            android:checkable="true"
+                            android:checkable="false"
                             app:checkedIconVisible="true"
                             app:chipIcon="@null"
                             app:closeIconVisible="false"/>
@@ -96,7 +98,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/filter_date"
-                            android:checkable="true"
+                            android:checkable="false"
                             app:checkedIconVisible="true"
                             app:chipIcon="@null"
                             app:closeIconVisible="false"/>

@@ -29,7 +29,9 @@
             android:id="@+id/repoInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="text" />
+            android:inputType="none"
+            android:focusable="false"
+            android:clickable="true" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -46,13 +48,19 @@
             android:id="@+id/branchInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="text" />
+            android:inputType="none"
+            android:focusable="false"
+            android:clickable="true" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/taskInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Describe the task for Jules..."
+        app:endIconMode="custom"
+        app:endIconDrawable="@drawable/ic_mic"
+        app:endIconContentDescription="Voice Input"
         app:shapeAppearance="@style/ShapeAppearance.Jules.MediumComponent">
 
         <com.google.android.material.textfield.TextInputEditText

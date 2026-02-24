@@ -5,10 +5,14 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ObjectAnimator
 import android.transition.AutoTransition
 import android.transition.TransitionManager
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.inputmethod.InputMethodManager
 import android.widget.PopupMenu
 import androidx.browser.customtabs.CustomTabsIntent
@@ -37,6 +41,7 @@ class MainActivity : BaseActivity() {
     private var selectedStatus: String? = null
     private var selectedDateRange: String? = null
     private var searchQuery: String = ""
+    private var isFilterActive = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -143,7 +148,9 @@ class MainActivity : BaseActivity() {
         popup.setOnMenuItemClickListener { item ->
             selectedRepo = if (item.itemId == 0) null else repos[item.itemId - 1]
             binding.chipRepo.text = if (selectedRepo == null) getString(R.string.filter_repo) else item.title
+            binding.chipRepo.isCheckable = true
             binding.chipRepo.isChecked = selectedRepo != null
+            binding.chipRepo.isCheckable = false
             applyFilters()
             true
         }
@@ -162,7 +169,9 @@ class MainActivity : BaseActivity() {
         popup.setOnMenuItemClickListener { item ->
             selectedStatus = if (item.itemId == 0) null else statuses[item.itemId - 1]
             binding.chipStatus.text = selectedStatus ?: getString(R.string.filter_status)
+            binding.chipStatus.isCheckable = true
             binding.chipStatus.isChecked = selectedStatus != null
+            binding.chipStatus.isCheckable = false
             applyFilters()
             true
         }
@@ -180,7 +189,9 @@ class MainActivity : BaseActivity() {
         popup.setOnMenuItemClickListener { item ->
             selectedDateRange = if (item.itemId == 0) null else item.title.toString()
             binding.chipDate.text = selectedDateRange ?: getString(R.string.filter_date)
+            binding.chipDate.isCheckable = true
             binding.chipDate.isChecked = selectedDateRange != null
+            binding.chipDate.isCheckable = false
             applyFilters()
             true
         }
@@ -243,6 +254,62 @@ class MainActivity : BaseActivity() {
         }
 
         adapter.submitList(filtered)
+        updateFilterIcon()
+    }
+
+    private fun updateFilterIcon() {
+        val hasFilter = selectedRepo != null || selectedStatus != null || selectedDateRange != null
+        if (hasFilter == isFilterActive) return
+
+        isFilterActive = hasFilter
+        val iconRes = if (hasFilter) R.drawable.ic_close else R.drawable.ic_filter_list
+        val desc = if (hasFilter) getString(R.string.clear_filters) else getString(R.string.filters_label)
+
+        val outAnim = ObjectAnimator.ofFloat(binding.btnFilter, "translationX", 0f, -binding.btnFilter.width.toFloat())
+        outAnim.duration = 150
+        outAnim.interpolator = AccelerateDecelerateInterpolator()
+        outAnim.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator) {
+                binding.btnFilter.setImageResource(iconRes)
+                binding.btnFilter.contentDescription = desc
+                if (hasFilter) {
+                    binding.btnFilter.setOnClickListener { clearFilters() }
+                    binding.btnFilter.isClickable = true
+                } else {
+                    binding.btnFilter.setOnClickListener(null)
+                    binding.btnFilter.isClickable = false
+                }
+
+                val inAnim = ObjectAnimator.ofFloat(binding.btnFilter, "translationX", binding.btnFilter.width.toFloat(), 0f)
+                inAnim.duration = 150
+                inAnim.interpolator = AccelerateDecelerateInterpolator()
+                inAnim.start()
+            }
+        })
+        outAnim.start()
+    }
+
+    private fun clearFilters() {
+        selectedRepo = null
+        selectedStatus = null
+        selectedDateRange = null
+
+        binding.chipRepo.text = getString(R.string.filter_repo)
+        binding.chipRepo.isCheckable = true
+        binding.chipRepo.isChecked = false
+        binding.chipRepo.isCheckable = false
+
+        binding.chipStatus.text = getString(R.string.filter_status)
+        binding.chipStatus.isCheckable = true
+        binding.chipStatus.isChecked = false
+        binding.chipStatus.isCheckable = false
+
+        binding.chipDate.text = getString(R.string.filter_date)
+        binding.chipDate.isCheckable = true
+        binding.chipDate.isChecked = false
+        binding.chipDate.isCheckable = false
+
+        applyFilters()
     }
 
     private fun isSameDay(cal1: Calendar, cal2: Calendar): Boolean {
