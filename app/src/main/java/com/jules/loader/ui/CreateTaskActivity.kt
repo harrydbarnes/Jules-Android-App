@@ -2,6 +2,8 @@ package com.jules.loader.ui
 
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.drawable.ClipDrawable
+import android.graphics.drawable.LayerDrawable
 import android.os.Bundle
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
@@ -17,7 +19,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.transition.platform.MaterialContainerTransform
+import com.google.android.material.internal.CheckableImageButton
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
+import com.jules.loader.R
 import com.jules.loader.data.JulesRepository
 import com.jules.loader.data.model.SourceContext
 import com.jules.loader.databinding.ActivityCreateTaskBinding
@@ -32,6 +36,8 @@ class CreateTaskActivity : BaseActivity() {
     private lateinit var speechRecognizerIntent: Intent
     private var isListening = false
     private var originalTextBeforeSpeech = ""
+    private var repoAdapter: ArrayAdapter<String>? = null
+    private var branchAdapter: ArrayAdapter<String>? = null
 
     companion object {
         private val TAG = CreateTaskActivity::class.java.simpleName
@@ -106,19 +112,25 @@ class CreateTaskActivity : BaseActivity() {
                 launch {
                     viewModel.availableSources.collectLatest { sources ->
                         val sourceNames = sources.map { it.source }.distinct()
-                        val adapter = ArrayAdapter(
-                            this@CreateTaskActivity,
-                            android.R.layout.simple_dropdown_item_1line,
-                            sourceNames
-                        )
-                        binding.repoInput.setAdapter(adapter)
+                        if (repoAdapter == null) {
+                            repoAdapter = ArrayAdapter(
+                                this@CreateTaskActivity,
+                                android.R.layout.simple_dropdown_item_1line,
+                                ArrayList(sourceNames)
+                            )
+                            binding.repoInput.setAdapter(repoAdapter)
+                        } else {
+                            repoAdapter?.clear()
+                            repoAdapter?.addAll(sourceNames)
+                            repoAdapter?.notifyDataSetChanged()
+                        }
                     }
                 }
 
                 launch {
                     viewModel.isLoading.collectLatest { isLoading ->
                         binding.btnStartTask.isEnabled = !isLoading
-                        binding.btnStartTask.text = if (isLoading) "Starting..." else "Start Octopus"
+                        binding.btnStartTask.text = if (isLoading) "Starting..." else "Send to Jules"
                     }
                 }
 
@@ -139,7 +151,12 @@ class CreateTaskActivity : BaseActivity() {
     }
 
     private fun setupRepoSelector() {
+        repoAdapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, ArrayList())
+        binding.repoInput.setAdapter(repoAdapter)
         binding.repoInput.setOnClickListener { binding.repoInput.showDropDown() }
+
+        branchAdapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, ArrayList())
+        binding.branchInput.setAdapter(branchAdapter)
         binding.branchInput.setOnClickListener { binding.branchInput.showDropDown() }
 
         binding.repoInput.setOnItemClickListener { parent, _, position, _ ->
@@ -147,12 +164,9 @@ class CreateTaskActivity : BaseActivity() {
             val matchingSources = viewModel.availableSources.value.filter { it.source == selectedSourceName }
             val branches = matchingSources.mapNotNull { it.githubRepoContext?.startingBranch }.distinct()
 
-            val branchAdapter = ArrayAdapter(
-                this@CreateTaskActivity,
-                android.R.layout.simple_dropdown_item_1line,
-                branches
-            )
-            binding.branchInput.setAdapter(branchAdapter)
+            branchAdapter?.clear()
+            branchAdapter?.addAll(branches)
+            branchAdapter?.notifyDataSetChanged()
 
             if (branches.isNotEmpty()) {
                 binding.branchInput.setText(branches.first(), false)
@@ -169,6 +183,10 @@ class CreateTaskActivity : BaseActivity() {
     }
 
     private fun setupVoiceInput() {
+        binding.taskInputLayout.setEndIconDrawable(R.drawable.mic_level_drawable)
+        binding.taskInputLayout.setEndIconContentDescription("Voice Input")
+        binding.taskInputLayout.setEndIconTintList(null) // Ensure original colors are used
+
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
         speechRecognizerIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
@@ -182,8 +200,22 @@ class CreateTaskActivity : BaseActivity() {
                 originalTextBeforeSpeech = binding.taskInput.text?.toString() ?: ""
                 updateMicIconState(true)
                 binding.taskInput.hint = "Listening..."
+
+                // Scale up
+                val endIcon = binding.taskInputLayout.findViewById<CheckableImageButton>(com.google.android.material.R.id.text_input_end_icon)
+                endIcon?.animate()?.scaleX(1.2f)?.scaleY(1.2f)?.setDuration(200)?.start()
             }
-            override fun onRmsChanged(rmsdB: Float) {}
+            override fun onRmsChanged(rmsdB: Float) {
+                // Map dB (-2 to 10) to level (0 to 10000)
+                val minDb = -2f
+                val maxDb = 10f
+                val clampedDb = rmsdB.coerceIn(minDb, maxDb)
+                val level = ((clampedDb - minDb) / (maxDb - minDb) * 10000).toInt()
+
+                val layerDrawable = binding.taskInputLayout.endIconDrawable as? LayerDrawable
+                val clipDrawable = layerDrawable?.findDrawableByLayerId(android.R.id.progress) as? ClipDrawable
+                clipDrawable?.level = level
+            }
             override fun onBufferReceived(buffer: ByteArray?) {}
             override fun onEndOfSpeech() {
                 isListening = false
@@ -234,9 +266,13 @@ class CreateTaskActivity : BaseActivity() {
     }
 
     private fun updateMicIconState(listening: Boolean) {
-        val colorAttr = if (listening) com.google.android.material.R.attr.colorPrimary else com.google.android.material.R.attr.colorOnSurfaceVariant
-        val typedValue = android.util.TypedValue()
-        theme.resolveAttribute(colorAttr, typedValue, true)
-        binding.taskInputLayout.setEndIconTintList(android.content.res.ColorStateList.valueOf(typedValue.data))
+        if (!listening) {
+            val endIcon = binding.taskInputLayout.findViewById<CheckableImageButton>(com.google.android.material.R.id.text_input_end_icon)
+            endIcon?.animate()?.scaleX(1.0f)?.scaleY(1.0f)?.setDuration(200)?.start()
+
+            val layerDrawable = binding.taskInputLayout.endIconDrawable as? LayerDrawable
+            val clipDrawable = layerDrawable?.findDrawableByLayerId(android.R.id.progress) as? ClipDrawable
+            clipDrawable?.level = 0
+        }
     }
 }
