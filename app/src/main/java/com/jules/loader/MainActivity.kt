@@ -128,19 +128,21 @@ class MainActivity : BaseActivity() {
     }
 
     private fun setupFilters() {
-        binding.chipRepo.setOnClickListener {
-            // Restore visual state immediately on click to prevent toggle
-            binding.chipRepo.isChecked = selectedRepo != null
-            showRepoMenu(it)
+        val touchListener = View.OnTouchListener { v, event ->
+            if (event.action == android.view.MotionEvent.ACTION_UP) {
+                when (v.id) {
+                    R.id.chipRepo -> showRepoMenu(v)
+                    R.id.chipStatus -> showStatusMenu(v)
+                    R.id.chipDate -> showDateMenu(v)
+                }
+                v.performHapticFeedback(android.view.HapticFeedbackConstants.CONTEXT_CLICK)
+            }
+            true
         }
-        binding.chipStatus.setOnClickListener {
-            binding.chipStatus.isChecked = selectedStatus != null
-            showStatusMenu(it)
-        }
-        binding.chipDate.setOnClickListener {
-            binding.chipDate.isChecked = selectedDateRange != null
-            showDateMenu(it)
-        }
+
+        binding.chipRepo.setOnTouchListener(touchListener)
+        binding.chipStatus.setOnTouchListener(touchListener)
+        binding.chipDate.setOnTouchListener(touchListener)
     }
 
     private fun showRepoMenu(anchor: View) {

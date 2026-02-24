@@ -183,9 +183,8 @@ class CreateTaskActivity : BaseActivity() {
     }
 
     private fun setupVoiceInput() {
-        binding.taskInputLayout.setEndIconDrawable(R.drawable.mic_level_drawable)
+        binding.taskInputLayout.setEndIconDrawable(R.drawable.ic_mic)
         binding.taskInputLayout.setEndIconContentDescription("Voice Input")
-        binding.taskInputLayout.setEndIconTintList(null) // Ensure original colors are used
 
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
         speechRecognizerIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
@@ -193,39 +192,58 @@ class CreateTaskActivity : BaseActivity() {
             putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
         }
 
+        binding.taskInputLayout.setEndIconOnClickListener {
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.RECORD_AUDIO), PERMISSION_REQUEST_AUDIO)
+            } else {
+                showVoiceDialog()
+            }
+        }
+    }
+
+    private fun showVoiceDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_voice_input, null)
+        val dialog = com.google.android.material.bottomsheet.BottomSheetDialog(this)
+        dialog.setContentView(dialogView)
+
+        val visualizer = dialogView.findViewById<android.view.View>(R.id.voice_visualizer)
+        val tvTranscription = dialogView.findViewById<android.widget.TextView>(R.id.tv_transcription)
+        val tvStatus = dialogView.findViewById<android.widget.TextView>(R.id.tv_listening_status)
+        val btnCancel = dialogView.findViewById<android.view.View>(R.id.btn_cancel_voice)
+
+        btnCancel.setOnClickListener {
+            speechRecognizer.stopListening()
+            dialog.dismiss()
+        }
+
+        dialog.setOnDismissListener {
+            speechRecognizer.stopListening()
+            isListening = false
+        }
+
         speechRecognizer.setRecognitionListener(object : RecognitionListener {
             override fun onReadyForSpeech(params: Bundle?) {}
             override fun onBeginningOfSpeech() {
                 isListening = true
                 originalTextBeforeSpeech = binding.taskInput.text?.toString() ?: ""
-                updateMicIconState(true)
-                binding.taskInput.hint = "Listening..."
-
-                // Scale up
-                val endIcon = binding.taskInputLayout.findViewById<CheckableImageButton>(com.google.android.material.R.id.text_input_end_icon)
-                endIcon?.animate()?.scaleX(1.5f)?.scaleY(1.5f)?.setDuration(200)?.start()
+                tvStatus.text = "Listening..."
             }
             override fun onRmsChanged(rmsdB: Float) {
-                // Map dB (-2 to 10) to level (0 to 10000)
+                // Scale visualizer based on dB (-2 to 10)
                 val minDb = -2f
                 val maxDb = 10f
                 val clampedDb = rmsdB.coerceIn(minDb, maxDb)
-                val level = ((clampedDb - minDb) / (maxDb - minDb) * 10000).toInt()
-
-                val layerDrawable = binding.taskInputLayout.endIconDrawable as? LayerDrawable
-                val clipDrawable = layerDrawable?.findDrawableByLayerId(android.R.id.progress) as? ClipDrawable
-                clipDrawable?.level = level
+                val scale = 1.0f + ((clampedDb - minDb) / (maxDb - minDb) * 1.0f) // Scale 1.0 to 2.0
+                visualizer.animate().scaleX(scale).scaleY(scale).setDuration(50).start()
             }
             override fun onBufferReceived(buffer: ByteArray?) {}
             override fun onEndOfSpeech() {
-                isListening = false
-                updateMicIconState(false)
-                binding.taskInput.hint = "Describe the task for Jules..."
+                tvStatus.text = "Processing..."
             }
             override fun onError(error: Int) {
                 isListening = false
-                updateMicIconState(false)
-                binding.taskInput.hint = "Describe the task for Jules..."
+                tvStatus.text = "Error"
+                dialog.dismiss()
             }
             override fun onResults(results: Bundle?) {
                 val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
@@ -235,44 +253,22 @@ class CreateTaskActivity : BaseActivity() {
                     binding.taskInput.setText(newText)
                     binding.taskInput.setSelection(newText.length)
                 }
+                dialog.dismiss()
             }
             override fun onPartialResults(partialResults: Bundle?) {
                 val matches = partialResults?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
                 if (!matches.isNullOrEmpty()) {
-                    val spokenText = matches[0]
-                    val newText = if (originalTextBeforeSpeech.isBlank()) spokenText else "$originalTextBeforeSpeech $spokenText"
-                    binding.taskInput.setText(newText)
-                    binding.taskInput.setSelection(newText.length)
+                    tvTranscription.text = matches[0]
                 }
             }
             override fun onEvent(eventType: Int, params: Bundle?) {}
         })
 
-        binding.taskInputLayout.setEndIconOnClickListener {
-            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.RECORD_AUDIO), PERMISSION_REQUEST_AUDIO)
-            } else {
-                toggleListening()
-            }
-        }
+        speechRecognizer.startListening(speechRecognizerIntent)
+        dialog.show()
     }
 
     private fun toggleListening() {
-        if (isListening) {
-            speechRecognizer.stopListening()
-        } else {
-            speechRecognizer.startListening(speechRecognizerIntent)
-        }
-    }
-
-    private fun updateMicIconState(listening: Boolean) {
-        if (!listening) {
-            val endIcon = binding.taskInputLayout.findViewById<CheckableImageButton>(com.google.android.material.R.id.text_input_end_icon)
-            endIcon?.animate()?.scaleX(1.0f)?.scaleY(1.0f)?.setDuration(200)?.start()
-
-            val layerDrawable = binding.taskInputLayout.endIconDrawable as? LayerDrawable
-            val clipDrawable = layerDrawable?.findDrawableByLayerId(android.R.id.progress) as? ClipDrawable
-            clipDrawable?.level = 0
-        }
+        showVoiceDialog()
     }
 }
