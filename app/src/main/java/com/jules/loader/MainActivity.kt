@@ -276,7 +276,11 @@ class MainActivity : BaseActivity() {
         val iconRes = if (hasFilter) R.drawable.ic_close else R.drawable.ic_filter_list
         val desc = if (hasFilter) getString(R.string.clear_filters) else getString(R.string.filters_label)
 
-        val outAnim = ObjectAnimator.ofFloat(binding.btnFilter, "translationX", 0f, -binding.btnFilter.width.toFloat())
+        val width = binding.btnFilter.width.toFloat()
+        val outEnd = if (hasFilter) -width else width
+        val inStart = if (hasFilter) width else -width
+
+        val outAnim = ObjectAnimator.ofFloat(binding.btnFilter, "translationX", 0f, outEnd)
         outAnim.duration = 150
         outAnim.interpolator = AccelerateDecelerateInterpolator()
         outAnim.addListener(object : AnimatorListenerAdapter() {
@@ -291,7 +295,7 @@ class MainActivity : BaseActivity() {
                     binding.btnFilter.isClickable = false
                 }
 
-                val inAnim = ObjectAnimator.ofFloat(binding.btnFilter, "translationX", binding.btnFilter.width.toFloat(), 0f)
+                val inAnim = ObjectAnimator.ofFloat(binding.btnFilter, "translationX", inStart, 0f)
                 inAnim.duration = 150
                 inAnim.interpolator = AccelerateDecelerateInterpolator()
                 inAnim.start()
