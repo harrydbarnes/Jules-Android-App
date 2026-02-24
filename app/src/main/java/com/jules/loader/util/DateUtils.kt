@@ -23,7 +23,7 @@ object DateUtils {
         }
         var sdf = map[pattern]
         if (sdf == null) {
-            sdf = SimpleDateFormat(pattern, Locale.getDefault())
+            sdf = SimpleDateFormat(pattern, Locale.US)
             sdf.timeZone = TimeZone.getTimeZone("UTC")
             map[pattern] = sdf
         }
