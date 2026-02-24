@@ -126,28 +126,6 @@ class MainActivity : BaseActivity() {
         binding.chipRepo.setOnClickListener { showRepoMenu(it) }
         binding.chipStatus.setOnClickListener { showStatusMenu(it) }
         binding.chipDate.setOnClickListener { showDateMenu(it) }
-        binding.chipClear.setOnClickListener { clearFilters() }
-    }
-
-    private fun clearFilters() {
-        selectedRepo = null
-        selectedStatus = null
-        selectedDateRange = null
-        searchQuery = ""
-        binding.searchEditText.setText("")
-
-        binding.chipRepo.text = getString(R.string.filter_repo)
-        binding.chipRepo.isChecked = false
-
-        binding.chipStatus.text = getString(R.string.filter_status)
-        binding.chipStatus.isChecked = false
-
-        binding.chipDate.text = getString(R.string.filter_date)
-        binding.chipDate.isChecked = false
-
-        binding.chipClear.visibility = View.GONE
-
-        applyFilters()
     }
 
     private fun showRepoMenu(anchor: View) {
@@ -166,7 +144,6 @@ class MainActivity : BaseActivity() {
             selectedRepo = if (item.itemId == 0) null else repos[item.itemId - 1]
             binding.chipRepo.text = if (selectedRepo == null) getString(R.string.filter_repo) else item.title
             binding.chipRepo.isChecked = selectedRepo != null
-            updateClearButtonVisibility()
             applyFilters()
             true
         }
@@ -186,7 +163,6 @@ class MainActivity : BaseActivity() {
             selectedStatus = if (item.itemId == 0) null else statuses[item.itemId - 1]
             binding.chipStatus.text = selectedStatus ?: getString(R.string.filter_status)
             binding.chipStatus.isChecked = selectedStatus != null
-            updateClearButtonVisibility()
             applyFilters()
             true
         }
@@ -205,16 +181,10 @@ class MainActivity : BaseActivity() {
             selectedDateRange = if (item.itemId == 0) null else item.title.toString()
             binding.chipDate.text = selectedDateRange ?: getString(R.string.filter_date)
             binding.chipDate.isChecked = selectedDateRange != null
-            updateClearButtonVisibility()
             applyFilters()
             true
         }
         popup.show()
-    }
-
-    private fun updateClearButtonVisibility() {
-        val hasFilters = selectedRepo != null || selectedStatus != null || selectedDateRange != null
-        binding.chipClear.visibility = if (hasFilters) View.VISIBLE else View.GONE
     }
 
     private fun applyFilters() {

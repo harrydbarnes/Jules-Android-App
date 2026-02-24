@@ -56,9 +56,8 @@
                     android:contentDescription="@string/filters_label"/>
 
                 <HorizontalScrollView
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:scrollbars="none">
 
                     <com.google.android.material.chip.ChipGroup
@@ -75,7 +74,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/filter_repo"
-                            android:checkable="false"
+                            android:checkable="true"
                             app:checkedIconVisible="true"
                             app:chipIcon="@null"
                             app:closeIconVisible="false"/>
@@ -86,7 +85,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/filter_status"
-                            android:checkable="false"
+                            android:checkable="true"
                             app:checkedIconVisible="true"
                             app:chipIcon="@null"
                             app:closeIconVisible="false"/>
@@ -97,23 +96,13 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/filter_date"
-                            android:checkable="false"
+                            android:checkable="true"
                             app:checkedIconVisible="true"
                             app:chipIcon="@null"
                             app:closeIconVisible="false"/>
 
                     </com.google.android.material.chip.ChipGroup>
                 </HorizontalScrollView>
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chipClear"
-                    style="@style/Widget.Material3.Chip.Assist"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Clear"
-                    app:chipIcon="@drawable/ic_close"
-                    android:visibility="gone"
-                    android:layout_marginStart="8dp"/>
             </LinearLayout>
 
             <!-- State 2: Search Bar -->
