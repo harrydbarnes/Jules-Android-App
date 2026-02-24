@@ -8,6 +8,9 @@
 
         <!-- Menu Popup -->
         <item name="actionBarPopupTheme">@style/ThemeOverlay.Jules.Popup</item>
+        <item name="popupMenuStyle">@style/Widget.Jules.PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/Widget.Jules.PopupMenu</item>
+        <item name="actionOverflowMenuStyle">@style/Widget.Jules.PopupMenu</item>
 
         <!-- Dynamic Text Colors -->
         <item name="android:textColor">?attr/colorOnSurface</item>
@@ -29,6 +32,10 @@
         <item name="colorOnSurface">@color/octopus_white</item>
         <item name="colorSurfaceVariant">@color/octopus_surface</item>
         <item name="colorOnSurfaceVariant">@color/octopus_white</item>
+
+        <!-- Containers (Search, Menus) -->
+        <item name="colorSurfaceContainer">@color/octopus_surface</item>
+        <item name="colorSurfaceContainerHigh">@color/octopus_surface</item>
 
         <!-- Typography -->
         <item name="textAppearanceDisplayLarge">@style/TextAppearance.Octopus.DisplayLarge</item>
@@ -60,6 +67,13 @@
         <item name="cornerSize">28dp</item>
     </style>
 
+    <style name="Widget.Jules.PopupMenu" parent="Widget.Material3.PopupMenu">
+        <item name="android:popupBackground">@drawable/bg_menu_rounded</item>
+        <item name="android:popupElevation">8dp</item>
+        <item name="android:dropDownVerticalOffset">4dp</item>
+        <item name="android:overlapAnchor">false</item>
+    </style>
+
     <style name="TextAppearance.Octopus.DisplayLarge" parent="TextAppearance.Material3.DisplayLarge">
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/jules_purple_light</item>
@@ -82,6 +96,10 @@
         <item name="colorSurfaceVariant">@color/pitch_black</item>
         <item name="colorOnSurfaceVariant">@color/ivory</item>
 
+        <!-- Containers (Search, Menus) -->
+        <item name="colorSurfaceContainer">@color/squid_surface_container</item>
+        <item name="colorSurfaceContainerHigh">@color/squid_surface_container</item>
+
         <!-- Typography -->
         <item name="textAppearanceDisplayLarge">@style/TextAppearance.Squid.DisplayLarge</item>
 
@@ -102,8 +120,10 @@
         <item name="android:textColor">@color/ivory</item>
     </style>
 
-    <style name="ThemeOverlay.Jules.Popup" parent="ThemeOverlay.Material3.Dark">
+    <style name="ThemeOverlay.Jules.Popup" parent="ThemeOverlay.Material3">
         <item name="android:colorBackground">?attr/colorSurface</item>
         <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="popupMenuStyle">@style/Widget.Jules.PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/Widget.Jules.PopupMenu</item>
     </style>
 </resources>

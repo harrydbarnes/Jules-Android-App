@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import com.jules.loader.R
 import com.jules.loader.data.model.Session
+import com.jules.loader.util.DateUtils
 
 import android.content.Intent
 import android.app.Activity
@@ -31,6 +32,7 @@ class SessionAdapter : ListAdapter<Session, SessionAdapter.SessionViewHolder>(Se
         private val prompt: TextView = itemView.findViewById(R.id.sessionPrompt)
         private val sourceChip: Chip = itemView.findViewById(R.id.sourceChip)
         private val statusChip: Chip = itemView.findViewById(R.id.statusChip)
+        private val dateChip: Chip = itemView.findViewById(R.id.dateChip)
         private val pulseView: View = itemView.findViewById(R.id.pulseView)
 
         fun bind(session: Session) {
@@ -62,7 +64,16 @@ class SessionAdapter : ListAdapter<Session, SessionAdapter.SessionViewHolder>(Se
             } else {
                 source
             }
-            sourceChip.text = cleanSource
+            sourceChip.text = cleanSource.substringAfterLast("/")
+
+            // Set date
+            val formattedDate = DateUtils.formatDate(session.createTime)
+            if (formattedDate != null) {
+                dateChip.text = formattedDate
+                dateChip.visibility = View.VISIBLE
+            } else {
+                dateChip.visibility = View.GONE
+            }
 
             itemView.transitionName = "shared_element_container_${session.id}"
 

@@ -65,4 +65,24 @@
     <string name="title_task_detail">Task Details</string>
     <string name="error_load_repositories">Failed to load repositories</string>
     <string name="error_create_task">Failed to create task</string>
+    <string name="filter_repo">Repo</string>
+    <string name="filter_status">Status</string>
+    <string name="filter_date">Date</string>
+    <string name="status_completed">Completed</string>
+    <string name="status_in_progress">In Progress</string>
+    <string name="status_pending">Pending</string>
+    <string name="status_blocked">Blocked</string>
+    <string name="filters_label">Filters</string>
+    <string name="clear_filters">Clear filters</string>
+    <string name="search_hint">Search sessions...</string>
+    <string name="date_today">Today</string>
+    <string name="date_yesterday">Yesterday</string>
+    <string name="date_7_days">Last 7 days</string>
+    <string name="date_30_days">Last 30 days</string>
+    <string name="filter_all">All</string>
+    <string name="create_task_starting">Starting...</string>
+    <string name="create_task_send">Send to Jules</string>
+    <string name="action_search_close">Close search</string>
+    <string name="action_search_clear">Clear search</string>
+    <string name="action_search">Search sessions</string>
 </resources>
