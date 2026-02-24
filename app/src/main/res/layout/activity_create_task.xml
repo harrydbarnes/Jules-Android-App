@@ -25,7 +25,7 @@
         app:endIconMode="clear_text"
         app:shapeAppearance="@style/ShapeAppearance.Jules.MediumComponent">
 
-        <AutoCompleteTextView
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
             android:id="@+id/repoInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -44,7 +44,7 @@
         app:endIconMode="clear_text"
         app:shapeAppearance="@style/ShapeAppearance.Jules.MediumComponent">
 
-        <AutoCompleteTextView
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
             android:id="@+id/branchInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

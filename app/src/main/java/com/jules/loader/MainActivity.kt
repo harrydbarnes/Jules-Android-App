@@ -128,9 +128,19 @@ class MainActivity : BaseActivity() {
     }
 
     private fun setupFilters() {
-        binding.chipRepo.setOnClickListener { showRepoMenu(it) }
-        binding.chipStatus.setOnClickListener { showStatusMenu(it) }
-        binding.chipDate.setOnClickListener { showDateMenu(it) }
+        binding.chipRepo.setOnClickListener {
+            // Restore visual state immediately on click to prevent toggle
+            binding.chipRepo.isChecked = selectedRepo != null
+            showRepoMenu(it)
+        }
+        binding.chipStatus.setOnClickListener {
+            binding.chipStatus.isChecked = selectedStatus != null
+            showStatusMenu(it)
+        }
+        binding.chipDate.setOnClickListener {
+            binding.chipDate.isChecked = selectedDateRange != null
+            showDateMenu(it)
+        }
     }
 
     private fun showRepoMenu(anchor: View) {
@@ -148,9 +158,7 @@ class MainActivity : BaseActivity() {
         popup.setOnMenuItemClickListener { item ->
             selectedRepo = if (item.itemId == 0) null else repos[item.itemId - 1]
             binding.chipRepo.text = if (selectedRepo == null) getString(R.string.filter_repo) else item.title
-            binding.chipRepo.isCheckable = true
             binding.chipRepo.isChecked = selectedRepo != null
-            binding.chipRepo.isCheckable = false
             applyFilters()
             true
         }
@@ -169,9 +177,7 @@ class MainActivity : BaseActivity() {
         popup.setOnMenuItemClickListener { item ->
             selectedStatus = if (item.itemId == 0) null else statuses[item.itemId - 1]
             binding.chipStatus.text = selectedStatus ?: getString(R.string.filter_status)
-            binding.chipStatus.isCheckable = true
             binding.chipStatus.isChecked = selectedStatus != null
-            binding.chipStatus.isCheckable = false
             applyFilters()
             true
         }
@@ -189,9 +195,7 @@ class MainActivity : BaseActivity() {
         popup.setOnMenuItemClickListener { item ->
             selectedDateRange = if (item.itemId == 0) null else item.title.toString()
             binding.chipDate.text = selectedDateRange ?: getString(R.string.filter_date)
-            binding.chipDate.isCheckable = true
             binding.chipDate.isChecked = selectedDateRange != null
-            binding.chipDate.isCheckable = false
             applyFilters()
             true
         }
@@ -295,19 +299,13 @@ class MainActivity : BaseActivity() {
         selectedDateRange = null
 
         binding.chipRepo.text = getString(R.string.filter_repo)
-        binding.chipRepo.isCheckable = true
         binding.chipRepo.isChecked = false
-        binding.chipRepo.isCheckable = false
 
         binding.chipStatus.text = getString(R.string.filter_status)
-        binding.chipStatus.isCheckable = true
         binding.chipStatus.isChecked = false
-        binding.chipStatus.isCheckable = false
 
         binding.chipDate.text = getString(R.string.filter_date)
-        binding.chipDate.isCheckable = true
         binding.chipDate.isChecked = false
-        binding.chipDate.isCheckable = false
 
         applyFilters()
     }
