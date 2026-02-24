@@ -203,7 +203,7 @@ class CreateTaskActivity : BaseActivity() {
 
                 // Scale up
                 val endIcon = binding.taskInputLayout.findViewById<CheckableImageButton>(com.google.android.material.R.id.text_input_end_icon)
-                endIcon?.animate()?.scaleX(1.2f)?.scaleY(1.2f)?.setDuration(200)?.start()
+                endIcon?.animate()?.scaleX(1.5f)?.scaleY(1.5f)?.setDuration(200)?.start()
             }
             override fun onRmsChanged(rmsdB: Float) {
                 // Map dB (-2 to 10) to level (0 to 10000)
