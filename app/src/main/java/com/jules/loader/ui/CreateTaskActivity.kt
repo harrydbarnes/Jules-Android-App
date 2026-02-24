@@ -177,7 +177,11 @@ class CreateTaskActivity : BaseActivity() {
         binding.taskInputLayout.setEndIconDrawable(R.drawable.ic_mic)
         binding.taskInputLayout.setEndIconContentDescription("Voice Input")
 
-        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
+        if (!SpeechRecognizer.isRecognitionAvailable(this)) {
+            binding.taskInputLayout.isEndIconVisible = false
+            return
+        }
+        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this) ?: return
         speechRecognizerIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
             putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
