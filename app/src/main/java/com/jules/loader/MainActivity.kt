@@ -131,18 +131,21 @@ class MainActivity : BaseActivity() {
     }
 
     private fun setupFilters() {
-        binding.chipRepo.setOnClickListener { v ->
-            showRepoMenu(v)
-            v.performHapticFeedback(android.view.HapticFeedbackConstants.CONTEXT_CLICK)
+        val touchListener = View.OnTouchListener { v, event ->
+            if (event.action == android.view.MotionEvent.ACTION_UP) {
+                when (v.id) {
+                    R.id.chipRepo -> showRepoMenu(v)
+                    R.id.chipStatus -> showStatusMenu(v)
+                    R.id.chipDate -> showDateMenu(v)
+                }
+                v.performHapticFeedback(android.view.HapticFeedbackConstants.CONTEXT_CLICK)
+            }
+            true
         }
-        binding.chipStatus.setOnClickListener { v ->
-            showStatusMenu(v)
-            v.performHapticFeedback(android.view.HapticFeedbackConstants.CONTEXT_CLICK)
-        }
-        binding.chipDate.setOnClickListener { v ->
-            showDateMenu(v)
-            v.performHapticFeedback(android.view.HapticFeedbackConstants.CONTEXT_CLICK)
-        }
+
+        binding.chipRepo.setOnTouchListener(touchListener)
+        binding.chipStatus.setOnTouchListener(touchListener)
+        binding.chipDate.setOnTouchListener(touchListener)
     }
 
     private fun showRepoMenu(anchor: View) {
