@@ -70,28 +70,34 @@
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/chipRepo"
-                            style="@style/Widget.Material3.Chip.Assist"
+                            style="@style/Widget.Material3.Chip.Filter"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/filter_repo"
+                            android:checkable="true"
+                            app:checkedIconVisible="true"
                             app:chipIcon="@null"
                             app:closeIconVisible="false"/>
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/chipStatus"
-                            style="@style/Widget.Material3.Chip.Assist"
+                            style="@style/Widget.Material3.Chip.Filter"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/filter_status"
+                            android:checkable="true"
+                            app:checkedIconVisible="true"
                             app:chipIcon="@null"
                             app:closeIconVisible="false"/>
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/chipDate"
-                            style="@style/Widget.Material3.Chip.Assist"
+                            style="@style/Widget.Material3.Chip.Filter"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/filter_date"
+                            android:checkable="true"
+                            app:checkedIconVisible="true"
                             app:chipIcon="@null"
                             app:closeIconVisible="false"/>
 

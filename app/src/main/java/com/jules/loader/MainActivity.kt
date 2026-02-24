@@ -20,12 +20,11 @@ import com.jules.loader.databinding.ActivityMainBinding
 import com.jules.loader.ui.BaseActivity
 import com.jules.loader.ui.OnboardingActivity
 import com.jules.loader.ui.SessionAdapter
+import com.jules.loader.util.DateUtils
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
-import java.util.TimeZone
 
 class MainActivity : BaseActivity() {
 
@@ -131,14 +130,14 @@ class MainActivity : BaseActivity() {
 
     private fun showRepoMenu(anchor: View) {
         val popup = PopupMenu(this, anchor)
-        val repos = allSessions.mapNotNull { it.sourceContext?.githubRepoContext?.startingBranch ?: it.sourceContext?.source }
+        val repos = allSessions.mapNotNull { it.sourceContext?.source }
+            .map { if (it.startsWith("sources/github/")) it.removePrefix("sources/github/") else it }
             .distinct()
             .sorted()
 
         popup.menu.add(0, 0, 0, getString(R.string.filter_all))
         repos.forEachIndexed { index, repo ->
-            val displayName = if (repo.startsWith("sources/github/")) repo.removePrefix("sources/github/") else repo
-            popup.menu.add(0, index + 1, index + 1, displayName)
+            popup.menu.add(0, index + 1, index + 1, repo)
         }
 
         popup.setOnMenuItemClickListener { item ->
@@ -203,7 +202,13 @@ class MainActivity : BaseActivity() {
         // 2. Repo Filter
         selectedRepo?.let { repo ->
              filtered = filtered.filter {
-                 (it.sourceContext?.githubRepoContext?.startingBranch == repo) || (it.sourceContext?.source == repo)
+                 val source = it.sourceContext?.source
+                 if (source != null) {
+                     val cleanSource = if (source.startsWith("sources/github/")) source.removePrefix("sources/github/") else source
+                     cleanSource == repo
+                 } else {
+                     false
+                 }
              }
         }
 
@@ -216,7 +221,7 @@ class MainActivity : BaseActivity() {
         selectedDateRange?.let { range ->
             val now = Calendar.getInstance()
             filtered = filtered.filter { session ->
-                val date = parseDate(session.createTime)
+                val date = DateUtils.parseDate(session.createTime)
                 if (date != null) {
                     val sessionCal = Calendar.getInstance()
                     sessionCal.time = date
@@ -238,25 +243,6 @@ class MainActivity : BaseActivity() {
         }
 
         adapter.submitList(filtered)
-    }
-
-    private fun parseDate(dateString: String?): Date? {
-        if (dateString == null) return null
-        val formats = listOf(
-            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
-            "yyyy-MM-dd'T'HH:mm:ss'Z'",
-            "yyyy-MM-dd'T'HH:mm:ss"
-        )
-        for (format in formats) {
-            try {
-                val sdf = SimpleDateFormat(format, Locale.getDefault())
-                sdf.timeZone = TimeZone.getTimeZone("UTC")
-                return sdf.parse(dateString)
-            } catch (e: Exception) {
-                // Try next format
-            }
-        }
-        return null
     }
 
     private fun isSameDay(cal1: Calendar, cal2: Calendar): Boolean {
