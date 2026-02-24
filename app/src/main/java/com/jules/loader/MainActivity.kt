@@ -95,6 +95,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun setupSearch() {
+        binding.btnSearch.contentDescription = getString(R.string.action_search)
         binding.btnSearch.setOnClickListener {
             TransitionManager.beginDelayedTransition(binding.root as ViewGroup, AutoTransition())
             binding.filterContainer.visibility = View.GONE
@@ -104,6 +105,7 @@ class MainActivity : BaseActivity() {
             imm.showSoftInput(binding.searchEditText, InputMethodManager.SHOW_IMPLICIT)
         }
 
+        binding.btnSearchBack.contentDescription = getString(R.string.action_search_close)
         binding.btnSearchBack.setOnClickListener {
             TransitionManager.beginDelayedTransition(binding.root as ViewGroup, AutoTransition())
             binding.searchContainer.visibility = View.GONE
@@ -113,6 +115,7 @@ class MainActivity : BaseActivity() {
             binding.searchEditText.setText("") // Clear search on close
         }
 
+        binding.btnSearchClear.contentDescription = getString(R.string.action_search_clear)
         binding.btnSearchClear.setOnClickListener {
             binding.searchEditText.setText("")
         }
@@ -147,8 +150,7 @@ class MainActivity : BaseActivity() {
 
     private fun showRepoMenu(anchor: View) {
         val popup = PopupMenu(this, anchor)
-        val repos = allSessions.mapNotNull { it.sourceContext?.source }
-            .map { if (it.startsWith("sources/github/")) it.removePrefix("sources/github/") else it }
+        val repos = allSessions.mapNotNull { it.sourceContext?.cleanSource }
             .distinct()
             .sorted()
 
@@ -219,13 +221,7 @@ class MainActivity : BaseActivity() {
         // 2. Repo Filter
         selectedRepo?.let { repo ->
              filtered = filtered.filter {
-                 val source = it.sourceContext?.source
-                 if (source != null) {
-                     val cleanSource = if (source.startsWith("sources/github/")) source.removePrefix("sources/github/") else source
-                     cleanSource == repo
-                 } else {
-                     false
-                 }
+                 it.sourceContext?.cleanSource == repo
              }
         }
 
@@ -237,18 +233,20 @@ class MainActivity : BaseActivity() {
         // 4. Date Filter
         selectedDateRange?.let { range ->
             val now = Calendar.getInstance()
+            resetTime(now)
             filtered = filtered.filter { session ->
                 val date = DateUtils.parseDate(session.createTime)
                 if (date != null) {
                     val sessionCal = Calendar.getInstance()
                     sessionCal.time = date
+                    resetTime(sessionCal)
 
                     val diff = now.timeInMillis - sessionCal.timeInMillis
-                    val daysDiff = diff / (1000 * 60 * 60 * 24)
+                    val daysDiff = java.util.concurrent.TimeUnit.MILLISECONDS.toDays(diff)
 
                     when (range) {
-                        getString(R.string.date_today) -> isSameDay(now, sessionCal)
-                        getString(R.string.date_yesterday) -> isYesterday(now, sessionCal)
+                        getString(R.string.date_today) -> daysDiff == 0L
+                        getString(R.string.date_yesterday) -> daysDiff == 1L
                         getString(R.string.date_7_days) -> daysDiff in 0..7
                         getString(R.string.date_30_days) -> daysDiff in 0..30
                         else -> true
@@ -261,6 +259,13 @@ class MainActivity : BaseActivity() {
 
         adapter.submitList(filtered)
         updateFilterIcon()
+    }
+
+    private fun resetTime(cal: Calendar) {
+        cal.set(Calendar.HOUR_OF_DAY, 0)
+        cal.set(Calendar.MINUTE, 0)
+        cal.set(Calendar.SECOND, 0)
+        cal.set(Calendar.MILLISECOND, 0)
     }
 
     private fun updateFilterIcon() {

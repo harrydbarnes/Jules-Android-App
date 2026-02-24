@@ -112,25 +112,16 @@ class CreateTaskActivity : BaseActivity() {
                 launch {
                     viewModel.availableSources.collectLatest { sources ->
                         val sourceNames = sources.map { it.source }.distinct()
-                        if (repoAdapter == null) {
-                            repoAdapter = ArrayAdapter(
-                                this@CreateTaskActivity,
-                                android.R.layout.simple_dropdown_item_1line,
-                                ArrayList(sourceNames)
-                            )
-                            binding.repoInput.setAdapter(repoAdapter)
-                        } else {
-                            repoAdapter?.clear()
-                            repoAdapter?.addAll(sourceNames)
-                            repoAdapter?.notifyDataSetChanged()
-                        }
+                        repoAdapter?.clear()
+                        repoAdapter?.addAll(sourceNames)
+                        repoAdapter?.notifyDataSetChanged()
                     }
                 }
 
                 launch {
                     viewModel.isLoading.collectLatest { isLoading ->
                         binding.btnStartTask.isEnabled = !isLoading
-                        binding.btnStartTask.text = if (isLoading) "Starting..." else "Send to Jules"
+                        binding.btnStartTask.text = if (isLoading) getString(R.string.create_task_starting) else getString(R.string.create_task_send)
                     }
                 }
 

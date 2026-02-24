@@ -7,19 +7,35 @@ import java.util.TimeZone
 
 object DateUtils {
 
+    private val DATE_FORMATS = listOf(
+        "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+        "yyyy-MM-dd'T'HH:mm:ss'Z'",
+        "yyyy-MM-dd'T'HH:mm:ss"
+    )
+
+    private val formatters = ThreadLocal<Map<String, SimpleDateFormat>>()
+
+    private fun getFormatter(pattern: String): SimpleDateFormat {
+        var map = formatters.get()
+        if (map == null) {
+            map = HashMap()
+            formatters.set(map)
+        }
+        var sdf = map[pattern]
+        if (sdf == null) {
+            sdf = SimpleDateFormat(pattern, Locale.getDefault())
+            sdf.timeZone = TimeZone.getTimeZone("UTC")
+            map[pattern] = sdf
+        }
+        return sdf
+    }
+
     fun parseDate(dateString: String?): Date? {
         if (dateString == null) return null
-        val formats = listOf(
-            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
-            "yyyy-MM-dd'T'HH:mm:ss'Z'",
-            "yyyy-MM-dd'T'HH:mm:ss"
-        )
-        for (format in formats) {
+        for (format in DATE_FORMATS) {
             try {
-                val sdf = SimpleDateFormat(format, Locale.getDefault())
-                sdf.timeZone = TimeZone.getTimeZone("UTC")
-                return sdf.parse(dateString)
-            } catch (e: Exception) {
+                return getFormatter(format).parse(dateString)
+            } catch (e: java.text.ParseException) {
                 // Try next format
             }
         }
@@ -28,8 +44,11 @@ object DateUtils {
 
     fun formatDate(dateString: String?): String? {
         val date = parseDate(dateString) ?: return null
-        val day = SimpleDateFormat("d", Locale.getDefault()).format(date).toInt()
-        val month = SimpleDateFormat("MMM", Locale.getDefault()).format(date)
+        val dayFormatter = SimpleDateFormat("d", Locale.getDefault())
+        val monthFormatter = SimpleDateFormat("MMM", Locale.getDefault())
+
+        val day = dayFormatter.format(date).toInt()
+        val month = monthFormatter.format(date)
         val suffix = getDayOfMonthSuffix(day)
         return "$day$suffix $month"
     }

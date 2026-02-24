@@ -80,4 +80,9 @@
     <string name="date_7_days">Last 7 days</string>
     <string name="date_30_days">Last 30 days</string>
     <string name="filter_all">All</string>
+    <string name="create_task_starting">Starting...</string>
+    <string name="create_task_send">Send to Jules</string>
+    <string name="action_search_close">Close search</string>
+    <string name="action_search_clear">Clear search</string>
+    <string name="action_search">Search sessions</string>
 </resources>

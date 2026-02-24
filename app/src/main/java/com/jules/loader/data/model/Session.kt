@@ -21,7 +21,10 @@ data class Session(
 data class SourceContext(
     val source: String,
     val githubRepoContext: GithubRepoContext?
-)
+) {
+    val cleanSource: String
+        get() = if (source.startsWith("sources/github/")) source.removePrefix("sources/github/") else source
+}
 
 data class GithubRepoContext(
     val startingBranch: String?
