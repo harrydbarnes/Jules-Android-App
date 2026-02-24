@@ -17,10 +17,24 @@ import com.jules.loader.databinding.ActivityCreateTaskBinding
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+import android.app.Activity
+import android.content.Intent
+import android.speech.RecognizerIntent
+import androidx.activity.result.contract.ActivityResultContracts
+
 class CreateTaskActivity : BaseActivity() {
 
     private lateinit var binding: ActivityCreateTaskBinding
     private lateinit var viewModel: CreateTaskViewModel
+
+    private val speechLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val spokenText = result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)?.firstOrNull()
+            if (spokenText != null) {
+                binding.taskInput.append(if (binding.taskInput.text.isNullOrEmpty()) spokenText else " $spokenText")
+            }
+        }
+    }
 
     companion object {
         private val TAG = CreateTaskActivity::class.java.simpleName
@@ -52,6 +66,10 @@ class CreateTaskActivity : BaseActivity() {
 
         setupRepoSelector()
         observeViewModel()
+
+        binding.taskInputLayout.setEndIconOnClickListener {
+            startVoiceInput()
+        }
 
         binding.btnStartTask.setOnClickListener {
             val prompt = binding.taskInput.text.toString().trim()
@@ -135,6 +153,18 @@ class CreateTaskActivity : BaseActivity() {
             if (it.isNullOrBlank()) {
                 binding.branchInput.setText("")
             }
+        }
+    }
+
+    private fun startVoiceInput() {
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            putExtra(RecognizerIntent.EXTRA_PROMPT, "Describe the task...")
+        }
+        try {
+            speechLauncher.launch(intent)
+        } catch (e: Exception) {
+            Toast.makeText(this, "Voice input not supported", Toast.LENGTH_SHORT).show()
         }
     }
 }
