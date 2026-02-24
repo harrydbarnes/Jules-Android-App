@@ -150,7 +150,7 @@ class MainActivity : BaseActivity() {
 
     private fun showRepoMenu(anchor: View) {
         val popup = PopupMenu(this, anchor)
-        val repos = allSessions.mapNotNull { it.sourceContext?.cleanSource }
+        val repos = allSessions.mapNotNull { it.sourceContext?.cleanSource?.substringAfterLast("/") }
             .distinct()
             .sorted()
 
@@ -221,7 +221,7 @@ class MainActivity : BaseActivity() {
         // 2. Repo Filter
         selectedRepo?.let { repo ->
              filtered = filtered.filter {
-                 it.sourceContext?.cleanSource == repo
+                 it.sourceContext?.cleanSource?.substringAfterLast("/") == repo
              }
         }
 
