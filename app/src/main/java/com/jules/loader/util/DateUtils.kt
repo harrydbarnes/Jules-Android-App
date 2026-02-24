@@ -13,7 +13,7 @@ object DateUtils {
         "yyyy-MM-dd'T'HH:mm:ss"
     )
 
-    private val formatters = ThreadLocal<Map<String, SimpleDateFormat>>()
+    private val formatters = ThreadLocal<MutableMap<String, SimpleDateFormat>>()
 
     private fun getFormatter(pattern: String): SimpleDateFormat {
         var map = formatters.get()
