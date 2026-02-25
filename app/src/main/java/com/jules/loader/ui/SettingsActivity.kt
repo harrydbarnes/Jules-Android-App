@@ -83,12 +83,32 @@ class SettingsActivity : BaseActivity() {
             .setTitle(R.string.action_edit_api_key)
             .setView(layout)
             .setPositiveButton(R.string.action_save, null) // Listener set later to prevent auto-dismiss
-            .setNegativeButton(R.string.action_cancel, null)
+            .setNegativeButton(R.string.action_cancel) { _, _ ->
+                // Smoothly hide keyboard on cancel
+                val imm = getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+                imm.hideSoftInputFromWindow(input.windowToken, 0)
+            }
             .create()
+
+        // Configure dialog window to sit at the top of the screen to prevent keyboard jump
+        dialog.window?.let { window ->
+            val layoutParams = window.attributes
+            layoutParams.gravity = android.view.Gravity.TOP
+            layoutParams.y = (100 * resources.displayMetrics.density).toInt() // Top margin
+            window.attributes = layoutParams
+        }
 
         dialog.show()
 
+        // Focus input and show keyboard automatically for better UX
+        input.requestFocus()
+        dialog.window?.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
+
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+            // Hide keyboard on save attempt
+            val imm = getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+            imm.hideSoftInputFromWindow(input.windowToken, 0)
+
             val newKey = input.text?.toString()?.trim()
             if (newKey.isNullOrEmpty()) {
                 return@setOnClickListener
