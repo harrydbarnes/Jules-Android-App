@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.jules.loader.MainActivity
 import com.jules.loader.R
 import com.jules.loader.data.JulesRepository
@@ -81,21 +82,16 @@ class OnboardingActivity : BaseActivity() {
     private class OnboardingAdapter(private val activity: OnboardingActivity) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         companion object {
-            private const val VIEW_TYPE_SLIDE = 0
-            private const val VIEW_TYPE_API = 1
-            private const val VIEW_TYPE_THEME = 2
+            private const val VIEW_TYPE_WELCOME = 0
+            private const val VIEW_TYPE_THEME = 1
+            private const val VIEW_TYPE_API = 2
         }
-
-        private val textSlides = listOf(
-            SlideData(activity.getString(R.string.onboarding_manage_sessions_title), activity.getString(R.string.onboarding_manage_sessions_desc)),
-            SlideData(activity.getString(R.string.onboarding_live_logs_title), activity.getString(R.string.onboarding_live_logs_desc))
-        )
 
         override fun getItemViewType(position: Int): Int {
             return when (position) {
-                textSlides.size -> VIEW_TYPE_THEME // Theme
-                textSlides.size + 1 -> VIEW_TYPE_API // API
-                else -> VIEW_TYPE_SLIDE
+                0 -> VIEW_TYPE_WELCOME
+                1 -> VIEW_TYPE_THEME
+                else -> VIEW_TYPE_API
             }
         }
 
@@ -110,15 +106,15 @@ class OnboardingActivity : BaseActivity() {
                     ThemeViewHolder(view)
                 }
                 else -> {
-                    val view = LayoutInflater.from(parent.context).inflate(R.layout.item_onboarding_page, parent, false)
-                    SlideViewHolder(view)
+                    val view = LayoutInflater.from(parent.context).inflate(R.layout.item_onboarding_welcome, parent, false)
+                    WelcomeViewHolder(view)
                 }
             }
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            if (holder is SlideViewHolder) {
-                holder.bind(textSlides[position])
+            if (holder is WelcomeViewHolder) {
+                holder.bind()
             } else if (holder is ApiViewHolder) {
                 holder.bind()
             } else if (holder is ThemeViewHolder) {
@@ -126,20 +122,21 @@ class OnboardingActivity : BaseActivity() {
             }
         }
 
-        override fun getItemCount(): Int = textSlides.size + 2 // +Theme, +API
+        override fun getItemCount(): Int = 3
 
-        inner class SlideViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-            private val title: TextView = itemView.findViewById(R.id.title)
-            private val desc: TextView = itemView.findViewById(R.id.description)
+        inner class WelcomeViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            private val nextButton: Button = itemView.findViewById(R.id.nextButton)
 
-            fun bind(data: SlideData) {
-                title.text = data.title
-                desc.text = data.desc
+            fun bind() {
+                nextButton.setOnClickListener {
+                    activity.binding.viewPager.currentItem = activity.binding.viewPager.currentItem + 1
+                }
             }
         }
 
         inner class ThemeViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             private val radioGroup: RadioGroup = itemView.findViewById(R.id.themeRadioGroup)
+            private val nextButton: Button = itemView.findViewById(R.id.nextButton)
 
             fun bind() {
                 val currentTheme = ThemeUtils.getSelectedTheme(activity)
@@ -161,10 +158,15 @@ class OnboardingActivity : BaseActivity() {
                         activity.recreate()
                     }
                 }
+
+                nextButton.setOnClickListener {
+                    activity.binding.viewPager.currentItem = activity.binding.viewPager.currentItem + 1
+                }
             }
         }
 
         inner class ApiViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            private val inputLayout: TextInputLayout = itemView.findViewById(R.id.apiKeyInputLayout)
             private val input: TextInputEditText = itemView.findViewById(R.id.apiKeyInput)
             private val getKeyLink: TextView = itemView.findViewById(R.id.getKeyLink)
             private val saveButton: Button = itemView.findViewById(R.id.saveButton)
@@ -172,6 +174,21 @@ class OnboardingActivity : BaseActivity() {
             fun bind() {
                 if (activity.detectedApiKey != null) {
                     input.setText(activity.detectedApiKey)
+                }
+
+                inputLayout.setEndIconOnClickListener {
+                    val clipboard = activity.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                    try {
+                        if (clipboard.hasPrimaryClip() && clipboard.primaryClipDescription?.hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN) == true) {
+                            val item = clipboard.primaryClip?.getItemAt(0)
+                            val text = item?.text?.toString()
+                            if (!text.isNullOrEmpty()) {
+                                input.setText(text)
+                            }
+                        }
+                    } catch (e: Exception) {
+                        // Ignore clipboard errors
+                    }
                 }
 
                 getKeyLink.setOnClickListener {
@@ -202,6 +219,4 @@ class OnboardingActivity : BaseActivity() {
             }
         }
     }
-
-    data class SlideData(val title: String, val desc: String)
 }
