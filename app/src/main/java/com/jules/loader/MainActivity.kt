@@ -97,13 +97,14 @@ class MainActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
+        val shortenRepoNames = PreferenceUtils.isShortenRepoNamesEnabled(this)
         if (::adapter.isInitialized) {
-            adapter.isShortenRepoNamesEnabled = PreferenceUtils.isShortenRepoNamesEnabled(this)
+            adapter.isShortenRepoNamesEnabled = shortenRepoNames
             adapter.notifyDataSetChanged()
         }
 
         selectedRepo?.let { repo ->
-            val displayRepo = PreferenceUtils.getDisplayRepoName(this, repo)
+            val displayRepo = PreferenceUtils.getDisplayRepoName(repo, shortenRepoNames)
             binding.chipRepo.text = displayRepo
         }
     }
@@ -178,7 +179,7 @@ class MainActivity : BaseActivity() {
         popup.setOnMenuItemClickListener { item ->
             selectedRepo = if (item.itemId == 0) null else repos[item.itemId - 1]
             val displayRepo = selectedRepo?.let { repo ->
-                PreferenceUtils.getDisplayRepoName(this, repo)
+                PreferenceUtils.getDisplayRepoName(repo, shortenRepoNames)
             } ?: getString(R.string.filter_repo)
             binding.chipRepo.text = displayRepo
             binding.chipRepo.isChecked = selectedRepo != null
