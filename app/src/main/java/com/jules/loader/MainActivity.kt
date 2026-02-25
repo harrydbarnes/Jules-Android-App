@@ -25,6 +25,7 @@ import com.jules.loader.ui.BaseActivity
 import com.jules.loader.ui.OnboardingActivity
 import com.jules.loader.ui.SessionAdapter
 import com.jules.loader.util.DateUtils
+import com.jules.loader.util.PreferenceUtils
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Date
@@ -94,6 +95,18 @@ class MainActivity : BaseActivity() {
         loadSessions()
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (::adapter.isInitialized) {
+            adapter.notifyDataSetChanged()
+        }
+
+        selectedRepo?.let { repo ->
+            val displayRepo = if (PreferenceUtils.isShortenRepoNamesEnabled(this)) repo.substringAfterLast("/") else repo
+            binding.chipRepo.text = displayRepo
+        }
+    }
+
     private fun setupSearch() {
         binding.btnSearch.contentDescription = getString(R.string.action_search)
         binding.btnSearch.setOnClickListener {
@@ -150,18 +163,22 @@ class MainActivity : BaseActivity() {
 
     private fun showRepoMenu(anchor: View) {
         val popup = PopupMenu(this, anchor)
-        val repos = allSessions.mapNotNull { it.sourceContext?.cleanSource?.substringAfterLast("/") }
+        val repos = allSessions.mapNotNull { it.sourceContext?.cleanSource }
             .distinct()
             .sorted()
 
         popup.menu.add(0, 0, 0, getString(R.string.filter_all))
         repos.forEachIndexed { index, repo ->
-            popup.menu.add(0, index + 1, index + 1, repo)
+            val displayRepo = if (PreferenceUtils.isShortenRepoNamesEnabled(this)) repo.substringAfterLast("/") else repo
+            popup.menu.add(0, index + 1, index + 1, displayRepo)
         }
 
         popup.setOnMenuItemClickListener { item ->
             selectedRepo = if (item.itemId == 0) null else repos[item.itemId - 1]
-            binding.chipRepo.text = if (selectedRepo == null) getString(R.string.filter_repo) else item.title
+            val displayRepo = selectedRepo?.let { repo ->
+                if (PreferenceUtils.isShortenRepoNamesEnabled(this)) repo.substringAfterLast("/") else repo
+            } ?: getString(R.string.filter_repo)
+            binding.chipRepo.text = displayRepo
             binding.chipRepo.isChecked = selectedRepo != null
             applyFilters()
             true
@@ -221,7 +238,7 @@ class MainActivity : BaseActivity() {
         // 2. Repo Filter
         selectedRepo?.let { repo ->
              filtered = filtered.filter {
-                 it.sourceContext?.cleanSource?.substringAfterLast("/") == repo
+                 it.sourceContext?.cleanSource == repo
              }
         }
 

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import com.jules.loader.R
 import com.jules.loader.databinding.ActivitySettingsBinding
+import com.jules.loader.util.PreferenceUtils
 import com.jules.loader.util.ThemeUtils
 
 class SettingsActivity : BaseActivity() {
@@ -19,6 +20,14 @@ class SettingsActivity : BaseActivity() {
         supportActionBar?.title = getString(R.string.menu_settings)
 
         setupThemeSelection()
+        setupDisplaySettings()
+    }
+
+    private fun setupDisplaySettings() {
+        binding.switchShortenRepoNames.isChecked = PreferenceUtils.isShortenRepoNamesEnabled(this)
+        binding.switchShortenRepoNames.setOnCheckedChangeListener { _, isChecked ->
+            PreferenceUtils.setShortenRepoNamesEnabled(this, isChecked)
+        }
     }
 
     private fun setupThemeSelection() {

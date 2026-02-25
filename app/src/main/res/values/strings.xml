@@ -24,6 +24,8 @@
     <string name="enter_repo_url">Enter Repo URL</string>
     <string name="load">Load</string>
     <string name="setting_use_dynamic_colours">Use Dynamic Colours</string>
+    <string name="setting_display">Display</string>
+    <string name="setting_shorten_repo_names">Shorten Repo Names</string>
     <string name="setting_theme">App Theme</string>
     <string name="theme_octopus">Octopus</string>
     <string name="theme_squid">Squid</string>

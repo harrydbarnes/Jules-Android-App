@@ -11,6 +11,7 @@ import com.google.android.material.chip.Chip
 import com.jules.loader.R
 import com.jules.loader.data.model.Session
 import com.jules.loader.util.DateUtils
+import com.jules.loader.util.PreferenceUtils
 
 import android.content.Intent
 import android.app.Activity
@@ -64,7 +65,11 @@ class SessionAdapter : ListAdapter<Session, SessionAdapter.SessionViewHolder>(Se
             } else {
                 source
             }
-            sourceChip.text = cleanSource.substringAfterLast("/")
+            sourceChip.text = if (PreferenceUtils.isShortenRepoNamesEnabled(context)) {
+                cleanSource.substringAfterLast("/")
+            } else {
+                cleanSource
+            }
 
             // Set date
             val formattedDate = DateUtils.formatDate(session.createTime)
