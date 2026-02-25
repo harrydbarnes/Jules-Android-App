@@ -26,7 +26,7 @@ object DateUtils {
         key: String,
         creator: () -> SimpleDateFormat
     ): SimpleDateFormat {
-        val map = cache.get()!!
+        val map = checkNotNull(cache.get()) { "ThreadLocal map should not be null" }
         return map.getOrPut(key, creator)
     }
 
