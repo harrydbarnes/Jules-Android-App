@@ -163,6 +163,11 @@ class SettingsActivity : BaseActivity() {
         binding.switchShortenRepoNames.setOnCheckedChangeListener { _, isChecked ->
             PreferenceUtils.setShortenRepoNamesEnabled(this, isChecked)
         }
+
+        binding.switchTransparentAppBar.isChecked = PreferenceUtils.isTransparentAppBarEnabled(this)
+        binding.switchTransparentAppBar.setOnCheckedChangeListener { _, isChecked ->
+            PreferenceUtils.setTransparentAppBarEnabled(this, isChecked)
+        }
     }
 
     private fun setupThemeSelection() {
