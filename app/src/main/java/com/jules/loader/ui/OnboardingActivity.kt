@@ -35,10 +35,6 @@ class OnboardingActivity : BaseActivity() {
         binding = ActivityOnboardingBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.imageViewAnimation.apply {
-            (drawable as? Animatable)?.start()
-        }
-
         val adapter = OnboardingAdapter(this)
         binding.viewPager.adapter = adapter
 
@@ -58,6 +54,12 @@ class OnboardingActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
         checkClipboard()
+        (binding.imageViewAnimation.drawable as? Animatable)?.start()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        (binding.imageViewAnimation.drawable as? Animatable)?.stop()
     }
 
     private fun checkClipboard() {

@@ -11,8 +11,8 @@
             <group android:name="bubble_0">
                 <path
                     android:pathData="M 30,180 m -4,0 a 4,4 0 1,1 8,0 a 4,4 0 1,1 -8,0"
-                    android:fillColor="#66FFFFFF"
-                    android:strokeColor="#99FFFFFF"
+                    android:fillColor="@color/octopus_bubble_fill"
+                    android:strokeColor="@color/octopus_bubble_stroke"
                     android:strokeWidth="0.5"/>
             </group>
 
@@ -20,8 +20,8 @@
             <group android:name="bubble_1">
                 <path
                     android:pathData="M 170,160 m -3,0 a 3,3 0 1,1 6,0 a 3,3 0 1,1 -6,0"
-                    android:fillColor="#66FFFFFF"
-                    android:strokeColor="#99FFFFFF"
+                    android:fillColor="@color/octopus_bubble_fill"
+                    android:strokeColor="@color/octopus_bubble_stroke"
                     android:strokeWidth="0.5"/>
             </group>
 
@@ -29,8 +29,8 @@
             <group android:name="bubble_2">
                 <path
                     android:pathData="M 185,190 m -5,0 a 5,5 0 1,1 10,0 a 5,5 0 1,1 -10,0"
-                    android:fillColor="#66FFFFFF"
-                    android:strokeColor="#99FFFFFF"
+                    android:fillColor="@color/octopus_bubble_fill"
+                    android:strokeColor="@color/octopus_bubble_stroke"
                     android:strokeWidth="0.5"/>
             </group>
 
@@ -38,8 +38,8 @@
             <group android:name="bubble_3">
                 <path
                     android:pathData="M 20,150 m -2.5,0 a 2.5,2.5 0 1,1 5,0 a 2.5,2.5 0 1,1 -5,0"
-                    android:fillColor="#66FFFFFF"
-                    android:strokeColor="#99FFFFFF"
+                    android:fillColor="@color/octopus_bubble_fill"
+                    android:strokeColor="@color/octopus_bubble_stroke"
                     android:strokeWidth="0.5"/>
             </group>
 
@@ -50,7 +50,7 @@
                 <group android:name="tentacle_1" android:pivotX="100" android:pivotY="120">
                     <path
                         android:pathData="M65,125 Q50,165 40,155"
-                        android:strokeColor="#9370DB"
+                        android:strokeColor="@color/octopus_body_color"
                         android:strokeWidth="14"
                         android:strokeLineCap="round"/>
                 </group>
@@ -59,7 +59,7 @@
                 <group android:name="tentacle_2" android:pivotX="100" android:pivotY="120">
                     <path
                         android:pathData="M85,130 Q85,180 75,170"
-                        android:strokeColor="#9370DB"
+                        android:strokeColor="@color/octopus_body_color"
                         android:strokeWidth="14"
                         android:strokeLineCap="round"/>
                 </group>
@@ -68,7 +68,7 @@
                 <group android:name="tentacle_3" android:pivotX="100" android:pivotY="120">
                     <path
                         android:pathData="M115,130 Q115,180 125,170"
-                        android:strokeColor="#9370DB"
+                        android:strokeColor="@color/octopus_body_color"
                         android:strokeWidth="14"
                         android:strokeLineCap="round"/>
                 </group>
@@ -77,7 +77,7 @@
                 <group android:name="tentacle_4" android:pivotX="100" android:pivotY="120">
                     <path
                         android:pathData="M135,125 Q150,165 160,155"
-                        android:strokeColor="#9370DB"
+                        android:strokeColor="@color/octopus_body_color"
                         android:strokeWidth="14"
                         android:strokeLineCap="round"/>
                 </group>
@@ -85,28 +85,28 @@
                 <!-- Head -->
                 <path
                     android:pathData="M50,100 A50,65 0 1,1 150,100 Q150,145 100,145 Q50,145 50,100"
-                    android:fillColor="#9370DB"/>
+                    android:fillColor="@color/octopus_body_color"/>
 
                 <!-- Left Eye -->
                 <path
                     android:pathData="M 80,105 m -6,0 a 6,6 0 1,1 12,0 a 6,6 0 1,1 -12,0"
-                    android:fillColor="#FFFFFFFF"/>
+                    android:fillColor="@color/white"/>
                 <path
                     android:pathData="M 80,105 m -3,0 a 3,3 0 1,1 6,0 a 3,3 0 1,1 -6,0"
-                    android:fillColor="#FF000000"/>
+                    android:fillColor="@color/black"/>
 
                 <!-- Right Eye -->
                 <path
                     android:pathData="M 120,105 m -6,0 a 6,6 0 1,1 12,0 a 6,6 0 1,1 -12,0"
-                    android:fillColor="#FFFFFFFF"/>
+                    android:fillColor="@color/white"/>
                 <path
                     android:pathData="M 120,105 m -3,0 a 3,3 0 1,1 6,0 a 3,3 0 1,1 -6,0"
-                    android:fillColor="#FF000000"/>
+                    android:fillColor="@color/black"/>
 
                 <!-- Mouth -->
                 <path
                     android:pathData="M90,125 Q100,133 110,125"
-                    android:strokeColor="#FFFFFFFF"
+                    android:strokeColor="@color/white"
                     android:strokeWidth="2"
                     android:strokeLineCap="round"/>
             </group>
