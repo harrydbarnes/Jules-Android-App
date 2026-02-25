@@ -101,8 +101,8 @@ class MainActivity : BaseActivity() {
             adapter.notifyDataSetChanged()
         }
 
-        if (selectedRepo != null) {
-            val displayRepo = if (PreferenceUtils.isShortenRepoNamesEnabled(this)) selectedRepo!!.substringAfterLast("/") else selectedRepo
+        selectedRepo?.let { repo ->
+            val displayRepo = if (PreferenceUtils.isShortenRepoNamesEnabled(this)) repo.substringAfterLast("/") else repo
             binding.chipRepo.text = displayRepo
         }
     }
