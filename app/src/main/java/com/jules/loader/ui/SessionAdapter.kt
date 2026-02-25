@@ -65,11 +65,7 @@ class SessionAdapter : ListAdapter<Session, SessionAdapter.SessionViewHolder>(Se
             } else {
                 source
             }
-            sourceChip.text = if (PreferenceUtils.isShortenRepoNamesEnabled(context)) {
-                cleanSource.substringAfterLast("/")
-            } else {
-                cleanSource
-            }
+            sourceChip.text = PreferenceUtils.getDisplayRepoName(context, cleanSource)
 
             // Set date
             val formattedDate = DateUtils.formatDate(session.createTime)

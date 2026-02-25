@@ -102,7 +102,7 @@ class MainActivity : BaseActivity() {
         }
 
         selectedRepo?.let { repo ->
-            val displayRepo = if (PreferenceUtils.isShortenRepoNamesEnabled(this)) repo.substringAfterLast("/") else repo
+            val displayRepo = PreferenceUtils.getDisplayRepoName(this, repo)
             binding.chipRepo.text = displayRepo
         }
     }
@@ -169,14 +169,14 @@ class MainActivity : BaseActivity() {
 
         popup.menu.add(0, 0, 0, getString(R.string.filter_all))
         repos.forEachIndexed { index, repo ->
-            val displayRepo = if (PreferenceUtils.isShortenRepoNamesEnabled(this)) repo.substringAfterLast("/") else repo
+            val displayRepo = PreferenceUtils.getDisplayRepoName(this, repo)
             popup.menu.add(0, index + 1, index + 1, displayRepo)
         }
 
         popup.setOnMenuItemClickListener { item ->
             selectedRepo = if (item.itemId == 0) null else repos[item.itemId - 1]
             val displayRepo = selectedRepo?.let { repo ->
-                if (PreferenceUtils.isShortenRepoNamesEnabled(this)) repo.substringAfterLast("/") else repo
+                PreferenceUtils.getDisplayRepoName(this, repo)
             } ?: getString(R.string.filter_repo)
             binding.chipRepo.text = displayRepo
             binding.chipRepo.isChecked = selectedRepo != null

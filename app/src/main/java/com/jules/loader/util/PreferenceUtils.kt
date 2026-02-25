@@ -12,6 +12,14 @@ object PreferenceUtils {
         return prefs.getBoolean(KEY_SHORTEN_REPO_NAMES, true)
     }
 
+    fun getDisplayRepoName(context: Context, fullName: String): String {
+        return if (isShortenRepoNamesEnabled(context)) {
+            fullName.substringAfterLast('/')
+        } else {
+            fullName
+        }
+    }
+
     fun setShortenRepoNamesEnabled(context: Context, enabled: Boolean) {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         prefs.edit { putBoolean(KEY_SHORTEN_REPO_NAMES, enabled) }
