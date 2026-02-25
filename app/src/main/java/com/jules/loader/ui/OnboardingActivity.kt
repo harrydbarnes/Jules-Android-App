@@ -36,6 +36,8 @@ class OnboardingActivity : BaseActivity() {
 
         binding.webViewAnimation.apply {
             setBackgroundColor(0)
+            settings.javaScriptEnabled = false
+            settings.allowFileAccess = false
             settings.loadWithOverviewMode = true
             settings.useWideViewPort = true
             loadUrl("file:///android_asset/octopus.html")
