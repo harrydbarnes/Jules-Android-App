@@ -7,17 +7,10 @@ object PreferenceUtils {
     private const val PREFS_NAME = "jules_settings"
     private const val KEY_SHORTEN_REPO_NAMES = "shorten_repo_names"
 
-    @Volatile
-    private var cachedShortenRepoNames: Boolean? = null
-
     private fun getPrefs(context: Context) = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
     fun isShortenRepoNamesEnabled(context: Context): Boolean {
-        return cachedShortenRepoNames ?: synchronized(this) {
-            cachedShortenRepoNames ?: getPrefs(context).getBoolean(KEY_SHORTEN_REPO_NAMES, true).also {
-                cachedShortenRepoNames = it
-            }
-        }
+        return getPrefs(context).getBoolean(KEY_SHORTEN_REPO_NAMES, true)
     }
 
     fun getDisplayRepoName(context: Context, fullName: String): String {
@@ -29,9 +22,6 @@ object PreferenceUtils {
     }
 
     fun setShortenRepoNamesEnabled(context: Context, enabled: Boolean) {
-        synchronized(this) {
-            getPrefs(context).edit { putBoolean(KEY_SHORTEN_REPO_NAMES, enabled) }
-            cachedShortenRepoNames = enabled
-        }
+        getPrefs(context).edit { putBoolean(KEY_SHORTEN_REPO_NAMES, enabled) }
     }
 }
