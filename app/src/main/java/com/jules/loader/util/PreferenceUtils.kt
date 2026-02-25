@@ -6,16 +6,11 @@ import androidx.core.content.edit
 object PreferenceUtils {
     private const val PREFS_NAME = "jules_settings"
     private const val KEY_SHORTEN_REPO_NAMES = "shorten_repo_names"
-    private const val KEY_TRANSPARENT_APP_BAR = "transparent_app_bar"
 
     private fun getPrefs(context: Context) = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
     fun isShortenRepoNamesEnabled(context: Context): Boolean {
         return getPrefs(context).getBoolean(KEY_SHORTEN_REPO_NAMES, true)
-    }
-
-    fun isTransparentAppBarEnabled(context: Context): Boolean {
-        return getPrefs(context).getBoolean(KEY_TRANSPARENT_APP_BAR, false)
     }
 
     fun getDisplayRepoName(context: Context, fullName: String): String {
@@ -32,9 +27,5 @@ object PreferenceUtils {
 
     fun setShortenRepoNamesEnabled(context: Context, enabled: Boolean) {
         getPrefs(context).edit { putBoolean(KEY_SHORTEN_REPO_NAMES, enabled) }
-    }
-
-    fun setTransparentAppBarEnabled(context: Context, enabled: Boolean) {
-        getPrefs(context).edit { putBoolean(KEY_TRANSPARENT_APP_BAR, enabled) }
     }
 }

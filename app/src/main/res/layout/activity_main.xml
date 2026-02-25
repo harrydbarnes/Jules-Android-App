@@ -11,13 +11,12 @@
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true"
         android:background="?android:attr/colorBackground"
-        app:liftOnScroll="true">
+        app:liftOnScroll="false">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:contentInsetStart="28dp"
             app:titleTextAppearance="@style/TextAppearance.Jules.Toolbar"
             app:popupTheme="@style/ThemeOverlay.Jules.Popup" />
 
@@ -37,32 +36,30 @@
                 android:orientation="horizontal"
                 android:gravity="center_vertical">
 
-                <com.google.android.material.button.MaterialButton
+                <ImageView
                     android:id="@+id/btnSearch"
-                    style="@style/Widget.Material3.Button.IconButton.FilledTonal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:icon="@drawable/ic_search"
-                    app:iconGravity="textStart"
-                    app:iconPadding="0dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:padding="12dp"
+                    android:src="@drawable/ic_search"
+                    android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/search_hint"/>
 
                 <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:layout_marginEnd="8dp"
                     android:clipChildren="true">
 
-                    <com.google.android.material.button.MaterialButton
+                    <ImageView
                         android:id="@+id/btnFilter"
-                        style="@style/Widget.Material3.Button.IconButton.FilledTonal"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="12dp"
                         android:clickable="true"
                         android:focusable="true"
-                        app:icon="@drawable/ic_filter_list"
-                        app:iconGravity="textStart"
-                        app:iconPadding="0dp"
+                        android:src="@drawable/ic_filter_list"
+                        android:background="?attr/selectableItemBackgroundBorderless"
                         android:contentDescription="@string/filters_label"/>
                 </FrameLayout>
 

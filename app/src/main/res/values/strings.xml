@@ -26,7 +26,6 @@
     <string name="setting_use_dynamic_colours">Use Dynamic Colours</string>
     <string name="setting_display">Display</string>
     <string name="setting_shorten_repo_names">Shorten Repo Names</string>
-    <string name="setting_transparent_app_bar">Transparent App Bar</string>
     <string name="setting_theme">App Theme</string>
     <string name="theme_octopus">Octopus</string>
     <string name="theme_squid">Squid</string>

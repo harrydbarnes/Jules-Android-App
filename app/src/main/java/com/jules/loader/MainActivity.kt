@@ -107,9 +107,6 @@ class MainActivity : BaseActivity() {
             val displayRepo = PreferenceUtils.getDisplayRepoName(repo, shortenRepoNames)
             binding.chipRepo.text = displayRepo
         }
-
-        val transparentAppBar = PreferenceUtils.isTransparentAppBarEnabled(this)
-        binding.appBarLayout.isLiftOnScroll = !transparentAppBar
     }
 
     private fun setupSearch() {
@@ -308,7 +305,7 @@ class MainActivity : BaseActivity() {
         outAnim.interpolator = AccelerateDecelerateInterpolator()
         outAnim.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator) {
-                binding.btnFilter.setIconResource(iconRes)
+                binding.btnFilter.setImageResource(iconRes)
                 binding.btnFilter.contentDescription = desc
                 if (hasFilter) {
                     binding.btnFilter.setOnClickListener { clearFilters() }
