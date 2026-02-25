@@ -43,10 +43,13 @@
     <string name="error_enter_api_key">Please enter an API Key</string>
 
     <string name="welcome_header">Welcome to Octopus!</string>
-    <string name="welcome_subtext">Whether you are commuting or just away from your desk, Octopus for Jules ensures you never lose momentum. Use Jules with ease, managing your technical tasks with the same power you expect from your desktop environment.</string>
-    <string name="feature_real_time">📈 Real-Time Activity Monitoring: Stay informed with live activity logs that provide instant updates on your task progress and status.</string>
-    <string name="feature_task_creation">✍️ Effortless Task Creation: Quickly start new tasks by entering prompts directly or by sharing text from other applications on your device.</string>
-    <string name="feature_repo_access">📂 Integrated Repository Access: Seamlessly connect to your GitHub repositories to attach relevant context and branches to your tasks.</string>
+    <string name="welcome_subtext">Jules in your pocket. Manage technical tasks on the go. Go grab that coffee, you deserve one.</string>
+    <string name="feature_real_time_title">📈 Live Activity Monitoring</string>
+    <string name="feature_real_time_desc">Instant updates on every task, in real time.</string>
+    <string name="feature_task_creation_title">✍️ Quick Task Creation</string>
+    <string name="feature_task_creation_desc">Type a prompt, dictate or share text straight from any app. You do you.</string>
+    <string name="feature_repo_access_title">📂 GitHub Integration</string>
+    <string name="feature_repo_access_desc">Connect repos and branches directly to your tasks. We have our tentacles everywhere.</string>
     <string name="action_next">Next</string>
     <string name="paste_api_key">Paste API Key</string>
 
