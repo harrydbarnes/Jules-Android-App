@@ -34,6 +34,13 @@ class OnboardingActivity : BaseActivity() {
         binding = ActivityOnboardingBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        binding.webViewAnimation.apply {
+            setBackgroundColor(0)
+            settings.loadWithOverviewMode = true
+            settings.useWideViewPort = true
+            loadUrl("file:///android_asset/octopus.html")
+        }
+
         val adapter = OnboardingAdapter(this)
         binding.viewPager.adapter = adapter
 
