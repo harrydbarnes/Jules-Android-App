@@ -138,11 +138,13 @@ class JulesRepository private constructor(private val context: Context) {
     }
 
     suspend fun validateApiKey(apiKey: String): Boolean {
-        return try {
-            service.listSources(apiKey)
-            true
-        } catch (e: Exception) {
-            false
+        return kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+            try {
+                service.listSources(apiKey)
+                true
+            } catch (e: Exception) {
+                false
+            }
         }
     }
 }
