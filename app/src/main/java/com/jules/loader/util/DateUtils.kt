@@ -13,21 +13,28 @@ object DateUtils {
         "yyyy-MM-dd'T'HH:mm:ss"
     )
 
-    private val formatters = ThreadLocal<MutableMap<String, SimpleDateFormat>>()
+    private val formatters = object : ThreadLocal<MutableMap<String, SimpleDateFormat>>() {
+        override fun initialValue() = HashMap<String, SimpleDateFormat>()
+    }
+
+    private val displayFormatters = object : ThreadLocal<MutableMap<String, SimpleDateFormat>>() {
+        override fun initialValue() = HashMap<String, SimpleDateFormat>()
+    }
 
     private fun getFormatter(pattern: String): SimpleDateFormat {
-        var map = formatters.get()
-        if (map == null) {
-            map = HashMap()
-            formatters.set(map)
+        val map = formatters.get()!!
+        return map.getOrPut(pattern) {
+            SimpleDateFormat(pattern, Locale.US).apply {
+                timeZone = TimeZone.getTimeZone("UTC")
+            }
         }
-        var sdf = map[pattern]
-        if (sdf == null) {
-            sdf = SimpleDateFormat(pattern, Locale.US)
-            sdf.timeZone = TimeZone.getTimeZone("UTC")
-            map[pattern] = sdf
+    }
+
+    private fun getDisplayFormatter(pattern: String): SimpleDateFormat {
+        val map = displayFormatters.get()!!
+        return map.getOrPut(pattern) {
+            SimpleDateFormat(pattern, Locale.getDefault())
         }
-        return sdf
     }
 
     fun parseDate(dateString: String?): Date? {
@@ -44,8 +51,8 @@ object DateUtils {
 
     fun formatDate(dateString: String?): String? {
         val date = parseDate(dateString) ?: return null
-        val dayFormatter = SimpleDateFormat("d", Locale.getDefault())
-        val monthFormatter = SimpleDateFormat("MMM", Locale.getDefault())
+        val dayFormatter = getDisplayFormatter("d")
+        val monthFormatter = getDisplayFormatter("MMM")
 
         val day = dayFormatter.format(date).toInt()
         val month = monthFormatter.format(date)

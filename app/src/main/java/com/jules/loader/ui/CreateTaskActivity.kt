@@ -42,6 +42,8 @@ class CreateTaskActivity : BaseActivity() {
     companion object {
         private val TAG = CreateTaskActivity::class.java.simpleName
         private const val PERMISSION_REQUEST_AUDIO = 100
+        private const val MIN_DB_LEVEL = -2f
+        private const val MAX_DB_LEVEL = 10f
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -102,7 +104,7 @@ class CreateTaskActivity : BaseActivity() {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == PERMISSION_REQUEST_AUDIO && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            toggleListening()
+            showVoiceDialog()
         }
     }
 
@@ -224,11 +226,9 @@ class CreateTaskActivity : BaseActivity() {
                 tvStatus.text = "Listening..."
             }
             override fun onRmsChanged(rmsdB: Float) {
-                // Scale visualizer based on dB (-2 to 10)
-                val minDb = -2f
-                val maxDb = 10f
-                val clampedDb = rmsdB.coerceIn(minDb, maxDb)
-                val scale = 1.0f + ((clampedDb - minDb) / (maxDb - minDb) * 1.0f) // Scale 1.0 to 2.0
+                // Scale visualizer based on dB
+                val clampedDb = rmsdB.coerceIn(MIN_DB_LEVEL, MAX_DB_LEVEL)
+                val scale = 1.0f + ((clampedDb - MIN_DB_LEVEL) / (MAX_DB_LEVEL - MIN_DB_LEVEL) * 1.0f) // Scale 1.0 to 2.0
                 visualizer.animate().scaleX(scale).scaleY(scale).setDuration(50).start()
             }
             override fun onBufferReceived(buffer: ByteArray?) {}
@@ -263,7 +263,4 @@ class CreateTaskActivity : BaseActivity() {
         dialog.show()
     }
 
-    private fun toggleListening() {
-        showVoiceDialog()
-    }
 }
