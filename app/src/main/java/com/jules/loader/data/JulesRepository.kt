@@ -88,6 +88,11 @@ class JulesRepository private constructor(private val context: Context) {
         prefs.edit().putString(KEY_API_KEY, key).apply()
     }
 
+    fun clearApiKey() {
+        prefs.edit().remove(KEY_API_KEY).apply()
+        cachedSessions = null
+    }
+
     fun getApiKey(): String? {
         return prefs.getString(KEY_API_KEY, null)
     }
