@@ -1,0 +1,129 @@
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt">
+    <aapt:attr name="android:drawable">
+        <vector
+            android:width="200dp"
+            android:height="200dp"
+            android:viewportWidth="200"
+            android:viewportHeight="200">
+
+            <!-- Bubble 1 (Delay 0) -->
+            <group android:name="bubble_0">
+                <path
+                    android:pathData="M 30,180 m -4,0 a 4,4 0 1,1 8,0 a 4,4 0 1,1 -8,0"
+                    android:fillColor="#66FFFFFF"
+                    android:strokeColor="#99FFFFFF"
+                    android:strokeWidth="0.5"/>
+            </group>
+
+            <!-- Bubble 2 (Delay 1.5s) -->
+            <group android:name="bubble_1">
+                <path
+                    android:pathData="M 170,160 m -3,0 a 3,3 0 1,1 6,0 a 3,3 0 1,1 -6,0"
+                    android:fillColor="#66FFFFFF"
+                    android:strokeColor="#99FFFFFF"
+                    android:strokeWidth="0.5"/>
+            </group>
+
+            <!-- Bubble 3 (Delay 0.8s) -->
+            <group android:name="bubble_2">
+                <path
+                    android:pathData="M 185,190 m -5,0 a 5,5 0 1,1 10,0 a 5,5 0 1,1 -10,0"
+                    android:fillColor="#66FFFFFF"
+                    android:strokeColor="#99FFFFFF"
+                    android:strokeWidth="0.5"/>
+            </group>
+
+            <!-- Bubble 4 (Delay 2.2s) -->
+            <group android:name="bubble_3">
+                <path
+                    android:pathData="M 20,150 m -2.5,0 a 2.5,2.5 0 1,1 5,0 a 2.5,2.5 0 1,1 -5,0"
+                    android:fillColor="#66FFFFFF"
+                    android:strokeColor="#99FFFFFF"
+                    android:strokeWidth="0.5"/>
+            </group>
+
+            <!-- Octopus Body Group -->
+            <group android:name="octopus_body">
+
+                <!-- Tentacle 1 (Delay 0) -->
+                <group android:name="tentacle_1" android:pivotX="100" android:pivotY="120">
+                    <path
+                        android:pathData="M65,125 Q50,165 40,155"
+                        android:strokeColor="#9370DB"
+                        android:strokeWidth="14"
+                        android:strokeLineCap="round"/>
+                </group>
+
+                <!-- Tentacle 2 (Delay 0.6s) -->
+                <group android:name="tentacle_2" android:pivotX="100" android:pivotY="120">
+                    <path
+                        android:pathData="M85,130 Q85,180 75,170"
+                        android:strokeColor="#9370DB"
+                        android:strokeWidth="14"
+                        android:strokeLineCap="round"/>
+                </group>
+
+                <!-- Tentacle 3 (Delay 0) -->
+                <group android:name="tentacle_3" android:pivotX="100" android:pivotY="120">
+                    <path
+                        android:pathData="M115,130 Q115,180 125,170"
+                        android:strokeColor="#9370DB"
+                        android:strokeWidth="14"
+                        android:strokeLineCap="round"/>
+                </group>
+
+                <!-- Tentacle 4 (Delay 0.6s) -->
+                <group android:name="tentacle_4" android:pivotX="100" android:pivotY="120">
+                    <path
+                        android:pathData="M135,125 Q150,165 160,155"
+                        android:strokeColor="#9370DB"
+                        android:strokeWidth="14"
+                        android:strokeLineCap="round"/>
+                </group>
+
+                <!-- Head -->
+                <path
+                    android:pathData="M50,100 A50,65 0 1,1 150,100 Q150,145 100,145 Q50,145 50,100"
+                    android:fillColor="#9370DB"/>
+
+                <!-- Left Eye -->
+                <path
+                    android:pathData="M 80,105 m -6,0 a 6,6 0 1,1 12,0 a 6,6 0 1,1 -12,0"
+                    android:fillColor="#FFFFFFFF"/>
+                <path
+                    android:pathData="M 80,105 m -3,0 a 3,3 0 1,1 6,0 a 3,3 0 1,1 -6,0"
+                    android:fillColor="#FF000000"/>
+
+                <!-- Right Eye -->
+                <path
+                    android:pathData="M 120,105 m -6,0 a 6,6 0 1,1 12,0 a 6,6 0 1,1 -12,0"
+                    android:fillColor="#FFFFFFFF"/>
+                <path
+                    android:pathData="M 120,105 m -3,0 a 3,3 0 1,1 6,0 a 3,3 0 1,1 -6,0"
+                    android:fillColor="#FF000000"/>
+
+                <!-- Mouth -->
+                <path
+                    android:pathData="M90,125 Q100,133 110,125"
+                    android:strokeColor="#FFFFFFFF"
+                    android:strokeWidth="2"
+                    android:strokeLineCap="round"/>
+            </group>
+        </vector>
+    </aapt:attr>
+
+    <!-- Targets -->
+    <target android:name="octopus_body" android:animation="@animator/octopus_float" />
+
+    <target android:name="tentacle_1" android:animation="@animator/octopus_wave" />
+    <target android:name="tentacle_2" android:animation="@animator/octopus_wave_delayed" />
+    <target android:name="tentacle_3" android:animation="@animator/octopus_wave" />
+    <target android:name="tentacle_4" android:animation="@animator/octopus_wave_delayed" />
+
+    <target android:name="bubble_0" android:animation="@animator/bubble_rise_0" />
+    <target android:name="bubble_1" android:animation="@animator/bubble_rise_1500" />
+    <target android:name="bubble_2" android:animation="@animator/bubble_rise_800" />
+    <target android:name="bubble_3" android:animation="@animator/bubble_rise_2200" />
+
+</animated-vector>

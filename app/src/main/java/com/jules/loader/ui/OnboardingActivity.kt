@@ -4,6 +4,7 @@ import android.content.ClipDescription
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.Animatable
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -34,14 +35,8 @@ class OnboardingActivity : BaseActivity() {
         binding = ActivityOnboardingBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.webViewAnimation.apply {
-            setBackgroundColor(0)
-            settings.javaScriptEnabled = false
-            settings.allowFileAccess = false
-            settings.allowContentAccess = false
-            settings.loadWithOverviewMode = true
-            settings.useWideViewPort = true
-            loadUrl("file:///android_asset/octopus.html")
+        binding.imageViewAnimation.apply {
+            (drawable as? Animatable)?.start()
         }
 
         val adapter = OnboardingAdapter(this)
