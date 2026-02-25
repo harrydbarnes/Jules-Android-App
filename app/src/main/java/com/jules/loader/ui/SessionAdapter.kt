@@ -19,13 +19,15 @@ import androidx.core.app.ActivityOptionsCompat
 
 class SessionAdapter : ListAdapter<Session, SessionAdapter.SessionViewHolder>(SessionDiffCallback()) {
 
+    var isShortenRepoNamesEnabled: Boolean = true
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SessionViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_session, parent, false)
         return SessionViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: SessionViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(getItem(position), isShortenRepoNamesEnabled)
     }
 
     class SessionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -36,7 +38,7 @@ class SessionAdapter : ListAdapter<Session, SessionAdapter.SessionViewHolder>(Se
         private val dateChip: Chip = itemView.findViewById(R.id.dateChip)
         private val pulseView: View = itemView.findViewById(R.id.pulseView)
 
-        fun bind(session: Session) {
+        fun bind(session: Session, shortenRepoNames: Boolean) {
             val context = itemView.context
             title.text = session.title ?: context.getString(R.string.untitled_session)
             prompt.text = session.prompt ?: context.getString(R.string.no_prompt)
@@ -65,11 +67,7 @@ class SessionAdapter : ListAdapter<Session, SessionAdapter.SessionViewHolder>(Se
             } else {
                 source
             }
-            sourceChip.text = if (PreferenceUtils.isShortenRepoNamesEnabled(context)) {
-                cleanSource.substringAfterLast("/")
-            } else {
-                cleanSource
-            }
+            sourceChip.text = PreferenceUtils.getDisplayRepoName(cleanSource, shortenRepoNames)
 
             // Set date
             val formattedDate = DateUtils.formatDate(session.createTime)

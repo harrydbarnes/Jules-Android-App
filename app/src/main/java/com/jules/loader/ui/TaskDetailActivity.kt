@@ -101,11 +101,7 @@ class TaskDetailActivity : BaseActivity() {
         if (source != null) {
             binding.detailSourceChip.visibility = View.VISIBLE
             val cleanSource = source.removePrefix("sources/github/")
-            val displaySource = if (PreferenceUtils.isShortenRepoNamesEnabled(this)) {
-                cleanSource.substringAfterLast("/")
-            } else {
-                cleanSource
-            }
+            val displaySource = PreferenceUtils.getDisplayRepoName(this, cleanSource)
             binding.detailSourceChip.text = displaySource
         } else {
             binding.detailSourceChip.visibility = View.GONE
