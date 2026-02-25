@@ -21,9 +21,17 @@ object DateUtils {
         override fun initialValue() = HashMap<String, SimpleDateFormat>()
     }
 
+    private fun getCachedFormatter(
+        cache: ThreadLocal<MutableMap<String, SimpleDateFormat>>,
+        key: String,
+        creator: () -> SimpleDateFormat
+    ): SimpleDateFormat {
+        val map = cache.get()!!
+        return map.getOrPut(key, creator)
+    }
+
     private fun getFormatter(pattern: String): SimpleDateFormat {
-        val map = formatters.get()!!
-        return map.getOrPut(pattern) {
+        return getCachedFormatter(formatters, pattern) {
             SimpleDateFormat(pattern, Locale.US).apply {
                 timeZone = TimeZone.getTimeZone("UTC")
             }
@@ -31,10 +39,9 @@ object DateUtils {
     }
 
     private fun getDisplayFormatter(pattern: String): SimpleDateFormat {
-        val map = displayFormatters.get()!!
         val locale = Locale.getDefault()
         val key = "$pattern:${locale.toLanguageTag()}"
-        return map.getOrPut(key) {
+        return getCachedFormatter(displayFormatters, key) {
             SimpleDateFormat(pattern, locale)
         }
     }
