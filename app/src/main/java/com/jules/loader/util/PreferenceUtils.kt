@@ -14,7 +14,11 @@ object PreferenceUtils {
     }
 
     fun getDisplayRepoName(context: Context, fullName: String): String {
-        return if (isShortenRepoNamesEnabled(context)) {
+        return getDisplayRepoName(fullName, isShortenRepoNamesEnabled(context))
+    }
+
+    fun getDisplayRepoName(fullName: String, shorten: Boolean): String {
+        return if (shorten) {
             fullName.substringAfterLast('/')
         } else {
             fullName

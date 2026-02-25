@@ -98,6 +98,7 @@ class MainActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
         if (::adapter.isInitialized) {
+            adapter.isShortenRepoNamesEnabled = PreferenceUtils.isShortenRepoNamesEnabled(this)
             adapter.notifyDataSetChanged()
         }
 
@@ -167,9 +168,10 @@ class MainActivity : BaseActivity() {
             .distinct()
             .sorted()
 
+        val shortenRepoNames = PreferenceUtils.isShortenRepoNamesEnabled(this)
         popup.menu.add(0, 0, 0, getString(R.string.filter_all))
         repos.forEachIndexed { index, repo ->
-            val displayRepo = PreferenceUtils.getDisplayRepoName(this, repo)
+            val displayRepo = PreferenceUtils.getDisplayRepoName(repo, shortenRepoNames)
             popup.menu.add(0, index + 1, index + 1, displayRepo)
         }
 
