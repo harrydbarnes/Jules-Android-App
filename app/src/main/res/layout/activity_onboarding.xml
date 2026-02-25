@@ -19,6 +19,7 @@
         android:id="@+id/webViewAnimation"
         android:layout_width="120dp"
         android:layout_height="120dp"
+        android:importantForAccessibility="no"
         app:layout_constraintBottom_toTopOf="@id/tabLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

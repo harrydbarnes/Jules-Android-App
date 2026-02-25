@@ -26,18 +26,32 @@
 <svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
   <style>
     /* Floating body animation */
+    @-webkit-keyframes float {
+      0%, 100% { -webkit-transform: translateY(0); }
+      50% { -webkit-transform: translateY(-10px); }
+    }
     @keyframes float {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-10px); }
     }
 
     /* Tentacle waving animation */
+    @-webkit-keyframes wave {
+      0%, 100% { -webkit-transform: rotate(0deg); }
+      50% { -webkit-transform: rotate(6deg); }
+    }
     @keyframes wave {
       0%, 100% { transform: rotate(0deg); }
       50% { transform: rotate(6deg); }
     }
 
     /* Bubble rising animation */
+    @-webkit-keyframes rise {
+      0% { -webkit-transform: translateY(0); opacity: 0; }
+      20% { opacity: 0.6; }
+      80% { opacity: 0.6; }
+      100% { -webkit-transform: translateY(-100px); opacity: 0; }
+    }
     @keyframes rise {
       0% { transform: translateY(0); opacity: 0; }
       20% { opacity: 0.6; }
@@ -46,16 +60,21 @@
     }
 
     .octopus-body {
+      -webkit-animation: float 3s ease-in-out infinite;
       animation: float 3s ease-in-out infinite;
+      -webkit-transform-origin: center;
       transform-origin: center;
     }
 
     .tentacle {
+      -webkit-animation: wave 2.5s ease-in-out infinite;
       animation: wave 2.5s ease-in-out infinite;
+      -webkit-transform-origin: 100px 120px; /* Pivots from inside the body */
       transform-origin: 100px 120px; /* Pivots from inside the body */
     }
 
     .tentacle:nth-child(even) {
+      -webkit-animation-delay: 0.6s;
       animation-delay: 0.6s;
     }
 
@@ -63,6 +82,7 @@
       fill: rgba(255, 255, 255, 0.4);
       stroke: rgba(255, 255, 255, 0.6);
       stroke-width: 0.5;
+      -webkit-animation: rise 4s infinite linear;
       animation: rise 4s infinite linear;
     }
   </style>
