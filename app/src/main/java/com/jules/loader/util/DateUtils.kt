@@ -32,8 +32,10 @@ object DateUtils {
 
     private fun getDisplayFormatter(pattern: String): SimpleDateFormat {
         val map = displayFormatters.get()!!
-        return map.getOrPut(pattern) {
-            SimpleDateFormat(pattern, Locale.getDefault())
+        val locale = Locale.getDefault()
+        val key = "$pattern:${locale.toLanguageTag()}"
+        return map.getOrPut(key) {
+            SimpleDateFormat(pattern, locale)
         }
     }
 
