@@ -17,9 +17,13 @@
         android:layout_marginBottom="32dp" />
 
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/apiKeyInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/api_key_hint">
+        android:hint="@string/api_key_hint"
+        app:endIconMode="custom"
+        app:endIconDrawable="@drawable/ic_content_paste"
+        app:endIconContentDescription="@string/paste_api_key">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/apiKeyInput"
