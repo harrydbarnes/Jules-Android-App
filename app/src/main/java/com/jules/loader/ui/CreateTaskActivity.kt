@@ -44,6 +44,7 @@ class CreateTaskActivity : BaseActivity() {
         private const val PERMISSION_REQUEST_AUDIO = 100
         private const val MIN_DB_LEVEL = -2f
         private const val MAX_DB_LEVEL = 10f
+        private const val DB_LEVEL_RANGE = MAX_DB_LEVEL - MIN_DB_LEVEL
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -228,7 +229,7 @@ class CreateTaskActivity : BaseActivity() {
             override fun onRmsChanged(rmsdB: Float) {
                 // Scale visualizer based on dB
                 val clampedDb = rmsdB.coerceIn(MIN_DB_LEVEL, MAX_DB_LEVEL)
-                val scale = 1.0f + ((clampedDb - MIN_DB_LEVEL) / (MAX_DB_LEVEL - MIN_DB_LEVEL) * 1.0f) // Scale 1.0 to 2.0
+                val scale = 1.0f + (clampedDb - MIN_DB_LEVEL) / DB_LEVEL_RANGE // Scale 1.0 to 2.0
                 visualizer.animate().scaleX(scale).scaleY(scale).setDuration(50).start()
             }
             override fun onBufferReceived(buffer: ByteArray?) {}
