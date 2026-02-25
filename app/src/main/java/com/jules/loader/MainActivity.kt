@@ -175,9 +175,9 @@ class MainActivity : BaseActivity() {
 
         popup.setOnMenuItemClickListener { item ->
             selectedRepo = if (item.itemId == 0) null else repos[item.itemId - 1]
-            val displayRepo = if (selectedRepo == null) getString(R.string.filter_repo)
-                              else if (PreferenceUtils.isShortenRepoNamesEnabled(this)) selectedRepo!!.substringAfterLast("/")
-                              else selectedRepo
+            val displayRepo = selectedRepo?.let { repo ->
+                if (PreferenceUtils.isShortenRepoNamesEnabled(this)) repo.substringAfterLast("/") else repo
+            } ?: getString(R.string.filter_repo)
             binding.chipRepo.text = displayRepo
             binding.chipRepo.isChecked = selectedRepo != null
             applyFilters()
