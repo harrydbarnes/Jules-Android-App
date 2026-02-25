@@ -4,6 +4,7 @@ import android.content.ClipDescription
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.Animatable
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -54,6 +55,12 @@ class OnboardingActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
         checkClipboard()
+        (binding.imageViewAnimation.drawable as? Animatable)?.start()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        (binding.imageViewAnimation.drawable as? Animatable)?.stop()
     }
 
     private fun checkClipboard() {
