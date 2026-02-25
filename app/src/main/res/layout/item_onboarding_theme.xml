@@ -7,66 +7,71 @@
     android:gravity="center_horizontal"
     android:padding="24dp">
 
-    <com.google.android.material.card.MaterialCardView
-        style="@style/Widget.Material3.CardView.Elevated"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardBackgroundColor="?attr/colorSurface"
-        android:layout_weight="1"
-        android:layout_gravity="center">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <com.google.android.material.card.MaterialCardView
+            style="@style/Widget.Material3.CardView.Elevated"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:padding="24dp">
+            app:cardBackgroundColor="?attr/colorSurface"
+            android:layout_gravity="center">
 
-            <TextView
-                android:id="@+id/title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?attr/textAppearanceHeadlineMedium"
-                android:textColor="?attr/colorOnSurface"
-                android:textAlignment="center"
-                android:layout_marginBottom="16dp"
-                android:text="@string/onboarding_theme_title"/>
-
-            <TextView
-                android:id="@+id/description"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?attr/textAppearanceBodyLarge"
-                android:textColor="?attr/colorOnSurface"
-                android:textAlignment="center"
-                android:layout_marginBottom="32dp"
-                android:text="@string/onboarding_theme_desc"/>
-
-            <RadioGroup
-                android:id="@+id/themeRadioGroup"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:gravity="start">
+                android:gravity="center"
+                android:padding="16dp">
 
-                <RadioButton
-                    android:id="@+id/radioOctopus"
-                    style="@style/Onboarding.RadioButton"
-                    android:text="@string/theme_octopus"/>
+                <TextView
+                    android:id="@+id/title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?attr/textAppearanceHeadlineMedium"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textAlignment="center"
+                    android:layout_marginBottom="8dp"
+                    android:text="@string/onboarding_theme_title"/>
 
-                <RadioButton
-                    android:id="@+id/radioSquid"
-                    style="@style/Onboarding.RadioButton"
-                    android:text="@string/theme_squid"/>
+                <TextView
+                    android:id="@+id/description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?attr/textAppearanceBodyLarge"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textAlignment="center"
+                    android:layout_marginBottom="16dp"
+                    android:text="@string/onboarding_theme_desc"/>
 
-                <RadioButton
-                    android:id="@+id/radioCuttlefish"
-                    style="@style/Onboarding.RadioButton"
-                    android:text="@string/theme_cuttlefish"/>
-            </RadioGroup>
-        </LinearLayout>
+                <RadioGroup
+                    android:id="@+id/themeRadioGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="start">
 
-    </com.google.android.material.card.MaterialCardView>
+                    <RadioButton
+                        android:id="@+id/radioOctopus"
+                        style="@style/Onboarding.RadioButton"
+                        android:text="@string/theme_octopus"/>
+
+                    <RadioButton
+                        android:id="@+id/radioSquid"
+                        style="@style/Onboarding.RadioButton"
+                        android:text="@string/theme_squid"/>
+
+                    <RadioButton
+                        android:id="@+id/radioCuttlefish"
+                        style="@style/Onboarding.RadioButton"
+                        android:text="@string/theme_cuttlefish"/>
+                </RadioGroup>
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+    </FrameLayout>
 
     <Button
         android:id="@+id/nextButton"

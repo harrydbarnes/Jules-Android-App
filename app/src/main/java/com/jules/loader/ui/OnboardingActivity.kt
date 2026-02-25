@@ -11,9 +11,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ProgressBar
 import android.widget.RadioGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
@@ -44,6 +46,11 @@ class OnboardingActivity : BaseActivity() {
         if (savedInstanceState != null) {
             val position = savedInstanceState.getInt("current_page", 0)
             binding.viewPager.setCurrentItem(position, false)
+        } else {
+            val startPage = intent.getIntExtra("start_page", 0)
+            if (startPage > 0) {
+                binding.viewPager.setCurrentItem(startPage, false)
+            }
         }
     }
 
@@ -177,6 +184,7 @@ class OnboardingActivity : BaseActivity() {
             private val input: TextInputEditText = itemView.findViewById(R.id.apiKeyInput)
             private val getKeyLink: TextView = itemView.findViewById(R.id.getKeyLink)
             private val saveButton: Button = itemView.findViewById(R.id.saveButton)
+            private val progressBar: ProgressBar = itemView.findViewById(R.id.progressBar)
 
             fun bind() {
                 if (activity.detectedApiKey != null) {
@@ -217,10 +225,31 @@ class OnboardingActivity : BaseActivity() {
                     val key = input.text?.toString()?.trim()
                     if (key.isNullOrEmpty()) {
                         Toast.makeText(activity, R.string.error_enter_api_key, Toast.LENGTH_SHORT).show()
-                    } else {
-                        activity.repository.saveApiKey(key)
-                        activity.startActivity(Intent(activity, MainActivity::class.java))
-                        activity.finish()
+                        return@setOnClickListener
+                    }
+
+                    if (key.length != 53) {
+                        Toast.makeText(activity, R.string.error_api_key_length, Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    }
+
+                    // Validate
+                    saveButton.visibility = View.INVISIBLE
+                    progressBar.visibility = View.VISIBLE
+                    input.isEnabled = false
+
+                    activity.lifecycleScope.launchWhenStarted {
+                        val isValid = activity.repository.validateApiKey(key)
+                        if (isValid) {
+                            activity.repository.saveApiKey(key)
+                            activity.startActivity(Intent(activity, MainActivity::class.java))
+                            activity.finish()
+                        } else {
+                            saveButton.visibility = View.VISIBLE
+                            progressBar.visibility = View.GONE
+                            input.isEnabled = true
+                            Toast.makeText(activity, R.string.error_api_key_invalid, Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
             }

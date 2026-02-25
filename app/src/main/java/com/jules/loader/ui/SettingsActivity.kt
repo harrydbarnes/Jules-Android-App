@@ -6,9 +6,12 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.LinearLayout
+import android.widget.Button
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.lifecycleScope
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.jules.loader.R
@@ -51,26 +54,18 @@ class SettingsActivity : BaseActivity() {
     }
 
     private fun showEditApiKeyDialog() {
-        val context = this
-        val layout = LinearLayout(context).apply {
-            orientation = LinearLayout.VERTICAL
-            val padding = (24 * resources.displayMetrics.density).toInt()
-            setPadding(padding, padding, padding, 0)
-        }
+        val dialog = BottomSheetDialog(this)
+        dialog.setContentView(R.layout.dialog_edit_api_key)
 
-        val inputLayout = TextInputLayout(context).apply {
-            hint = getString(R.string.api_key_hint)
-            endIconMode = TextInputLayout.END_ICON_CUSTOM
-            setEndIconDrawable(R.drawable.ic_content_paste)
-            setEndIconContentDescription(R.string.paste_api_key)
-        }
+        val inputLayout = dialog.findViewById<TextInputLayout>(R.id.apiKeyInputLayout)!!
+        val input = dialog.findViewById<TextInputEditText>(R.id.apiKeyInput)!!
+        val saveButton = dialog.findViewById<Button>(R.id.saveButton)!!
+        val progressBar = dialog.findViewById<ProgressBar>(R.id.progressBar)!!
 
-        val input = TextInputEditText(context).apply {
-            inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+        val apiKey = repository.getApiKey()
+        if (!apiKey.isNullOrEmpty()) {
+            input.setText(apiKey)
         }
-
-        inputLayout.addView(input)
-        layout.addView(inputLayout)
 
         inputLayout.setEndIconOnClickListener {
             val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -87,19 +82,37 @@ class SettingsActivity : BaseActivity() {
             }
         }
 
-        AlertDialog.Builder(context)
-            .setTitle(R.string.dialog_api_key_title)
-            .setView(layout)
-            .setPositiveButton(R.string.action_save) { _, _ ->
-                val newKey = input.text?.toString()?.trim()
-                if (!newKey.isNullOrEmpty()) {
+        saveButton.setOnClickListener {
+            val newKey = input.text?.toString()?.trim()
+            if (newKey.isNullOrEmpty()) {
+                return@setOnClickListener
+            }
+
+            if (newKey.length != 53) {
+                Toast.makeText(this, getString(R.string.error_api_key_length), Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            saveButton.visibility = View.INVISIBLE
+            progressBar.visibility = View.VISIBLE
+            input.isEnabled = false
+
+            lifecycleScope.launchWhenStarted {
+                val isValid = repository.validateApiKey(newKey)
+                if (isValid) {
                     repository.saveApiKey(newKey)
                     setupApiKeySection()
-                    Toast.makeText(this, getString(R.string.message_api_key_updated), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@SettingsActivity, getString(R.string.message_api_key_updated), Toast.LENGTH_SHORT).show()
+                    dialog.dismiss()
+                } else {
+                    saveButton.visibility = View.VISIBLE
+                    progressBar.visibility = View.GONE
+                    input.isEnabled = true
+                    Toast.makeText(this@SettingsActivity, getString(R.string.error_api_key_invalid), Toast.LENGTH_SHORT).show()
                 }
             }
-            .setNegativeButton(R.string.action_cancel, null)
-            .show()
+        }
+        dialog.show()
     }
 
     private fun showRemoveApiKeyDialog() {
@@ -110,6 +123,7 @@ class SettingsActivity : BaseActivity() {
                 repository.clearApiKey()
                 val intent = Intent(this, OnboardingActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                intent.putExtra("start_page", 2)
                 startActivity(intent)
                 finish()
             }

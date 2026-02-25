@@ -112,4 +112,6 @@
     <string name="action_save">Save</string>
     <string name="action_remove">Remove</string>
     <string name="message_api_key_updated">API Key Updated</string>
+    <string name="error_api_key_length">API Key must be 53 characters long</string>
+    <string name="error_api_key_invalid">Invalid API Key. Please check and try again.</string>
 </resources>

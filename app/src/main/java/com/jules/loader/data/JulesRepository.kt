@@ -136,4 +136,13 @@ class JulesRepository private constructor(private val context: Context) {
         val apiKey = requireApiKey()
         return service.listSources(apiKey).sources ?: emptyList()
     }
+
+    suspend fun validateApiKey(apiKey: String): Boolean {
+        return try {
+            service.listSources(apiKey)
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
 }
