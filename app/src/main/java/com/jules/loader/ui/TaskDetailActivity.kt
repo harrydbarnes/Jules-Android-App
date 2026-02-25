@@ -16,6 +16,7 @@ import com.google.android.material.transition.platform.MaterialContainerTransfor
 import com.jules.loader.R
 import com.jules.loader.data.JulesRepository
 import com.jules.loader.data.model.ActivityLog
+import com.jules.loader.util.PreferenceUtils
 import com.jules.loader.databinding.ActivityTaskDetailBinding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -99,7 +100,13 @@ class TaskDetailActivity : BaseActivity() {
 
         if (source != null) {
             binding.detailSourceChip.visibility = View.VISIBLE
-            binding.detailSourceChip.text = source.removePrefix("sources/github/")
+            val cleanSource = source.removePrefix("sources/github/")
+            val displaySource = if (PreferenceUtils.isShortenRepoNamesEnabled(this)) {
+                cleanSource.substringAfterLast("/")
+            } else {
+                cleanSource
+            }
+            binding.detailSourceChip.text = displaySource
         } else {
             binding.detailSourceChip.visibility = View.GONE
         }
