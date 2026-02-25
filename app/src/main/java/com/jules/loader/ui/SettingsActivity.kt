@@ -11,7 +11,7 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
-import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.jules.loader.R
@@ -54,13 +54,10 @@ class SettingsActivity : BaseActivity() {
     }
 
     private fun showEditApiKeyDialog() {
-        val dialog = BottomSheetDialog(this)
-        dialog.setContentView(R.layout.dialog_edit_api_key)
-
-        val inputLayout = dialog.findViewById<TextInputLayout>(R.id.apiKeyInputLayout)!!
-        val input = dialog.findViewById<TextInputEditText>(R.id.apiKeyInput)!!
-        val saveButton = dialog.findViewById<Button>(R.id.saveButton)!!
-        val progressBar = dialog.findViewById<ProgressBar>(R.id.progressBar)!!
+        val layout = layoutInflater.inflate(R.layout.dialog_edit_api_key, null)
+        val inputLayout = layout.findViewById<TextInputLayout>(R.id.apiKeyInputLayout)
+        val input = layout.findViewById<TextInputEditText>(R.id.apiKeyInput)
+        val progressBar = layout.findViewById<ProgressBar>(R.id.progressBar)
 
         val apiKey = repository.getApiKey()
         if (!apiKey.isNullOrEmpty()) {
@@ -82,7 +79,16 @@ class SettingsActivity : BaseActivity() {
             }
         }
 
-        saveButton.setOnClickListener {
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.action_edit_api_key)
+            .setView(layout)
+            .setPositiveButton(R.string.action_save, null) // Listener set later to prevent auto-dismiss
+            .setNegativeButton(R.string.action_cancel, null)
+            .create()
+
+        dialog.show()
+
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
             val newKey = input.text?.toString()?.trim()
             if (newKey.isNullOrEmpty()) {
                 return@setOnClickListener
@@ -93,7 +99,7 @@ class SettingsActivity : BaseActivity() {
                 return@setOnClickListener
             }
 
-            saveButton.visibility = View.INVISIBLE
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = false
             progressBar.visibility = View.VISIBLE
             input.isEnabled = false
 
@@ -105,26 +111,27 @@ class SettingsActivity : BaseActivity() {
                     Toast.makeText(this@SettingsActivity, getString(R.string.message_api_key_updated), Toast.LENGTH_SHORT).show()
                     dialog.dismiss()
                 } else {
-                    saveButton.visibility = View.VISIBLE
+                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = true
                     progressBar.visibility = View.GONE
                     input.isEnabled = true
                     Toast.makeText(this@SettingsActivity, getString(R.string.error_api_key_invalid), Toast.LENGTH_SHORT).show()
                 }
             }
         }
-        dialog.show()
     }
 
     private fun showRemoveApiKeyDialog() {
-        AlertDialog.Builder(this)
+        MaterialAlertDialogBuilder(this)
             .setTitle(R.string.dialog_confirm_remove_title)
             .setMessage(R.string.dialog_confirm_remove_message)
+            .setIcon(R.drawable.ic_delete)
             .setPositiveButton(R.string.action_remove) { _, _ ->
                 repository.clearApiKey()
                 val intent = Intent(this, OnboardingActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 intent.putExtra("start_page", 2)
                 startActivity(intent)
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                 finish()
             }
             .setNegativeButton(R.string.action_cancel, null)

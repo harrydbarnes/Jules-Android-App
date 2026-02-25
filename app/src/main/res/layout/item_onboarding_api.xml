@@ -38,7 +38,7 @@
         android:layout_height="wrap_content"
         android:text="@string/get_api_key"
         android:layout_marginTop="8dp"
-        android:textColor="@color/jules_purple_light"
+        android:textColor="?attr/colorOnSurface"
         android:layout_gravity="end"
         android:clickable="true"
         android:focusable="true" />
