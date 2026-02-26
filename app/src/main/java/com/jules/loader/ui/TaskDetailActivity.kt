@@ -110,8 +110,9 @@ class TaskDetailActivity : BaseActivity() {
 
         binding.btnSend.setOnClickListener {
             val message = binding.inputMessage.text.toString().trim()
-            if (message.isNotEmpty() && sessionId != null) {
-                sendMessage(sessionId, message)
+            val currentSessionId = sessionId
+            if (message.isNotEmpty() && currentSessionId != null) {
+                sendMessage(currentSessionId, message)
             }
         }
     }
