@@ -44,6 +44,9 @@ class MainActivity : BaseActivity() {
     private var searchQuery: String = ""
     private var isFilterActive = false
 
+    private var nextPageToken: String? = null
+    private var isLoadingMore = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -67,12 +70,36 @@ class MainActivity : BaseActivity() {
         // Set default item animator to ensure add/remove animations are smooth
         binding.sessionsRecyclerView.itemAnimator = androidx.recyclerview.widget.DefaultItemAnimator()
 
+        val swipeHandler = object : androidx.recyclerview.widget.ItemTouchHelper.SimpleCallback(0, androidx.recyclerview.widget.ItemTouchHelper.LEFT) {
+            override fun onMove(r: androidx.recyclerview.widget.RecyclerView, v: androidx.recyclerview.widget.RecyclerView.ViewHolder, t: androidx.recyclerview.widget.RecyclerView.ViewHolder): Boolean = false
+
+            override fun onSwiped(viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+                val session = adapter.currentList[position]
+                deleteSession(session, position)
+            }
+        }
+        androidx.recyclerview.widget.ItemTouchHelper(swipeHandler).attachToRecyclerView(binding.sessionsRecyclerView)
+
         binding.sessionsRecyclerView.addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: androidx.recyclerview.widget.RecyclerView, dx: Int, dy: Int) {
                 if (dy > 0) {
                     binding.fab.shrink()
                 } else if (dy < 0) {
                     binding.fab.extend()
+                }
+
+                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                val visibleItemCount = layoutManager.childCount
+                val totalItemCount = layoutManager.itemCount
+                val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+
+                if (!isLoadingMore && nextPageToken != null) {
+                    if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
+                        && firstVisibleItemPosition >= 0
+                    ) {
+                        loadMoreSessions()
+                    }
                 }
             }
         })
@@ -341,6 +368,20 @@ class MainActivity : BaseActivity() {
         applyFilters()
     }
 
+    private fun deleteSession(session: Session, position: Int) {
+        lifecycleScope.launch {
+            try {
+                repository.deleteSession(session.id)
+                allSessions = allSessions.filter { it.id != session.id }
+                applyFilters()
+                com.google.android.material.snackbar.Snackbar.make(binding.root, "Session deleted", com.google.android.material.snackbar.Snackbar.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                android.util.Log.e("MainActivity", "Error deleting session", e)
+                adapter.notifyItemChanged(position)
+                android.widget.Toast.makeText(this@MainActivity, "Failed to delete session", android.widget.Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     override fun onCreateOptionsMenu(menu: android.view.Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
@@ -377,7 +418,10 @@ class MainActivity : BaseActivity() {
 
         lifecycleScope.launch {
             try {
-                allSessions = repository.getSessions(forceRefresh)
+                isLoadingMore = true
+                val response = repository.getSessions(pageToken = null, forceRefresh = forceRefresh)
+                allSessions = response.sessions ?: emptyList()
+                nextPageToken = response.nextPageToken
 
                 if (allSessions.isEmpty()) {
                     binding.errorText.text = getString(R.string.no_sessions)
@@ -402,6 +446,27 @@ class MainActivity : BaseActivity() {
             } finally {
                 binding.skeletonLayout.visibility = View.GONE
                 binding.swipeRefresh.isRefreshing = false
+                isLoadingMore = false
+            }
+        }
+    }
+
+    private fun loadMoreSessions() {
+        if (isLoadingMore || nextPageToken == null) return
+        isLoadingMore = true
+
+        lifecycleScope.launch {
+            try {
+                val response = repository.getSessions(pageToken = nextPageToken)
+                val newSessions = response.sessions ?: emptyList()
+                nextPageToken = response.nextPageToken
+
+                allSessions = allSessions + newSessions
+                applyFilters()
+            } catch (e: Exception) {
+                android.util.Log.e("MainActivity", "Error loading more sessions", e)
+            } finally {
+                isLoadingMore = false
             }
         }
     }

@@ -20,6 +20,16 @@
             android:textAllCaps="true"
             android:textStyle="bold" />
 
+        <ProgressBar
+            android:id="@+id/logProgress"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="8dp"
+            android:layout_gravity="center_vertical"
+            android:indeterminate="true"
+            android:visibility="gone"
+            style="?android:attr/progressBarStyleSmall" />
+
         <Space
             android:layout_width="0dp"
             android:layout_height="wrap_content"

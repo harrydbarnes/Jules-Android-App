@@ -108,16 +108,26 @@ class JulesRepository private constructor(private val context: Context) {
 
     fun hasCachedSessions(): Boolean = cachedSessions != null
 
-    suspend fun getSessions(forceRefresh: Boolean = false): List<Session> {
-        if (!forceRefresh && cachedSessions != null) {
-            return cachedSessions ?: emptyList()
+    suspend fun getSessions(pageToken: String? = null, forceRefresh: Boolean = false): ListSessionsResponse {
+        // If requesting the first page without force refresh and we have cache, return it?
+        // But cachedSessions is just a List<Session>, it doesn't store nextPageToken.
+        // So simple caching strategy might need to be adjusted or disabled for pagination.
+        // For simplicity, let's bypass cache if pageToken is provided, or just update cache on first page load.
+
+        if (pageToken == null && !forceRefresh && cachedSessions != null) {
+             // We can't return ListSessionsResponse easily from just cached list without knowing if there was a next page.
+             // So we might need to invalidate cache or just fetch from network if we want full pagination support.
+             // Let's assume for now we always fetch from network for simplicity given the requirement changes.
         }
+
         val apiKey = requireApiKey()
-        // Handle pagination later if needed, for now just get first page
-        val response = service.listSessions(apiKey)
-        val sessions = response.sessions ?: emptyList()
-        cachedSessions = sessions
-        return sessions
+        val response = service.listSessions(apiKey, pageToken = pageToken)
+
+        if (pageToken == null) {
+             cachedSessions = response.sessions
+        }
+
+        return response
     }
 
     suspend fun createSession(prompt: String, repoUrl: String? = null, branch: String? = null): Session {
@@ -132,9 +142,35 @@ class JulesRepository private constructor(private val context: Context) {
         return service.createSession(apiKey, request)
     }
 
-    suspend fun getActivities(sessionId: String): List<ActivityLog> {
+    suspend fun getActivities(sessionId: String, pageToken: String? = null): ListActivitiesResponse {
         val apiKey = requireApiKey()
-        return service.listActivities(apiKey, sessionId).activities ?: emptyList()
+        return service.listActivities(apiKey, sessionId, pageToken = pageToken)
+    }
+
+    suspend fun createActivity(sessionId: String, message: String): ActivityLog {
+        val apiKey = requireApiKey()
+        val userMessage = com.jules.loader.data.model.MessageLog(message = message, text = null, prompt = null)
+        val request = com.jules.loader.data.model.CreateActivityRequest(userMessage = userMessage)
+        return service.createActivity(apiKey, sessionId, request)
+    }
+
+    suspend fun deleteSession(sessionId: String) {
+        val apiKey = requireApiKey()
+        val response = service.deleteSession(apiKey, sessionId)
+        if (!response.isSuccessful) {
+            throw retrofit2.HttpException(response)
+        }
+        cachedSessions = cachedSessions?.filter { it.id != sessionId }
+    }
+
+    suspend fun cancelSession(sessionId: String): Session {
+        val apiKey = requireApiKey()
+        return service.cancelSession(apiKey, sessionId)
+    }
+
+    suspend fun getSession(sessionId: String): Session {
+        val apiKey = requireApiKey()
+        return service.getSession(apiKey, sessionId)
     }
 
     suspend fun getSources(): List<SourceContext> {
