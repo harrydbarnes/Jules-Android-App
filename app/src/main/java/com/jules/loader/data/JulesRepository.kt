@@ -2,6 +2,7 @@ package com.jules.loader.data
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
 import com.jules.loader.BuildConfig
@@ -11,6 +12,9 @@ import com.jules.loader.data.model.CreateSessionRequest
 import com.jules.loader.data.model.GithubRepoContext
 import com.jules.loader.data.model.Session
 import com.jules.loader.data.model.SourceContext
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -139,14 +143,14 @@ class JulesRepository private constructor(private val context: Context) {
     }
 
     suspend fun validateApiKey(apiKey: String): Boolean {
-        return kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+        return withContext(Dispatchers.IO) {
             try {
                 service.listSources(apiKey)
                 true
             } catch (e: Exception) {
-                if (e is kotlinx.coroutines.CancellationException) throw e
+                if (e is CancellationException) throw e
                 // For debugging
-                android.util.Log.e("API_VALIDATION", "API key validation failed", e)
+                Log.e("API_VALIDATION", "API key validation failed", e)
                 false
             }
         }

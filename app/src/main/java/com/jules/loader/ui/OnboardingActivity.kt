@@ -186,6 +186,12 @@ class OnboardingActivity : BaseActivity() {
             private val saveButton: Button = itemView.findViewById(R.id.saveButton)
             private val progressBar: ProgressBar = itemView.findViewById(R.id.progressBar)
 
+            private fun setLoading(isLoading: Boolean) {
+                progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+                saveButton.visibility = if (isLoading) View.INVISIBLE else View.VISIBLE
+                input.isEnabled = !isLoading
+            }
+
             fun bind() {
                 if (activity.detectedApiKey != null) {
                     input.setText(activity.detectedApiKey)
@@ -234,9 +240,7 @@ class OnboardingActivity : BaseActivity() {
                     }
 
                     // Validate
-                    saveButton.visibility = View.INVISIBLE
-                    progressBar.visibility = View.VISIBLE
-                    input.isEnabled = false
+                    setLoading(true)
 
                     activity.lifecycleScope.launchWhenStarted {
                         val isValid = activity.repository.validateApiKey(key)
@@ -245,9 +249,7 @@ class OnboardingActivity : BaseActivity() {
                             activity.startActivity(Intent(activity, MainActivity::class.java))
                             activity.finish()
                         } else {
-                            saveButton.visibility = View.VISIBLE
-                            progressBar.visibility = View.GONE
-                            input.isEnabled = true
+                            setLoading(false)
                             Toast.makeText(activity, R.string.error_api_key_invalid, Toast.LENGTH_SHORT).show()
                         }
                     }
