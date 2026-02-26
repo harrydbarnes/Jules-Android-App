@@ -25,6 +25,9 @@ class CreateTaskViewModel(private val repository: JulesRepository) : ViewModel()
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
+    private val _isSourcesLoading = MutableStateFlow(true)
+    val isSourcesLoading: StateFlow<Boolean> = _isSourcesLoading
+
     companion object {
         private val TAG = CreateTaskViewModel::class.java.simpleName
     }
@@ -35,12 +38,15 @@ class CreateTaskViewModel(private val repository: JulesRepository) : ViewModel()
 
     private fun loadSources() {
         viewModelScope.launch {
+            _isSourcesLoading.value = true
             try {
                 val sources = repository.getSources()
                 _availableSources.value = sources
             } catch (e: Exception) {
                 android.util.Log.e(TAG, "Failed to load repositories", e)
                 _errorEvent.emit(R.string.error_load_repositories)
+            } finally {
+                _isSourcesLoading.value = false
             }
         }
     }
