@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="toolbar_content_inset_start">28dp</dimen>
+    <dimen name="dialog_top_margin">100dp</dimen>
+</resources>

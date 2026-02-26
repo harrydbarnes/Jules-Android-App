@@ -45,7 +45,7 @@
     <string name="error_enter_api_key">Please enter an API Key</string>
 
     <string name="welcome_header">Welcome to Octopus!</string>
-    <string name="welcome_subtext">Jules in your pocket. Manage technical tasks on the go. Go grab that coffee, you deserve one.</string>
+    <string name="welcome_subtext">Jules, in your pocket. Manage technical tasks on the go. Go grab that coffee, you deserve one.</string>
     <string name="feature_real_time_title">📈 Live Activity Monitoring</string>
     <string name="feature_real_time_desc">Instant updates on every task, in real time.</string>
     <string name="feature_task_creation_title">✍️ Quick Task Creation</string>
@@ -98,4 +98,20 @@
     <string name="action_search_close">Close search</string>
     <string name="action_search_clear">Clear search</string>
     <string name="action_search">Search sessions</string>
+
+    <!-- Settings API Key -->
+    <string name="setting_api_key_title">API Key</string>
+    <string name="api_key_masked_placeholder">••••••••••••</string>
+    <string name="action_edit_api_key">Edit API Key</string>
+    <string name="action_remove_api_key">Remove API Key</string>
+    <string name="dialog_api_key_title">Enter API Key</string>
+    <string name="dialog_api_key_hint">Paste API Key</string>
+    <string name="dialog_confirm_remove_title">Remove API Key?</string>
+    <string name="dialog_confirm_remove_message">You will be logged out and returned to the onboarding screen.</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_save">Save</string>
+    <string name="action_remove">Remove</string>
+    <string name="message_api_key_updated">API Key Updated</string>
+    <string name="error_api_key_length">API Key must be 53 characters long</string>
+    <string name="error_api_key_invalid">Invalid API Key. Please check and try again.</string>
 </resources>

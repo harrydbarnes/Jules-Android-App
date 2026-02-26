@@ -2,6 +2,7 @@ package com.jules.loader.data
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
 import com.jules.loader.BuildConfig
@@ -11,6 +12,9 @@ import com.jules.loader.data.model.CreateSessionRequest
 import com.jules.loader.data.model.GithubRepoContext
 import com.jules.loader.data.model.Session
 import com.jules.loader.data.model.SourceContext
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -73,6 +77,7 @@ class JulesRepository private constructor(private val context: Context) {
     companion object {
         private const val PREFS_FILE_NAME = "jules_prefs"
         private const val KEY_API_KEY = "jules_api_key"
+        const val API_KEY_LENGTH = 53
 
         @Volatile
         private var INSTANCE: JulesRepository? = null
@@ -86,6 +91,11 @@ class JulesRepository private constructor(private val context: Context) {
 
     fun saveApiKey(key: String) {
         prefs.edit().putString(KEY_API_KEY, key).apply()
+    }
+
+    fun clearApiKey() {
+        prefs.edit().remove(KEY_API_KEY).apply()
+        cachedSessions = null
     }
 
     fun getApiKey(): String? {
@@ -130,5 +140,19 @@ class JulesRepository private constructor(private val context: Context) {
     suspend fun getSources(): List<SourceContext> {
         val apiKey = requireApiKey()
         return service.listSources(apiKey).sources ?: emptyList()
+    }
+
+    suspend fun validateApiKey(apiKey: String): Boolean {
+        return withContext(Dispatchers.IO) {
+            try {
+                service.listSources(apiKey)
+                true
+            } catch (e: Exception) {
+                if (e is CancellationException) throw e
+                // For debugging
+                Log.e("API_VALIDATION", "API key validation failed", e)
+                false
+            }
+        }
     }
 }

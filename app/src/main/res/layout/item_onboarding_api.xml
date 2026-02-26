@@ -38,16 +38,29 @@
         android:layout_height="wrap_content"
         android:text="@string/get_api_key"
         android:layout_marginTop="8dp"
-        android:textColor="?attr/colorPrimary"
+        android:textColor="?attr/colorOnSurface"
         android:layout_gravity="end"
         android:clickable="true"
         android:focusable="true" />
 
-    <Button
-        android:id="@+id/saveButton"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/save_continue"
-        android:layout_marginTop="24dp" />
+        android:layout_marginTop="24dp">
+
+        <Button
+            android:id="@+id/saveButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/save_continue" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone"/>
+
+    </FrameLayout>
 
 </LinearLayout>
