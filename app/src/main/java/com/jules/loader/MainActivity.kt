@@ -380,7 +380,10 @@ class MainActivity : BaseActivity() {
                 Snackbar.make(binding.root, "Session deleted", Snackbar.LENGTH_LONG).show()
             } catch (e: Exception) {
                 Log.e("MainActivity", "Error deleting session", e)
-                adapter.notifyItemChanged(position)
+                val currentPosition = adapter.currentList.indexOf(session)
+                if (currentPosition != -1) {
+                    adapter.notifyItemChanged(currentPosition)
+                }
                 Toast.makeText(this@MainActivity, "Failed to delete session", Toast.LENGTH_SHORT).show()
             }
         }
