@@ -20,8 +20,35 @@ interface JulesService {
     @GET("v1alpha/sessions/{sessionId}/activities")
     suspend fun listActivities(
         @Header("X-Goog-Api-Key") apiKey: String,
-        @Path("sessionId") sessionId: String
+        @Path("sessionId") sessionId: String,
+        @Query("pageSize") pageSize: Int = 20,
+        @Query("pageToken") pageToken: String? = null
     ): ListActivitiesResponse
+
+    @POST("v1alpha/sessions/{sessionId}/activities")
+    suspend fun createActivity(
+        @Header("X-Goog-Api-Key") apiKey: String,
+        @Path("sessionId") sessionId: String,
+        @Body request: CreateActivityRequest
+    ): ActivityLog
+
+    @DELETE("v1alpha/sessions/{sessionId}")
+    suspend fun deleteSession(
+        @Header("X-Goog-Api-Key") apiKey: String,
+        @Path("sessionId") sessionId: String
+    ): retrofit2.Response<Unit>
+
+    @POST("v1alpha/sessions/{sessionId}:cancel")
+    suspend fun cancelSession(
+        @Header("X-Goog-Api-Key") apiKey: String,
+        @Path("sessionId") sessionId: String
+    ): Session
+
+    @GET("v1alpha/sessions/{sessionId}")
+    suspend fun getSession(
+        @Header("X-Goog-Api-Key") apiKey: String,
+        @Path("sessionId") sessionId: String
+    ): Session
 
     @GET("v1alpha/sources")
     suspend fun listSources(

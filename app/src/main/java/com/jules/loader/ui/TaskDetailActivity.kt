@@ -1,11 +1,13 @@
 package com.jules.loader.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.TextView
+import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -29,6 +31,11 @@ class TaskDetailActivity : BaseActivity() {
     private lateinit var logAdapter: LogAdapter
     private var sessionId: String? = null
 
+    private var nextPageToken: String? = null
+    private var lastLoadedPageToken: String? = null
+    private var isLoadingMore = false
+    private val allLogs = java.util.Collections.synchronizedList(java.util.ArrayList<ActivityLog>())
+
     companion object {
         const val EXTRA_SESSION_ID = "EXTRA_SESSION_ID"
         const val EXTRA_SESSION_TITLE = "EXTRA_SESSION_TITLE"
@@ -39,6 +46,9 @@ class TaskDetailActivity : BaseActivity() {
         const val STATUS_PR_OPEN = "PR Open"
         const val STATUS_EXECUTING_TESTS = "Executing Tests"
         private const val POLLING_INTERVAL_MS = 3000L
+
+        val WORKING_TYPES = setOf("WORKING", "COMMITTING_CODE", "EXECUTING TESTS", "RUNNING TESTS")
+        val TERMINAL_STATES = setOf("COMPLETED", "FAILED", "CANCELLED", "TERMINATED")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,6 +72,8 @@ class TaskDetailActivity : BaseActivity() {
         sessionId = intent.getStringExtra(EXTRA_SESSION_ID)
         binding.root.transitionName = "shared_element_container_${sessionId}"
 
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
         binding.toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
         populateSessionDetails()
@@ -75,8 +87,83 @@ class TaskDetailActivity : BaseActivity() {
         logAdapter = LogAdapter()
         binding.logRecyclerView.adapter = logAdapter
 
+        binding.logRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                val visibleItemCount = layoutManager.childCount
+                val totalItemCount = layoutManager.itemCount
+                val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+
+                if (!isLoadingMore && nextPageToken != null) {
+                    if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
+                        && firstVisibleItemPosition >= 0
+                    ) {
+                        loadMoreLogs()
+                    }
+                }
+            }
+        })
+
         sessionId?.let { id ->
             startPollingLogs(id)
+        }
+
+        binding.btnSend.setOnClickListener {
+            val message = binding.inputMessage.text.toString().trim()
+            val currentSessionId = sessionId
+            if (message.isNotEmpty() && currentSessionId != null) {
+                sendMessage(currentSessionId, message)
+            }
+        }
+    }
+
+    private fun sendMessage(sessionId: String, message: String) {
+        lifecycleScope.launch {
+            try {
+                binding.btnSend.isEnabled = false
+                val log = repository.createActivity(sessionId, message)
+                binding.inputMessage.text?.clear()
+
+                synchronized(allLogs) {
+                    allLogs.add(log)
+                    logAdapter.submitList(ArrayList(allLogs))
+                }
+            } catch (e: Exception) {
+                Toast.makeText(this@TaskDetailActivity, "Failed to send message", Toast.LENGTH_SHORT).show()
+                Log.e("TaskDetailActivity", "Error sending message", e)
+            } finally {
+                binding.btnSend.isEnabled = true
+            }
+        }
+    }
+
+    private fun cancelSession() {
+        sessionId?.let { id ->
+            lifecycleScope.launch {
+                try {
+                    val session = repository.cancelSession(id)
+                    binding.detailStatusChip.text = session.status
+                    Toast.makeText(this@TaskDetailActivity, "Task cancelled", Toast.LENGTH_SHORT).show()
+                } catch (e: Exception) {
+                    Toast.makeText(this@TaskDetailActivity, "Failed to cancel task", Toast.LENGTH_SHORT).show()
+                    Log.e("TaskDetailActivity", "Error cancelling task", e)
+                }
+            }
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: android.view.Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_task_detail, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_cancel -> {
+                cancelSession()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 
@@ -119,8 +206,22 @@ class TaskDetailActivity : BaseActivity() {
         lifecycleScope.launch {
             while (isActive) {
                 try {
-                    val logs = repository.getActivities(id)
-                    logAdapter.submitList(logs)
+                    val session = repository.getSession(id)
+                    binding.detailStatusChip.text = session.status
+
+                    if (!isLoadingMore) {
+                        val response = repository.getActivities(id, pageToken = null)
+                        addLogs(response.activities ?: emptyList(), prepend = false)
+
+                        // Only set the initial token for backward pagination
+                        if (nextPageToken == null) {
+                            nextPageToken = response.nextPageToken
+                        }
+                    }
+
+                    if (session.status != null && TERMINAL_STATES.contains(session.status.uppercase(java.util.Locale.ROOT))) {
+                        break
+                    }
                 } catch (e: Exception) {
                     android.util.Log.e("TaskDetailActivity", "Error polling logs", e)
                 }
@@ -129,9 +230,49 @@ class TaskDetailActivity : BaseActivity() {
         }
     }
 
+    private fun loadMoreLogs() {
+        if (isLoadingMore || nextPageToken == null || sessionId == null) return
+        isLoadingMore = true
+        lifecycleScope.launch {
+            try {
+                val token = nextPageToken
+                val response = repository.getActivities(sessionId!!, pageToken = token)
+
+                // lastLoadedPageToken is less relevant now that polling always fetches latest,
+                // but kept for consistency if we wanted to track pagination cursor.
+                lastLoadedPageToken = token
+                nextPageToken = response.nextPageToken
+
+                addLogs(response.activities ?: emptyList(), prepend = true)
+            } catch (e: Exception) {
+                android.util.Log.e("TaskDetailActivity", "Error loading more logs", e)
+            } finally {
+                isLoadingMore = false
+            }
+        }
+    }
+
+    private fun addLogs(newLogs: List<ActivityLog>, prepend: Boolean) {
+        synchronized(allLogs) {
+            // Append new logs avoiding duplicates
+            val existingIds = allLogs.mapNotNull { it.id }.toSet()
+            val uniqueNewLogs = newLogs.filter { it.id == null || !existingIds.contains(it.id) }
+
+            if (uniqueNewLogs.isNotEmpty()) {
+                if (prepend) {
+                    allLogs.addAll(0, uniqueNewLogs)
+                } else {
+                    allLogs.addAll(uniqueNewLogs)
+                }
+                logAdapter.submitList(ArrayList(allLogs))
+            }
+        }
+    }
+
     class LogAdapter : ListAdapter<ActivityLog, LogAdapter.LogViewHolder>(LogDiffCallback()) {
         class LogViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             val typeText: TextView = view.findViewById(R.id.logType)
+            val progress: View = view.findViewById(R.id.logProgress)
             val descText: TextView = view.findViewById(R.id.logDescription)
             val timeText: TextView = view.findViewById(R.id.logTimestamp)
         }
@@ -143,9 +284,22 @@ class TaskDetailActivity : BaseActivity() {
 
         override fun onBindViewHolder(holder: LogViewHolder, position: Int) {
             val log = getItem(position)
-            holder.typeText.text = log.getResolvedType()
+            val type = log.getResolvedType()
+            holder.typeText.text = type
             holder.descText.text = log.getResolvedDescription()
             holder.timeText.text = log.timestamp ?: ""
+
+            if (TaskDetailActivity.WORKING_TYPES.contains(type.uppercase(java.util.Locale.ROOT))) {
+                holder.progress.visibility = View.VISIBLE
+            } else {
+                holder.progress.visibility = View.GONE
+            }
+
+            if (type.contains("CODE") || type.contains("FILE") || holder.descText.text.contains("```")) {
+                holder.descText.typeface = android.graphics.Typeface.MONOSPACE
+            } else {
+                holder.descText.typeface = android.graphics.Typeface.DEFAULT
+            }
         }
 
         class LogDiffCallback : DiffUtil.ItemCallback<ActivityLog>() {

@@ -36,9 +36,15 @@ data class CreateSessionRequest(
     val sourceContext: SourceContext? = null
 )
 
+// Request body for creating a new activity (user message)
+data class CreateActivityRequest(
+    val userMessage: MessageLog
+)
+
 // Response models for live logs (activities)
 data class ListActivitiesResponse(
-    val activities: List<ActivityLog>?
+    val activities: List<ActivityLog>?,
+    val nextPageToken: String?
 )
 
 data class ActivityLog(
