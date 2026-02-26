@@ -45,7 +45,7 @@ class TaskDetailActivity : BaseActivity() {
         const val STATUS_EXECUTING_TESTS = "Executing Tests"
         private const val POLLING_INTERVAL_MS = 3000L
 
-        val WORKING_TYPES = setOf("WORKING", "COMMITTING CODE", "EXECUTING TESTS", "RUNNING TESTS", "COMMITTING_CODE")
+        val WORKING_TYPES = setOf("WORKING", "COMMITTING_CODE", "EXECUTING TESTS", "RUNNING TESTS")
         val TERMINAL_STATES = setOf("COMPLETED", "FAILED", "CANCELLED", "TERMINATED")
     }
 
@@ -109,16 +109,16 @@ class TaskDetailActivity : BaseActivity() {
         binding.btnSend.setOnClickListener {
             val message = binding.inputMessage.text.toString().trim()
             if (message.isNotEmpty() && sessionId != null) {
-                sendMessage(message)
+                sendMessage(sessionId!!, message)
             }
         }
     }
 
-    private fun sendMessage(message: String) {
+    private fun sendMessage(sessionId: String, message: String) {
         lifecycleScope.launch {
             try {
                 binding.btnSend.isEnabled = false
-                val log = repository.createActivity(sessionId!!, message)
+                val log = repository.createActivity(sessionId, message)
                 binding.inputMessage.text?.clear()
 
                 allLogs.add(log)
@@ -203,20 +203,14 @@ class TaskDetailActivity : BaseActivity() {
                     val session = repository.getSession(id)
                     binding.detailStatusChip.text = session.status
 
-                    if (!isLoadingMore && nextPageToken == null) {
-                        val response = repository.getActivities(id, pageToken = lastLoadedPageToken)
-                        val newLogs = response.activities ?: emptyList()
+                    if (!isLoadingMore) {
+                        val response = repository.getActivities(id, pageToken = null)
+                        addLogs(response.activities ?: emptyList(), prepend = false)
 
-                        // Append new logs avoiding duplicates
-                        val existingIds = allLogs.mapNotNull { it.id }.toSet()
-                        val uniqueNewLogs = newLogs.filter { it.id == null || !existingIds.contains(it.id) }
-
-                        if (uniqueNewLogs.isNotEmpty()) {
-                            allLogs.addAll(uniqueNewLogs)
-                            logAdapter.submitList(ArrayList(allLogs))
+                        // Only set the initial token for backward pagination
+                        if (nextPageToken == null) {
+                            nextPageToken = response.nextPageToken
                         }
-
-                        nextPageToken = response.nextPageToken
                     }
 
                     if (session.status != null && TERMINAL_STATES.contains(session.status.uppercase(java.util.Locale.ROOT))) {
@@ -237,23 +231,33 @@ class TaskDetailActivity : BaseActivity() {
             try {
                 val token = nextPageToken
                 val response = repository.getActivities(sessionId!!, pageToken = token)
-                val newLogs = response.activities ?: emptyList()
 
+                // lastLoadedPageToken is less relevant now that polling always fetches latest,
+                // but kept for consistency if we wanted to track pagination cursor.
                 lastLoadedPageToken = token
                 nextPageToken = response.nextPageToken
 
-                val existingIds = allLogs.mapNotNull { it.id }.toSet()
-                val uniqueNewLogs = newLogs.filter { it.id == null || !existingIds.contains(it.id) }
-
-                if (uniqueNewLogs.isNotEmpty()) {
-                    allLogs.addAll(uniqueNewLogs)
-                    logAdapter.submitList(ArrayList(allLogs))
-                }
+                addLogs(response.activities ?: emptyList(), prepend = true)
             } catch (e: Exception) {
                 android.util.Log.e("TaskDetailActivity", "Error loading more logs", e)
             } finally {
                 isLoadingMore = false
             }
+        }
+    }
+
+    private fun addLogs(newLogs: List<ActivityLog>, prepend: Boolean) {
+        // Append new logs avoiding duplicates
+        val existingIds = allLogs.mapNotNull { it.id }.toSet()
+        val uniqueNewLogs = newLogs.filter { it.id == null || !existingIds.contains(it.id) }
+
+        if (uniqueNewLogs.isNotEmpty()) {
+            if (prepend) {
+                allLogs.addAll(0, uniqueNewLogs)
+            } else {
+                allLogs.addAll(uniqueNewLogs)
+            }
+            logAdapter.submitList(ArrayList(allLogs))
         }
     }
 

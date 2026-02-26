@@ -9,9 +9,11 @@ import com.jules.loader.BuildConfig
 import com.jules.loader.data.api.JulesService
 import com.jules.loader.data.model.ActivityLog
 import com.jules.loader.data.model.CreateSessionRequest
+import com.jules.loader.data.model.CreateActivityRequest
 import com.jules.loader.data.model.GithubRepoContext
 import com.jules.loader.data.model.ListActivitiesResponse
 import com.jules.loader.data.model.ListSessionsResponse
+import com.jules.loader.data.model.MessageLog
 import com.jules.loader.data.model.Session
 import com.jules.loader.data.model.SourceContext
 import kotlinx.coroutines.CancellationException
@@ -116,12 +118,6 @@ class JulesRepository private constructor(private val context: Context) {
         // So simple caching strategy might need to be adjusted or disabled for pagination.
         // For simplicity, let's bypass cache if pageToken is provided, or just update cache on first page load.
 
-        if (pageToken == null && !forceRefresh && cachedSessions != null) {
-             // We can't return ListSessionsResponse easily from just cached list without knowing if there was a next page.
-             // So we might need to invalidate cache or just fetch from network if we want full pagination support.
-             // Let's assume for now we always fetch from network for simplicity given the requirement changes.
-        }
-
         val apiKey = requireApiKey()
         val response = service.listSessions(apiKey, pageToken = pageToken)
 
@@ -151,8 +147,8 @@ class JulesRepository private constructor(private val context: Context) {
 
     suspend fun createActivity(sessionId: String, message: String): ActivityLog {
         val apiKey = requireApiKey()
-        val userMessage = com.jules.loader.data.model.MessageLog(message = message, text = null, prompt = null)
-        val request = com.jules.loader.data.model.CreateActivityRequest(userMessage = userMessage)
+        val userMessage = MessageLog(message = message, text = null, prompt = null)
+        val request = CreateActivityRequest(userMessage = userMessage)
         return service.createActivity(apiKey, sessionId, request)
     }
 
