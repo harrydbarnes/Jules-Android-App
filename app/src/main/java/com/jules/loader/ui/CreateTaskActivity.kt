@@ -38,7 +38,6 @@ class CreateTaskActivity : BaseActivity() {
     private var originalTextBeforeSpeech = ""
     private var repoAdapter: ArrayAdapter<String>? = null
     private var branchAdapter: ArrayAdapter<String>? = null
-    private val sourceMap = mutableMapOf<String, List<SourceContext>>()
 
     companion object {
         private val TAG = CreateTaskActivity::class.java.simpleName
@@ -117,17 +116,9 @@ class CreateTaskActivity : BaseActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.availableSources.collectLatest { sources ->
-                        val isShortenEnabled = com.jules.loader.util.PreferenceUtils.isShortenRepoNamesEnabled(this@CreateTaskActivity)
-                        sourceMap.clear()
-                        sources.forEach { source ->
-                            val cleanSource = if (source.source.startsWith("sources/github/")) source.source.removePrefix("sources/github/") else source.source
-                            val displayName = com.jules.loader.util.PreferenceUtils.getDisplayRepoName(cleanSource, isShortenEnabled)
-                            val currentList = sourceMap.getOrDefault(displayName, emptyList())
-                            sourceMap[displayName] = currentList + source
-                        }
-                        val displayNames = sourceMap.keys.toList().sorted()
+                        val sourceNames = sources.map { it.source }.distinct()
                         repoAdapter?.clear()
-                        repoAdapter?.addAll(displayNames)
+                        repoAdapter?.addAll(sourceNames)
                         repoAdapter?.notifyDataSetChanged()
                     }
                 }
@@ -136,12 +127,6 @@ class CreateTaskActivity : BaseActivity() {
                     viewModel.isLoading.collectLatest { isLoading ->
                         binding.btnStartTask.isEnabled = !isLoading
                         binding.btnStartTask.text = if (isLoading) getString(R.string.create_task_starting) else getString(R.string.create_task_send)
-                    }
-                }
-
-                launch {
-                    viewModel.isSourcesLoading.collectLatest { isLoading ->
-                        binding.repoLoadingIndicator.visibility = if (isLoading) android.view.View.VISIBLE else android.view.View.GONE
                     }
                 }
 
@@ -171,9 +156,9 @@ class CreateTaskActivity : BaseActivity() {
         binding.branchInput.setOnClickListener { binding.branchInput.showDropDown() }
 
         binding.repoInput.setOnItemClickListener { parent, _, position, _ ->
-            val selectedDisplayName = parent.getItemAtPosition(position) as String
-            val matchingSources = sourceMap[selectedDisplayName] ?: emptyList()
-            val branches = matchingSources.mapNotNull { it.githubRepoContext?.startingBranch }.distinct().sorted()
+            val selectedSourceName = parent.getItemAtPosition(position) as String
+            val matchingSources = viewModel.availableSources.value.filter { it.source == selectedSourceName }
+            val branches = matchingSources.mapNotNull { it.githubRepoContext?.startingBranch }.distinct()
 
             branchAdapter?.clear()
             branchAdapter?.addAll(branches)
