@@ -1,11 +1,13 @@
 package com.jules.loader.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.TextView
+import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -121,11 +123,13 @@ class TaskDetailActivity : BaseActivity() {
                 val log = repository.createActivity(sessionId, message)
                 binding.inputMessage.text?.clear()
 
-                allLogs.add(log)
-                logAdapter.submitList(ArrayList(allLogs))
+                synchronized(allLogs) {
+                    allLogs.add(log)
+                    logAdapter.submitList(ArrayList(allLogs))
+                }
             } catch (e: Exception) {
-                android.widget.Toast.makeText(this@TaskDetailActivity, "Failed to send message", android.widget.Toast.LENGTH_SHORT).show()
-                android.util.Log.e("TaskDetailActivity", "Error sending message", e)
+                Toast.makeText(this@TaskDetailActivity, "Failed to send message", Toast.LENGTH_SHORT).show()
+                Log.e("TaskDetailActivity", "Error sending message", e)
             } finally {
                 binding.btnSend.isEnabled = true
             }
@@ -133,15 +137,16 @@ class TaskDetailActivity : BaseActivity() {
     }
 
     private fun cancelSession() {
-        if (sessionId == null) return
-        lifecycleScope.launch {
-            try {
-                val session = repository.cancelSession(sessionId!!)
-                binding.detailStatusChip.text = session.status
-                android.widget.Toast.makeText(this@TaskDetailActivity, "Task cancelled", android.widget.Toast.LENGTH_SHORT).show()
-            } catch (e: Exception) {
-                android.widget.Toast.makeText(this@TaskDetailActivity, "Failed to cancel task", android.widget.Toast.LENGTH_SHORT).show()
-                android.util.Log.e("TaskDetailActivity", "Error cancelling task", e)
+        sessionId?.let { id ->
+            lifecycleScope.launch {
+                try {
+                    val session = repository.cancelSession(id)
+                    binding.detailStatusChip.text = session.status
+                    Toast.makeText(this@TaskDetailActivity, "Task cancelled", Toast.LENGTH_SHORT).show()
+                } catch (e: Exception) {
+                    Toast.makeText(this@TaskDetailActivity, "Failed to cancel task", Toast.LENGTH_SHORT).show()
+                    Log.e("TaskDetailActivity", "Error cancelling task", e)
+                }
             }
         }
     }
@@ -247,17 +252,19 @@ class TaskDetailActivity : BaseActivity() {
     }
 
     private fun addLogs(newLogs: List<ActivityLog>, prepend: Boolean) {
-        // Append new logs avoiding duplicates
-        val existingIds = allLogs.mapNotNull { it.id }.toSet()
-        val uniqueNewLogs = newLogs.filter { it.id == null || !existingIds.contains(it.id) }
+        synchronized(allLogs) {
+            // Append new logs avoiding duplicates
+            val existingIds = allLogs.mapNotNull { it.id }.toSet()
+            val uniqueNewLogs = newLogs.filter { it.id == null || !existingIds.contains(it.id) }
 
-        if (uniqueNewLogs.isNotEmpty()) {
-            if (prepend) {
-                allLogs.addAll(0, uniqueNewLogs)
-            } else {
-                allLogs.addAll(uniqueNewLogs)
+            if (uniqueNewLogs.isNotEmpty()) {
+                if (prepend) {
+                    allLogs.addAll(0, uniqueNewLogs)
+                } else {
+                    allLogs.addAll(uniqueNewLogs)
+                }
+                logAdapter.submitList(ArrayList(allLogs))
             }
-            logAdapter.submitList(ArrayList(allLogs))
         }
     }
 

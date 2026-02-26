@@ -10,12 +10,15 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
 import android.transition.AutoTransition
 import android.transition.TransitionManager
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.inputmethod.InputMethodManager
 import android.widget.PopupMenu
+import android.widget.Toast
 import androidx.browser.customtabs.CustomTabsIntent
+import com.google.android.material.snackbar.Snackbar
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.jules.loader.data.JulesRepository
@@ -374,11 +377,11 @@ class MainActivity : BaseActivity() {
                 repository.deleteSession(session.id)
                 allSessions = allSessions.filter { it.id != session.id }
                 applyFilters()
-                com.google.android.material.snackbar.Snackbar.make(binding.root, "Session deleted", com.google.android.material.snackbar.Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(binding.root, "Session deleted", Snackbar.LENGTH_LONG).show()
             } catch (e: Exception) {
-                android.util.Log.e("MainActivity", "Error deleting session", e)
+                Log.e("MainActivity", "Error deleting session", e)
                 adapter.notifyItemChanged(position)
-                android.widget.Toast.makeText(this@MainActivity, "Failed to delete session", android.widget.Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, "Failed to delete session", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -464,7 +467,7 @@ class MainActivity : BaseActivity() {
                 allSessions = allSessions + newSessions
                 applyFilters()
             } catch (e: Exception) {
-                android.util.Log.e("MainActivity", "Error loading more sessions", e)
+                Log.e("MainActivity", "Error loading more sessions", e)
             } finally {
                 isLoadingMore = false
             }

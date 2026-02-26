@@ -21,6 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
@@ -156,7 +157,7 @@ class JulesRepository private constructor(private val context: Context) {
         val apiKey = requireApiKey()
         val response = service.deleteSession(apiKey, sessionId)
         if (!response.isSuccessful) {
-            throw retrofit2.HttpException(response)
+            throw HttpException(response)
         }
         cachedSessions = cachedSessions?.filter { it.id != sessionId }
     }
