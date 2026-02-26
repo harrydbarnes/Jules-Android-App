@@ -73,6 +73,7 @@ class JulesRepository private constructor(private val context: Context) {
     companion object {
         private const val PREFS_FILE_NAME = "jules_prefs"
         private const val KEY_API_KEY = "jules_api_key"
+        const val API_KEY_LENGTH = 53
 
         @Volatile
         private var INSTANCE: JulesRepository? = null
@@ -143,6 +144,9 @@ class JulesRepository private constructor(private val context: Context) {
                 service.listSources(apiKey)
                 true
             } catch (e: Exception) {
+                if (e is kotlinx.coroutines.CancellationException) throw e
+                // For debugging
+                android.util.Log.e("API_VALIDATION", "API key validation failed", e)
                 false
             }
         }

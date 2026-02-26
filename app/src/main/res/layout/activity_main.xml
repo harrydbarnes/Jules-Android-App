@@ -17,7 +17,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:contentInsetStart="28dp"
+            app:contentInsetStart="@dimen/toolbar_content_inset_start"
             app:titleTextAppearance="@style/TextAppearance.Jules.Toolbar"
             app:popupTheme="@style/ThemeOverlay.Jules.Popup" />
 

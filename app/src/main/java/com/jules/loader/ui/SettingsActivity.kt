@@ -94,7 +94,7 @@ class SettingsActivity : BaseActivity() {
         dialog.window?.let { window ->
             val layoutParams = window.attributes
             layoutParams.gravity = android.view.Gravity.TOP
-            layoutParams.y = (100 * resources.displayMetrics.density).toInt() // Top margin
+            layoutParams.y = resources.getDimensionPixelSize(R.dimen.dialog_top_margin) // Top margin
             window.attributes = layoutParams
         }
 
@@ -114,7 +114,7 @@ class SettingsActivity : BaseActivity() {
                 return@setOnClickListener
             }
 
-            if (newKey.length != 53) {
+            if (newKey.length != JulesRepository.API_KEY_LENGTH) {
                 Toast.makeText(this, getString(R.string.error_api_key_length), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }

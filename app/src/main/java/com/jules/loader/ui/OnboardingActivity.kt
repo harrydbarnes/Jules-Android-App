@@ -228,7 +228,7 @@ class OnboardingActivity : BaseActivity() {
                         return@setOnClickListener
                     }
 
-                    if (key.length != 53) {
+                    if (key.length != JulesRepository.API_KEY_LENGTH) {
                         Toast.makeText(activity, R.string.error_api_key_length, Toast.LENGTH_SHORT).show()
                         return@setOnClickListener
                     }
