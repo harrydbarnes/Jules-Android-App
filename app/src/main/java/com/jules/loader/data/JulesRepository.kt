@@ -10,6 +10,8 @@ import com.jules.loader.data.api.JulesService
 import com.jules.loader.data.model.ActivityLog
 import com.jules.loader.data.model.CreateSessionRequest
 import com.jules.loader.data.model.GithubRepoContext
+import com.jules.loader.data.model.ListActivitiesResponse
+import com.jules.loader.data.model.ListSessionsResponse
 import com.jules.loader.data.model.Session
 import com.jules.loader.data.model.SourceContext
 import kotlinx.coroutines.CancellationException
