@@ -129,7 +129,13 @@ class JulesRepository private constructor(private val context: Context) {
         return response
     }
 
-    suspend fun createSession(prompt: String, repoUrl: String? = null, branch: String? = null): Session {
+    suspend fun createSession(
+        prompt: String,
+        repoUrl: String? = null,
+        branch: String? = null,
+        automationMode: String? = null,
+        requirePlanApproval: Boolean? = null
+    ): Session {
         val apiKey = requireApiKey()
         val sourceContext = if (repoUrl != null) {
             SourceContext(
@@ -137,7 +143,12 @@ class JulesRepository private constructor(private val context: Context) {
                 githubRepoContext = GithubRepoContext(startingBranch = branch)
             )
         } else null
-        val request = CreateSessionRequest(prompt = prompt, sourceContext = sourceContext)
+        val request = CreateSessionRequest(
+            prompt = prompt,
+            sourceContext = sourceContext,
+            automationMode = automationMode,
+            requirePlanApproval = requirePlanApproval
+        )
         return service.createSession(apiKey, request)
     }
 

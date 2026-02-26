@@ -45,11 +45,17 @@ class CreateTaskViewModel(private val repository: JulesRepository) : ViewModel()
         }
     }
 
-    fun submitTask(prompt: String, repoUrl: String?, branch: String?) {
+    fun submitTask(
+        prompt: String,
+        repoUrl: String?,
+        branch: String?,
+        automationMode: String? = null,
+        requirePlanApproval: Boolean? = null
+    ) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                repository.createSession(prompt, repoUrl, branch)
+                repository.createSession(prompt, repoUrl, branch, automationMode, requirePlanApproval)
                 _taskCreatedEvent.emit(Unit)
             } catch (e: Exception) {
                 android.util.Log.e(TAG, "Error creating session", e)

@@ -80,7 +80,9 @@ class CreateTaskActivity : BaseActivity() {
             if (prompt.isNotEmpty()) {
                 val repo = binding.repoInput.text.toString().takeIf { it.isNotBlank() }
                 val branch = binding.branchInput.text.toString().takeIf { it.isNotBlank() }
-                viewModel.submitTask(prompt, repo, branch)
+                val automationMode = if (binding.switchAutoCreatePr.isChecked) "AUTO_CREATE_PR" else null
+                val requirePlanApproval = binding.switchRequirePlanApproval.isChecked
+                viewModel.submitTask(prompt, repo, branch, automationMode, requirePlanApproval)
             } else {
                 binding.taskInput.error = "Please enter a task"
             }

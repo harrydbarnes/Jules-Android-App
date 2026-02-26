@@ -22,7 +22,6 @@
         android:layout_height="wrap_content"
         android:hint="Repository (Optional)"
         android:layout_marginBottom="16dp"
-        app:endIconMode="clear_text"
         app:shapeAppearance="@style/ShapeAppearance.Jules.MediumComponent">
 
         <com.google.android.material.textfield.MaterialAutoCompleteTextView
@@ -41,7 +40,6 @@
         android:layout_height="wrap_content"
         android:hint="Branch (Optional)"
         android:layout_marginBottom="16dp"
-        app:endIconMode="clear_text"
         app:shapeAppearance="@style/ShapeAppearance.Jules.MediumComponent">
 
         <com.google.android.material.textfield.MaterialAutoCompleteTextView
@@ -52,6 +50,20 @@
             android:focusable="false"
             android:clickable="true" />
     </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.materialswitch.MaterialSwitch
+        android:id="@+id/switchAutoCreatePr"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Auto Create PR"
+        android:layout_marginBottom="8dp" />
+
+    <com.google.android.material.materialswitch.MaterialSwitch
+        android:id="@+id/switchRequirePlanApproval"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Require Plan Approval"
+        android:layout_marginBottom="16dp" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/taskInputLayout"

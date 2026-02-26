@@ -19,7 +19,7 @@ data class Session(
 )
 
 data class SourceContext(
-    val source: String,
+    @SerializedName(value = "source", alternate = ["name"]) val source: String,
     val githubRepoContext: GithubRepoContext?
 ) {
     val cleanSource: String
@@ -33,7 +33,10 @@ data class GithubRepoContext(
 // Request body for creating a new session/task
 data class CreateSessionRequest(
     val prompt: String,
-    val sourceContext: SourceContext? = null
+    val sourceContext: SourceContext? = null,
+    val automationMode: String? = null,
+    val requirePlanApproval: Boolean? = null,
+    val title: String? = null
 )
 
 // Request body for creating a new activity (user message)
