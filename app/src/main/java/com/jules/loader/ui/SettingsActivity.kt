@@ -111,6 +111,7 @@ class SettingsActivity : BaseActivity() {
 
             val newKey = input.text?.toString()?.trim()
             if (newKey.isNullOrEmpty()) {
+                Toast.makeText(this, getString(R.string.error_enter_api_key), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
