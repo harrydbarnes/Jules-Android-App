@@ -18,7 +18,20 @@ data class Session(
     @SerializedName("state") val status: String?,
     val sourceContext: SourceContext?,
     val createTime: String?,
-    val updateTime: String?
+    val updateTime: String?,
+    val outputs: List<SessionOutput>? = null
+) : Parcelable
+
+@Parcelize
+data class SessionOutput(
+    val pullRequest: PullRequest?
+) : Parcelable
+
+@Parcelize
+data class PullRequest(
+    val url: String,
+    val title: String,
+    val description: String
 ) : Parcelable
 
 @Parcelize
@@ -72,13 +85,20 @@ data class ActivityLog(
     // Union fields containing the replies/comments
     val userMessage: MessageLog?,
     val agentMessage: MessageLog?,
-    val planGenerated: PlanLog?
+    val planGenerated: PlanGeneratedLog?,
+    val planApproved: PlanApprovedLog?,
+    val progressUpdated: ProgressUpdatedLog?,
+    val sessionCompleted: SessionCompletedLog?,
+    val artifacts: List<Artifact>?
 ) {
     fun getResolvedType(): String {
         return type ?: when {
             userMessage != null -> "USER MESSAGE"
             agentMessage != null -> "AGENT MESSAGE"
             planGenerated != null -> "PLAN GENERATED"
+            planApproved != null -> "PLAN APPROVED"
+            progressUpdated != null -> "PROGRESS UPDATED"
+            sessionCompleted != null -> "SESSION COMPLETED"
             else -> "ACTIVITY"
         }
     }
@@ -87,7 +107,10 @@ data class ActivityLog(
         // Fallbacks to extract the actual comment details and content
         return userMessage?.message ?: userMessage?.text ?: userMessage?.prompt ?:
                agentMessage?.message ?: agentMessage?.text ?: agentMessage?.prompt ?:
-               planGenerated?.plan ?: planGenerated?.message ?:
+               planGenerated?.plan?.steps?.joinToString("\n") { it.title } ?: planGenerated?.message ?:
+               planApproved?.planId?.let { "Plan Approved: $it" } ?:
+               progressUpdated?.description ?: progressUpdated?.title ?:
+               sessionCompleted?.let { "Session Completed" } ?:
                description ?: "No details"
     }
 }
@@ -98,9 +121,59 @@ data class MessageLog(
     val prompt: String?
 )
 
-data class PlanLog(
-    val plan: String?,
+data class PlanGeneratedLog(
+    val plan: PlanDetail?,
     val message: String?
+)
+
+data class PlanDetail(
+    val id: String?,
+    val steps: List<PlanStep>?
+)
+
+data class PlanStep(
+    val id: String?,
+    val title: String,
+    val index: Int?
+)
+
+data class PlanApprovedLog(
+    val planId: String?
+)
+
+data class ProgressUpdatedLog(
+    val title: String?,
+    val description: String?
+)
+
+class SessionCompletedLog
+
+data class Artifact(
+    val bashOutput: BashOutput?,
+    val changeSet: ChangeSet?,
+    val media: Media?
+)
+
+data class BashOutput(
+    val command: String?,
+    val output: String?,
+    val exitCode: Int?
+)
+
+data class ChangeSet(
+    val source: String?,
+    val gitPatch: GitPatch?
+)
+
+data class GitPatch(
+    val unidiffPatch: String?,
+    val baseCommitId: String?,
+    val suggestedCommitMessage: String?
+)
+
+data class Media(
+    val data: String?,
+    val mimeType: String?
 )
 
 // Response models for user sources (repositories)
