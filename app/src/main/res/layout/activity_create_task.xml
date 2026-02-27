@@ -15,98 +15,81 @@
         android:textAppearance="?attr/textAppearanceDisplayLarge"
         android:layout_marginBottom="24dp" />
 
-    <com.google.android.material.progressindicator.CircularProgressIndicator
-        android:id="@+id/pageLoadingIndicator"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:indeterminate="true"
-        android:visibility="gone" />
-
-    <LinearLayout
-        android:id="@+id/contentContainer"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/repoInputLayout"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:visibility="visible">
+        android:hint="Repository (Optional)"
+        android:layout_marginBottom="16dp"
+        app:shapeAppearance="@style/ShapeAppearance.Jules.MediumComponent">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/repoInputLayout"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+            android:id="@+id/repoInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Repository (Optional)"
-            android:layout_marginBottom="16dp"
-            app:shapeAppearance="@style/ShapeAppearance.Jules.MediumComponent">
+            android:inputType="none"
+            android:focusable="false"
+            android:clickable="true" />
+    </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                android:id="@+id/repoInput"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="none"
-                android:focusable="false"
-                android:clickable="true" />
-        </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/branchInputLayout"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Branch (Optional)"
+        android:layout_marginBottom="16dp"
+        app:shapeAppearance="@style/ShapeAppearance.Jules.MediumComponent">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/branchInputLayout"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+            android:id="@+id/branchInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Branch (Optional)"
-            android:layout_marginBottom="16dp"
-            app:shapeAppearance="@style/ShapeAppearance.Jules.MediumComponent">
+            android:inputType="none"
+            android:focusable="false"
+            android:clickable="true" />
+    </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                android:id="@+id/branchInput"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="none"
-                android:focusable="false"
-                android:clickable="true" />
-        </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.materialswitch.MaterialSwitch
+        android:id="@+id/switchAutoCreatePr"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Auto Create PR"
+        android:layout_marginBottom="8dp" />
 
-        <com.google.android.material.materialswitch.MaterialSwitch
-            android:id="@+id/switchAutoCreatePr"
+    <com.google.android.material.materialswitch.MaterialSwitch
+        android:id="@+id/switchRequirePlanApproval"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Require Plan Approval"
+        android:layout_marginBottom="16dp" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/taskInputLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Describe the task for Jules..."
+        app:endIconMode="custom"
+        app:endIconDrawable="@drawable/ic_mic"
+        app:endIconContentDescription="Voice Input"
+        app:shapeAppearance="@style/ShapeAppearance.Jules.MediumComponent">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/taskInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Auto Create PR"
-            android:layout_marginBottom="8dp" />
+            android:minLines="3"
+            android:gravity="top" />
+    </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.materialswitch.MaterialSwitch
-            android:id="@+id/switchRequirePlanApproval"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Require Plan Approval"
-            android:layout_marginBottom="16dp" />
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/taskInputLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Describe the task for Jules..."
-            app:endIconMode="custom"
-            app:endIconDrawable="@drawable/ic_mic"
-            app:endIconContentDescription="Voice Input"
-            app:shapeAppearance="@style/ShapeAppearance.Jules.MediumComponent">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/taskInput"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minLines="3"
-                android:gravity="top" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <Button
-            android:id="@+id/btn_start_task"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Send to Jules"
-            android:layout_marginTop="24dp"
-            style="@style/Widget.Material3.Button"
-            app:cornerRadius="20dp" />
-
-    </LinearLayout>
+    <Button
+        android:id="@+id/btn_start_task"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Send to Jules"
+        android:layout_marginTop="24dp"
+        style="@style/Widget.Material3.Button"
+        app:cornerRadius="20dp" />
 
 </LinearLayout>
