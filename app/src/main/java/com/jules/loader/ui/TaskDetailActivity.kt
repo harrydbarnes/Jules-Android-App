@@ -170,27 +170,15 @@ class TaskDetailActivity : BaseActivity() {
     private fun populateSessionDetails() {
         val title = intent.getStringExtra(EXTRA_SESSION_TITLE)
         val prompt = intent.getStringExtra(EXTRA_SESSION_PROMPT) ?: getString(R.string.no_prompt)
-        val statusRaw = intent.getStringExtra(EXTRA_SESSION_STATUS) ?: "Initialising"
-        val status = statusRaw.replace("_", " ")
+        val status = intent.getStringExtra(EXTRA_SESSION_STATUS) ?: "Initialising"
         val source = intent.getStringExtra(EXTRA_SESSION_SOURCE)
         val branch = intent.getStringExtra(EXTRA_SESSION_BRANCH)
 
-        val fullTitle = title ?: getString(R.string.untitled_session)
-        val words = fullTitle.split(" ")
-        if (words.size > 10) {
-            val truncatedTitle = words.take(10).joinToString(" ") + "..."
-            binding.detailTitle.text = truncatedTitle
-            binding.detailTitle.setOnClickListener { view ->
-                showTooltip(view, fullTitle)
-            }
-        } else {
-            binding.detailTitle.text = fullTitle
-        }
-
+        binding.detailTitle.text = title ?: getString(R.string.untitled_session)
         binding.detailPrompt.text = prompt
         binding.detailStatusChip.text = status
 
-        when (statusRaw) {
+        when (status) {
             STATUS_PR_OPEN -> binding.detailStatusChip.setChipBackgroundColorResource(R.color.status_pr_open)
             STATUS_EXECUTING_TESTS -> binding.detailStatusChip.setChipBackgroundColorResource(R.color.status_tests_passing)
             "COMPLETED" -> binding.detailStatusChip.setChipBackgroundColorResource(R.color.status_tests_passing)
@@ -219,8 +207,7 @@ class TaskDetailActivity : BaseActivity() {
             while (isActive) {
                 try {
                     val session = repository.getSession(id)
-                    val statusRaw = session.status ?: "Idle"
-                    binding.detailStatusChip.text = statusRaw.replace("_", " ")
+                    binding.detailStatusChip.text = session.status
 
                     if (!isLoadingMore) {
                         val response = repository.getActivities(id, pageToken = null)
@@ -263,25 +250,6 @@ class TaskDetailActivity : BaseActivity() {
                 isLoadingMore = false
             }
         }
-    }
-
-    private fun showTooltip(anchor: View, text: String) {
-        val popupView = layoutInflater.inflate(R.layout.popup_tooltip, null)
-        val textView = popupView.findViewById<TextView>(R.id.tooltipText)
-        textView.text = text
-
-        val popupWindow = android.widget.PopupWindow(
-            popupView,
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            true
-        )
-        popupWindow.elevation = 8f
-        popupWindow.enterTransition = android.transition.Fade().setDuration(200)
-        popupWindow.exitTransition = android.transition.Fade().setDuration(200)
-
-        // Show below anchor
-        popupWindow.showAsDropDown(anchor, 0, 0)
     }
 
     private fun addLogs(newLogs: List<ActivityLog>, prepend: Boolean) {

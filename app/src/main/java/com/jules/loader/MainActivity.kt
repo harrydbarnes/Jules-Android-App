@@ -460,7 +460,6 @@ class MainActivity : BaseActivity() {
     private fun loadMoreSessions() {
         if (isLoadingMore || nextPageToken == null) return
         isLoadingMore = true
-        adapter.setLoading(true)
 
         lifecycleScope.launch {
             try {
@@ -474,7 +473,6 @@ class MainActivity : BaseActivity() {
                 Log.e("MainActivity", "Error loading more sessions", e)
             } finally {
                 isLoadingMore = false
-                adapter.setLoading(false)
             }
         }
     }
