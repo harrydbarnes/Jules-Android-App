@@ -8,6 +8,8 @@ import android.os.Bundle
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
+import android.transition.TransitionManager
+import android.view.View
 import android.view.Window
 import android.widget.ArrayAdapter
 import android.widget.Toast
@@ -203,10 +205,17 @@ class CreateTaskActivity : BaseActivity() {
         }
 
         binding.repoInput.addTextChangedListener {
-            if (it.isNullOrBlank()) {
+            val hasRepo = !it.isNullOrBlank()
+            TransitionManager.beginDelayedTransition(binding.contentContainer)
+            binding.branchInputLayout.visibility = if (hasRepo) View.VISIBLE else View.INVISIBLE
+            if (!hasRepo) {
                 binding.branchInput.setText("")
             }
         }
+        
+        // Initial state check
+        val initialHasRepo = !binding.repoInput.text.isNullOrBlank()
+        binding.branchInputLayout.visibility = if (initialHasRepo) View.VISIBLE else View.INVISIBLE
     }
 
     private fun setupVoiceInput() {
