@@ -17,18 +17,55 @@ import android.content.Intent
 import android.app.Activity
 import androidx.core.app.ActivityOptionsCompat
 
-class SessionAdapter : ListAdapter<Session, SessionAdapter.SessionViewHolder>(SessionDiffCallback()) {
+class SessionAdapter : ListAdapter<Session, RecyclerView.ViewHolder>(SessionDiffCallback()) {
 
     var isShortenRepoNamesEnabled: Boolean = true
+    private var isLoadingFooterVisible = false
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SessionViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_session, parent, false)
-        return SessionViewHolder(view)
+    companion object {
+        private const val VIEW_TYPE_ITEM = 0
+        private const val VIEW_TYPE_LOADING = 1
     }
 
-    override fun onBindViewHolder(holder: SessionViewHolder, position: Int) {
-        holder.bind(getItem(position), isShortenRepoNamesEnabled)
+    fun setLoading(isLoading: Boolean) {
+        if (isLoadingFooterVisible == isLoading) return
+        isLoadingFooterVisible = isLoading
+        if (isLoading) {
+            notifyItemInserted(currentList.size)
+        } else {
+            notifyItemRemoved(currentList.size)
+        }
     }
+
+    override fun getItemCount(): Int {
+        return super.getItemCount() + if (isLoadingFooterVisible) 1 else 0
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return if (isLoadingFooterVisible && position == itemCount - 1) {
+            VIEW_TYPE_LOADING
+        } else {
+            VIEW_TYPE_ITEM
+        }
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return if (viewType == VIEW_TYPE_LOADING) {
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_loading, parent, false)
+            LoadingViewHolder(view)
+        } else {
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_session, parent, false)
+            SessionViewHolder(view)
+        }
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        if (holder is SessionViewHolder) {
+            holder.bind(getItem(position), isShortenRepoNamesEnabled)
+        }
+    }
+
+    class LoadingViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
     class SessionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val title: TextView = itemView.findViewById(R.id.sessionTitle)
@@ -43,7 +80,8 @@ class SessionAdapter : ListAdapter<Session, SessionAdapter.SessionViewHolder>(Se
             title.text = session.title ?: context.getString(R.string.untitled_session)
             prompt.text = session.prompt ?: context.getString(R.string.no_prompt)
 
-            val status = session.status ?: "Idle"
+            val statusRaw = session.status ?: "Idle"
+            val status = statusRaw.replace("_", " ")
             statusChip.text = status
 
             // Set status color

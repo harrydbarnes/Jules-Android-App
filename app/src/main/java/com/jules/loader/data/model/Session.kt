@@ -20,14 +20,20 @@ data class Session(
 
 data class SourceContext(
     @SerializedName(value = "source", alternate = ["name"]) val source: String,
-    val githubRepoContext: GithubRepoContext?
+    @SerializedName("githubRepo") val githubRepoContext: GithubRepoContext?
 ) {
     val cleanSource: String
         get() = if (source.startsWith("sources/github/")) source.removePrefix("sources/github/") else source
 }
 
 data class GithubRepoContext(
-    val startingBranch: String?
+    val startingBranch: String?,
+    val branches: List<Branch>?,
+    val defaultBranch: Branch?
+)
+
+data class Branch(
+    val displayName: String
 )
 
 // Request body for creating a new session/task
