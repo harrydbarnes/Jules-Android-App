@@ -71,6 +71,7 @@
                 android:layout_height="wrap_content"
                 android:hint="Branch (Optional)"
                 android:layout_marginBottom="16dp"
+                android:visibility="invisible"
                 app:shapeAppearance="@style/ShapeAppearance.Jules.MediumComponent">
 
                 <com.google.android.material.textfield.MaterialAutoCompleteTextView
