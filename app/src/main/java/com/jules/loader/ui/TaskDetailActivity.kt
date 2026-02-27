@@ -6,6 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.content.Intent
+import android.net.Uri
 import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
@@ -270,6 +272,18 @@ class TaskDetailActivity : BaseActivity() {
                     val session = repository.getSession(id)
                     val statusRaw = session.status ?: "Idle"
                     binding.detailStatusChip.text = statusRaw.replace("_", " ")
+
+                    val prOutput = session.outputs?.firstOrNull { it.pullRequest != null }?.pullRequest
+                    if (prOutput != null) {
+                        binding.detailPrChip.visibility = View.VISIBLE
+                        binding.detailPrChip.text = "View PR"
+                        binding.detailPrChip.setOnClickListener {
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(prOutput.url))
+                            startActivity(intent)
+                        }
+                    } else {
+                        binding.detailPrChip.visibility = View.GONE
+                    }
 
                     if (!isLoadingMore) {
                         val response = repository.getActivities(id, pageToken = null)
