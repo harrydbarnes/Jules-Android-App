@@ -37,6 +37,7 @@ class TaskDetailActivity : BaseActivity() {
     private var lastLoadedPageToken: String? = null
     private var isLoadingMore = false
     private val allLogs = java.util.Collections.synchronizedList(java.util.ArrayList<ActivityLog>())
+    private var currentPrUrl: String? = null
 
     companion object {
         const val EXTRA_SESSION_ID = "EXTRA_SESSION_ID"
@@ -110,6 +111,22 @@ class TaskDetailActivity : BaseActivity() {
             startPollingLogs(id)
         }
 
+        binding.detailPrChip.setOnClickListener {
+            val url = currentPrUrl
+            if (!url.isNullOrEmpty() && url.startsWith("https://")) {
+                try {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                    startActivity(intent)
+                } catch (e: Exception) {
+                    Toast.makeText(this@TaskDetailActivity, getString(R.string.error_open_url), Toast.LENGTH_SHORT).show()
+                    Log.e("TaskDetailActivity", "Error opening PR URL", e)
+                }
+            } else {
+                Toast.makeText(this@TaskDetailActivity, getString(R.string.error_invalid_url), Toast.LENGTH_SHORT).show()
+                Log.e("TaskDetailActivity", "Invalid PR URL: $url")
+            }
+        }
+
         binding.btnSend.setOnClickListener {
             val message = binding.inputMessage.text.toString().trim()
             val currentSessionId = sessionId
@@ -131,7 +148,7 @@ class TaskDetailActivity : BaseActivity() {
                     logAdapter.submitList(ArrayList(allLogs))
                 }
             } catch (e: Exception) {
-                Toast.makeText(this@TaskDetailActivity, "Failed to send message", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@TaskDetailActivity, getString(R.string.error_sending_message), Toast.LENGTH_SHORT).show()
                 Log.e("TaskDetailActivity", "Error sending message", e)
             } finally {
                 binding.btnSend.isEnabled = true
@@ -148,7 +165,7 @@ class TaskDetailActivity : BaseActivity() {
                     Toast.makeText(this@TaskDetailActivity, getString(R.string.message_session_cancelled), Toast.LENGTH_SHORT).show()
                     invalidateOptionsMenu()
                 } catch (e: Exception) {
-                    Toast.makeText(this@TaskDetailActivity, "Failed to cancel task", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@TaskDetailActivity, getString(R.string.error_cancel_session), Toast.LENGTH_SHORT).show()
                     Log.e("TaskDetailActivity", "Error cancelling task", e)
                 }
             }
@@ -224,7 +241,7 @@ class TaskDetailActivity : BaseActivity() {
     private fun populateSessionDetails() {
         val title = intent.getStringExtra(EXTRA_SESSION_TITLE)
         val prompt = intent.getStringExtra(EXTRA_SESSION_PROMPT) ?: getString(R.string.no_prompt)
-        val statusRaw = intent.getStringExtra(EXTRA_SESSION_STATUS) ?: "Initialising"
+        val statusRaw = intent.getStringExtra(EXTRA_SESSION_STATUS) ?: getString(R.string.status_initialising)
         val status = statusRaw.replace("_", " ")
         val source = intent.getStringExtra(EXTRA_SESSION_SOURCE)
         val branch = intent.getStringExtra(EXTRA_SESSION_BRANCH)
@@ -270,18 +287,16 @@ class TaskDetailActivity : BaseActivity() {
             while (isActive) {
                 try {
                     val session = repository.getSession(id)
-                    val statusRaw = session.status ?: "Idle"
+                    val statusRaw = session.status ?: getString(R.string.status_idle)
                     binding.detailStatusChip.text = statusRaw.replace("_", " ")
 
                     val prOutput = session.outputs?.firstOrNull { it.pullRequest != null }?.pullRequest
                     if (prOutput != null) {
+                        currentPrUrl = prOutput.url
                         binding.detailPrChip.visibility = View.VISIBLE
-                        binding.detailPrChip.text = "View PR"
-                        binding.detailPrChip.setOnClickListener {
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(prOutput.url))
-                            startActivity(intent)
-                        }
+                        binding.detailPrChip.text = getString(R.string.view_pr)
                     } else {
+                        currentPrUrl = null
                         binding.detailPrChip.visibility = View.GONE
                     }
 

@@ -80,14 +80,14 @@ class MainActivity : BaseActivity() {
         // Set default item animator to ensure add/remove animations are smooth
         binding.sessionsRecyclerView.itemAnimator = androidx.recyclerview.widget.DefaultItemAnimator()
 
-        val cornerRadius = 28 * resources.displayMetrics.density
+        val cornerRadius = resources.getDimension(R.dimen.swipe_corner_radius)
         val paint = android.graphics.Paint().apply {
-            color = android.graphics.Color.parseColor("#B3261E") // Archive Red
+            color = androidx.core.content.ContextCompat.getColor(this@MainActivity, R.color.archive_red) // Archive Red
             style = android.graphics.Paint.Style.FILL
             isAntiAlias = true
         }
         val icon = androidx.core.content.ContextCompat.getDrawable(this, R.drawable.ic_archive_session)
-        val iconMargin = 32 * resources.displayMetrics.density.toInt()
+        val iconMargin = resources.getDimensionPixelSize(R.dimen.swipe_icon_margin)
         val background = android.graphics.RectF()
 
         val swipeHandler = object : androidx.recyclerview.widget.ItemTouchHelper.SimpleCallback(0, androidx.recyclerview.widget.ItemTouchHelper.LEFT or androidx.recyclerview.widget.ItemTouchHelper.RIGHT) {
@@ -492,13 +492,15 @@ class MainActivity : BaseActivity() {
         val layout = android.widget.LinearLayout(this).apply {
             orientation = android.widget.LinearLayout.HORIZONTAL
             gravity = android.view.Gravity.CENTER_VERTICAL
-            setPadding(64, 64, 64, 64)
+            val padLarge = resources.getDimensionPixelSize(R.dimen.dialog_padding_large)
+            setPadding(padLarge, padLarge, padLarge, padLarge)
             addView(com.google.android.material.progressindicator.CircularProgressIndicator(this@MainActivity).apply {
                 isIndeterminate = true
             })
             addView(android.widget.TextView(this@MainActivity).apply {
                 text = getString(R.string.dialog_wait_message)
-                setPadding(48, 0, 0, 0)
+                val padStart = resources.getDimensionPixelSize(R.dimen.dialog_text_padding_start)
+                setPadding(padStart, 0, 0, 0)
                 setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyLarge)
             })
         }
