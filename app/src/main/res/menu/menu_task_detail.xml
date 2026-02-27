@@ -2,7 +2,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/action_pause"
+        android:title="@string/action_pause"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_cancel"
         android:title="Cancel Task"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_archive"
+        android:title="@string/action_archive"
         app:showAsAction="never" />
 </menu>
