@@ -78,6 +78,8 @@ class JulesRepository private constructor(private val context: Context) {
     private val service = retrofit.create(JulesService::class.java)
 
     private var cachedSessions: List<Session>? = null
+    private var cachedSources: List<SourceContext>? = null
+    private var lastSourcesFetchTime: Long = 0
 
     companion object {
         private const val PREFS_FILE_NAME = "jules_prefs"
@@ -129,15 +131,26 @@ class JulesRepository private constructor(private val context: Context) {
         return response
     }
 
-    suspend fun createSession(prompt: String, repoUrl: String? = null, branch: String? = null): Session {
+    suspend fun createSession(
+        prompt: String,
+        repoUrl: String? = null,
+        branch: String? = null,
+        automationMode: String? = null,
+        requirePlanApproval: Boolean? = null
+    ): Session {
         val apiKey = requireApiKey()
         val sourceContext = if (repoUrl != null) {
             SourceContext(
                 source = repoUrl,
-                githubRepoContext = GithubRepoContext(startingBranch = branch)
+                githubRepoContext = GithubRepoContext(startingBranch = branch, branches = null, defaultBranch = null)
             )
         } else null
-        val request = CreateSessionRequest(prompt = prompt, sourceContext = sourceContext)
+        val request = CreateSessionRequest(
+            prompt = prompt,
+            sourceContext = sourceContext,
+            automationMode = automationMode,
+            requirePlanApproval = requirePlanApproval
+        )
         return service.createSession(apiKey, request)
     }
 
@@ -172,9 +185,19 @@ class JulesRepository private constructor(private val context: Context) {
         return service.getSession(apiKey, sessionId)
     }
 
+    fun hasValidSourceCache(): Boolean {
+        return cachedSources != null && (System.currentTimeMillis() - lastSourcesFetchTime) < 5000
+    }
+
     suspend fun getSources(): List<SourceContext> {
+        if (hasValidSourceCache()) {
+            return cachedSources!!
+        }
         val apiKey = requireApiKey()
-        return service.listSources(apiKey).sources ?: emptyList()
+        val sources = service.listSources(apiKey).sources ?: emptyList()
+        cachedSources = sources
+        lastSourcesFetchTime = System.currentTimeMillis()
+        return sources
     }
 
     suspend fun validateApiKey(apiKey: String): Boolean {

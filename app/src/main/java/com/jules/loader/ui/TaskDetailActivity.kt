@@ -170,15 +170,24 @@ class TaskDetailActivity : BaseActivity() {
     private fun populateSessionDetails() {
         val title = intent.getStringExtra(EXTRA_SESSION_TITLE)
         val prompt = intent.getStringExtra(EXTRA_SESSION_PROMPT) ?: getString(R.string.no_prompt)
-        val status = intent.getStringExtra(EXTRA_SESSION_STATUS) ?: "Initialising"
+        val statusRaw = intent.getStringExtra(EXTRA_SESSION_STATUS) ?: "Initialising"
+        val status = statusRaw.replace("_", " ")
         val source = intent.getStringExtra(EXTRA_SESSION_SOURCE)
         val branch = intent.getStringExtra(EXTRA_SESSION_BRANCH)
 
-        binding.detailTitle.text = title ?: getString(R.string.untitled_session)
+        val fullTitle = title ?: getString(R.string.untitled_session)
+        val words = fullTitle.split(" ")
+        if (words.size > 10) {
+            val truncatedTitle = words.take(10).joinToString(" ") + "..."
+            binding.detailTitle.text = truncatedTitle
+        } else {
+            binding.detailTitle.text = fullTitle
+        }
+
         binding.detailPrompt.text = prompt
         binding.detailStatusChip.text = status
 
-        when (status) {
+        when (statusRaw) {
             STATUS_PR_OPEN -> binding.detailStatusChip.setChipBackgroundColorResource(R.color.status_pr_open)
             STATUS_EXECUTING_TESTS -> binding.detailStatusChip.setChipBackgroundColorResource(R.color.status_tests_passing)
             "COMPLETED" -> binding.detailStatusChip.setChipBackgroundColorResource(R.color.status_tests_passing)
@@ -207,7 +216,8 @@ class TaskDetailActivity : BaseActivity() {
             while (isActive) {
                 try {
                     val session = repository.getSession(id)
-                    binding.detailStatusChip.text = session.status
+                    val statusRaw = session.status ?: "Idle"
+                    binding.detailStatusChip.text = statusRaw.replace("_", " ")
 
                     if (!isLoadingMore) {
                         val response = repository.getActivities(id, pageToken = null)

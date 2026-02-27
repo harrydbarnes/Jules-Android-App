@@ -80,7 +80,9 @@ class CreateTaskActivity : BaseActivity() {
             if (prompt.isNotEmpty()) {
                 val repo = binding.repoInput.text.toString().takeIf { it.isNotBlank() }
                 val branch = binding.branchInput.text.toString().takeIf { it.isNotBlank() }
-                viewModel.submitTask(prompt, repo, branch)
+                val automationMode = if (binding.switchAutoCreatePr.isChecked) "AUTO_CREATE_PR" else null
+                val requirePlanApproval = binding.switchRequirePlanApproval.isChecked
+                viewModel.submitTask(prompt, repo, branch, automationMode, requirePlanApproval)
             } else {
                 binding.taskInput.error = "Please enter a task"
             }
@@ -129,6 +131,29 @@ class CreateTaskActivity : BaseActivity() {
                 }
 
                 launch {
+                    viewModel.isSourcesLoading.collectLatest { isLoading ->
+                        if (isLoading) {
+                            binding.pageLoadingIndicator.visibility = android.view.View.VISIBLE
+                            binding.contentContainer.visibility = android.view.View.GONE
+                        } else {
+                            binding.pageLoadingIndicator.visibility = android.view.View.GONE
+                            if (binding.contentContainer.visibility != android.view.View.VISIBLE) {
+                                binding.contentContainer.alpha = 0f
+                                binding.contentContainer.scaleX = 0.95f
+                                binding.contentContainer.scaleY = 0.95f
+                                binding.contentContainer.visibility = android.view.View.VISIBLE
+                                binding.contentContainer.animate()
+                                    .alpha(1f)
+                                    .scaleX(1f)
+                                    .scaleY(1f)
+                                    .setDuration(300)
+                                    .start()
+                            }
+                        }
+                    }
+                }
+
+                launch {
                     viewModel.errorEvent.collect { errorResId ->
                         Toast.makeText(this@CreateTaskActivity, errorResId, Toast.LENGTH_LONG).show()
                     }
@@ -151,18 +176,26 @@ class CreateTaskActivity : BaseActivity() {
 
         branchAdapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, ArrayList())
         binding.branchInput.setAdapter(branchAdapter)
-        binding.branchInput.setOnClickListener { binding.branchInput.showDropDown() }
+        binding.branchInput.setOnClickListener {
+            if (!binding.repoInput.text.isNullOrBlank()) {
+                binding.branchInput.showDropDown()
+            }
+        }
 
         binding.repoInput.setOnItemClickListener { parent, _, position, _ ->
             val selectedSourceName = parent.getItemAtPosition(position) as String
-            val matchingSources = viewModel.availableSources.value.filter { it.source == selectedSourceName }
-            val branches = matchingSources.mapNotNull { it.githubRepoContext?.startingBranch }.distinct()
+            val source = viewModel.availableSources.value.find { it.source == selectedSourceName }
+            val branches = source?.githubRepoContext?.branches?.map { it.displayName } ?: emptyList()
 
             branchAdapter?.clear()
             branchAdapter?.addAll(branches)
             branchAdapter?.notifyDataSetChanged()
 
-            if (branches.isNotEmpty()) {
+            // If a default branch exists, select it
+            val defaultBranch = source?.githubRepoContext?.defaultBranch?.displayName
+            if (defaultBranch != null && branches.contains(defaultBranch)) {
+                binding.branchInput.setText(defaultBranch, false)
+            } else if (branches.isNotEmpty()) {
                 binding.branchInput.setText(branches.first(), false)
             } else {
                 binding.branchInput.setText("")

@@ -25,6 +25,9 @@ class CreateTaskViewModel(private val repository: JulesRepository) : ViewModel()
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
+    private val _isSourcesLoading = MutableStateFlow(false)
+    val isSourcesLoading: StateFlow<Boolean> = _isSourcesLoading
+
     companion object {
         private val TAG = CreateTaskViewModel::class.java.simpleName
     }
@@ -35,21 +38,32 @@ class CreateTaskViewModel(private val repository: JulesRepository) : ViewModel()
 
     private fun loadSources() {
         viewModelScope.launch {
+            if (!repository.hasValidSourceCache()) {
+                _isSourcesLoading.value = true
+            }
             try {
                 val sources = repository.getSources()
                 _availableSources.value = sources
             } catch (e: Exception) {
                 android.util.Log.e(TAG, "Failed to load repositories", e)
                 _errorEvent.emit(R.string.error_load_repositories)
+            } finally {
+                _isSourcesLoading.value = false
             }
         }
     }
 
-    fun submitTask(prompt: String, repoUrl: String?, branch: String?) {
+    fun submitTask(
+        prompt: String,
+        repoUrl: String?,
+        branch: String?,
+        automationMode: String? = null,
+        requirePlanApproval: Boolean? = null
+    ) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                repository.createSession(prompt, repoUrl, branch)
+                repository.createSession(prompt, repoUrl, branch, automationMode, requirePlanApproval)
                 _taskCreatedEvent.emit(Unit)
             } catch (e: Exception) {
                 android.util.Log.e(TAG, "Error creating session", e)

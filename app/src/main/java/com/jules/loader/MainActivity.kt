@@ -50,6 +50,13 @@ class MainActivity : BaseActivity() {
     private var nextPageToken: String? = null
     private var isLoadingMore = false
 
+    companion object {
+        private const val KEY_SESSIONS = "key_sessions"
+        private const val KEY_NEXT_PAGE_TOKEN = "key_next_page_token"
+        private const val KEY_STOP_TIME = "key_stop_time"
+        private const val REFRESH_TIMEOUT_MS = 20000L
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -122,7 +129,29 @@ class MainActivity : BaseActivity() {
 
         setupSearch()
         setupFilters()
-        loadSessions()
+
+        if (savedInstanceState != null) {
+            val stopTime = savedInstanceState.getLong(KEY_STOP_TIME, 0)
+            val currentTime = System.currentTimeMillis()
+            if (currentTime - stopTime < REFRESH_TIMEOUT_MS) {
+                val restoredSessions = savedInstanceState.getParcelableArrayList<Session>(KEY_SESSIONS)
+                if (restoredSessions != null) {
+                    allSessions = restoredSessions
+                    nextPageToken = savedInstanceState.getString(KEY_NEXT_PAGE_TOKEN)
+                    
+                    binding.sessionsRecyclerView.visibility = View.VISIBLE
+                    binding.skeletonLayout.visibility = View.GONE
+                    binding.errorText.visibility = View.GONE
+                    applyFilters()
+                } else {
+                    loadSessions()
+                }
+            } else {
+                loadSessions()
+            }
+        } else {
+            loadSessions()
+        }
     }
 
     override fun onResume() {
@@ -137,6 +166,13 @@ class MainActivity : BaseActivity() {
             val displayRepo = PreferenceUtils.getDisplayRepoName(repo, shortenRepoNames)
             binding.chipRepo.text = displayRepo
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putParcelableArrayList(KEY_SESSIONS, ArrayList(allSessions))
+        outState.putString(KEY_NEXT_PAGE_TOKEN, nextPageToken)
+        outState.putLong(KEY_STOP_TIME, System.currentTimeMillis())
     }
 
     private fun setupSearch() {
@@ -460,6 +496,7 @@ class MainActivity : BaseActivity() {
     private fun loadMoreSessions() {
         if (isLoadingMore || nextPageToken == null) return
         isLoadingMore = true
+        adapter.setLoading(true)
 
         lifecycleScope.launch {
             try {
@@ -473,6 +510,7 @@ class MainActivity : BaseActivity() {
                 Log.e("MainActivity", "Error loading more sessions", e)
             } finally {
                 isLoadingMore = false
+                adapter.setLoading(false)
             }
         }
     }

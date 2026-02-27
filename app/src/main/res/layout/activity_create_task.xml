@@ -1,83 +1,139 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="24dp"
     android:transitionName="shared_element_container"
     android:background="?android:colorBackground">
 
-    <TextView
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true">
+
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:layout_width="match_parent"
+            android:layout_height="128dp"
+            app:expandedTitleMarginStart="16dp"
+            app:expandedTitleMarginBottom="20dp"
+            app:expandedTitleTextAppearance="?attr/textAppearanceHeadlineMedium"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:elevation="0dp"
+                app:layout_collapseMode="pin"
+                app:navigationIcon="@drawable/ic_arrow_back"
+                app:title="New Task" />
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:id="@+id/contentContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:visibility="visible">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/repoInputLayout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Repository (Optional)"
+                android:layout_marginBottom="16dp"
+                app:shapeAppearance="@style/ShapeAppearance.Jules.MediumComponent">
+
+                <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                    android:id="@+id/repoInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="none"
+                    android:focusable="false"
+                    android:clickable="true" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/branchInputLayout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Branch (Optional)"
+                android:layout_marginBottom="16dp"
+                app:shapeAppearance="@style/ShapeAppearance.Jules.MediumComponent">
+
+                <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                    android:id="@+id/branchInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="none"
+                    android:focusable="false"
+                    android:clickable="true" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/switchAutoCreatePr"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Auto Create PR"
+                android:textColor="?attr/colorOnSurface"
+                android:layout_marginBottom="8dp" />
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/switchRequirePlanApproval"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Require Plan Approval"
+                android:textColor="?attr/colorOnSurface"
+                android:layout_marginBottom="16dp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/taskInputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Describe the task for Jules..."
+                app:endIconMode="custom"
+                app:endIconDrawable="@drawable/ic_mic"
+                app:endIconContentDescription="Voice Input"
+                app:shapeAppearance="@style/ShapeAppearance.Jules.MediumComponent">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/taskInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minLines="3"
+                    android:gravity="top" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <Button
+                android:id="@+id/btn_start_task"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Send to Jules"
+                android:layout_marginTop="24dp"
+                style="@style/Widget.Material3.Button"
+                app:cornerRadius="20dp" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/pageLoadingIndicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="New Task"
-        android:textAppearance="?attr/textAppearanceDisplayLarge"
-        android:layout_marginBottom="24dp" />
+        android:layout_gravity="center"
+        android:indeterminate="true"
+        android:visibility="gone" />
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/repoInputLayout"
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Repository (Optional)"
-        android:layout_marginBottom="16dp"
-        app:endIconMode="clear_text"
-        app:shapeAppearance="@style/ShapeAppearance.Jules.MediumComponent">
-
-        <com.google.android.material.textfield.MaterialAutoCompleteTextView
-            android:id="@+id/repoInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="none"
-            android:focusable="false"
-            android:clickable="true" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/branchInputLayout"
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Branch (Optional)"
-        android:layout_marginBottom="16dp"
-        app:endIconMode="clear_text"
-        app:shapeAppearance="@style/ShapeAppearance.Jules.MediumComponent">
-
-        <com.google.android.material.textfield.MaterialAutoCompleteTextView
-            android:id="@+id/branchInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="none"
-            android:focusable="false"
-            android:clickable="true" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/taskInputLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Describe the task for Jules..."
-        app:endIconMode="custom"
-        app:endIconDrawable="@drawable/ic_mic"
-        app:endIconContentDescription="Voice Input"
-        app:shapeAppearance="@style/ShapeAppearance.Jules.MediumComponent">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/taskInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minLines="3"
-            android:gravity="top" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <Button
-        android:id="@+id/btn_start_task"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Send to Jules"
-        android:layout_marginTop="24dp"
-        style="@style/Widget.Material3.Button"
-        app:cornerRadius="20dp" />
-
-</LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
