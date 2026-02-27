@@ -143,10 +143,43 @@ class TaskDetailActivity : BaseActivity() {
                 try {
                     val session = repository.cancelSession(id)
                     binding.detailStatusChip.text = session.status
-                    Toast.makeText(this@TaskDetailActivity, "Task cancelled", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@TaskDetailActivity, getString(R.string.message_session_cancelled), Toast.LENGTH_SHORT).show()
+                    invalidateOptionsMenu()
                 } catch (e: Exception) {
                     Toast.makeText(this@TaskDetailActivity, "Failed to cancel task", Toast.LENGTH_SHORT).show()
                     Log.e("TaskDetailActivity", "Error cancelling task", e)
+                }
+            }
+        }
+    }
+
+    private fun pauseSession() {
+        sessionId?.let { id ->
+            lifecycleScope.launch {
+                try {
+                    // Map "Pause" to deleteSession per user instructions "use the existing delete session endpoint"
+                    repository.deleteSession(id)
+                    Toast.makeText(this@TaskDetailActivity, getString(R.string.message_session_paused), Toast.LENGTH_SHORT).show()
+                    finish()
+                } catch (e: Exception) {
+                    Toast.makeText(this@TaskDetailActivity, getString(R.string.error_pause_session), Toast.LENGTH_SHORT).show()
+                    Log.e("TaskDetailActivity", "Error pausing task", e)
+                }
+            }
+        }
+    }
+
+    private fun archiveSession() {
+        sessionId?.let { id ->
+            lifecycleScope.launch {
+                try {
+                    // Map "Archive" to deleteSession per user instructions
+                    repository.deleteSession(id)
+                    Toast.makeText(this@TaskDetailActivity, getString(R.string.message_session_archived), Toast.LENGTH_SHORT).show()
+                    finish()
+                } catch (e: Exception) {
+                    Toast.makeText(this@TaskDetailActivity, getString(R.string.error_archive_session), Toast.LENGTH_SHORT).show()
+                    Log.e("TaskDetailActivity", "Error archiving task", e)
                 }
             }
         }
@@ -157,10 +190,29 @@ class TaskDetailActivity : BaseActivity() {
         return true
     }
 
+    override fun onPrepareOptionsMenu(menu: android.view.Menu?): Boolean {
+        val status = binding.detailStatusChip.text.toString().uppercase(java.util.Locale.ROOT).replace(" ", "_")
+        val isTerminal = TERMINAL_STATES.contains(status)
+
+        menu?.findItem(R.id.action_archive)?.isVisible = isTerminal
+        menu?.findItem(R.id.action_cancel)?.isVisible = !isTerminal
+        menu?.findItem(R.id.action_pause)?.isVisible = !isTerminal
+
+        return super.onPrepareOptionsMenu(menu)
+    }
+
     override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_cancel -> {
                 cancelSession()
+                true
+            }
+            R.id.action_pause -> {
+                pauseSession()
+                true
+            }
+            R.id.action_archive -> {
+                archiveSession()
                 true
             }
             else -> super.onOptionsItemSelected(item)

@@ -80,13 +80,77 @@ class MainActivity : BaseActivity() {
         // Set default item animator to ensure add/remove animations are smooth
         binding.sessionsRecyclerView.itemAnimator = androidx.recyclerview.widget.DefaultItemAnimator()
 
-        val swipeHandler = object : androidx.recyclerview.widget.ItemTouchHelper.SimpleCallback(0, androidx.recyclerview.widget.ItemTouchHelper.LEFT) {
+        val cornerRadius = 28 * resources.displayMetrics.density
+        val paint = android.graphics.Paint().apply {
+            color = android.graphics.Color.parseColor("#B3261E") // Archive Red
+            style = android.graphics.Paint.Style.FILL
+            isAntiAlias = true
+        }
+        val icon = androidx.core.content.ContextCompat.getDrawable(this, R.drawable.ic_archive_session)
+        val iconMargin = 32 * resources.displayMetrics.density.toInt()
+        val background = android.graphics.RectF()
+
+        val swipeHandler = object : androidx.recyclerview.widget.ItemTouchHelper.SimpleCallback(0, androidx.recyclerview.widget.ItemTouchHelper.LEFT or androidx.recyclerview.widget.ItemTouchHelper.RIGHT) {
             override fun onMove(r: androidx.recyclerview.widget.RecyclerView, v: androidx.recyclerview.widget.RecyclerView.ViewHolder, t: androidx.recyclerview.widget.RecyclerView.ViewHolder): Boolean = false
+
+            override fun onChildDraw(
+                c: android.graphics.Canvas,
+                recyclerView: androidx.recyclerview.widget.RecyclerView,
+                viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder,
+                dX: Float,
+                dY: Float,
+                actionState: Int,
+                isCurrentlyActive: Boolean
+            ) {
+                if (actionState == androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_SWIPE) {
+                    val itemView = viewHolder.itemView
+
+                    background.set(
+                        itemView.left.toFloat(),
+                        itemView.top.toFloat(),
+                        itemView.right.toFloat(),
+                        itemView.bottom.toFloat()
+                    )
+                    
+                    c.save()
+                    c.drawRoundRect(background, cornerRadius, cornerRadius, paint)
+
+                    if (icon != null) {
+                        val swipeProgress = kotlin.math.abs(dX) / itemView.width
+                        val scale = (0.5f + (swipeProgress * 2.0f)).coerceAtMost(1.5f)
+                        
+                        val iconWidth = (icon.intrinsicWidth * scale).toInt()
+                        val iconHeight = (icon.intrinsicHeight * scale).toInt()
+                        
+                        val iconCenterY = (itemView.top + itemView.bottom) / 2
+                        val iconTopScaled = iconCenterY - iconHeight / 2
+                        val iconBottomScaled = iconCenterY + iconHeight / 2
+
+                        val iconLeft: Int
+                        val iconRight: Int
+                        
+                        if (dX > 0) { // Swiping Right
+                             iconLeft = itemView.left + iconMargin
+                             iconRight = itemView.left + iconMargin + iconWidth
+                        } else { // Swiping Left
+                             iconLeft = itemView.right - iconMargin - iconWidth
+                             iconRight = itemView.right - iconMargin
+                        }
+
+                        if (iconLeft < iconRight) {
+                            icon.setBounds(iconLeft, iconTopScaled, iconRight, iconBottomScaled)
+                            icon.draw(c)
+                        }
+                    }
+                    c.restore()
+                }
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+            }
 
             override fun onSwiped(viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
                 val session = adapter.currentList[position]
-                deleteSession(session, position)
+                confirmArchiveSession(session, position)
             }
         }
         androidx.recyclerview.widget.ItemTouchHelper(swipeHandler).attachToRecyclerView(binding.sessionsRecyclerView)
@@ -407,20 +471,57 @@ class MainActivity : BaseActivity() {
         applyFilters()
     }
 
-    private fun deleteSession(session: Session, position: Int) {
+    private fun confirmArchiveSession(session: Session, position: Int) {
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.dialog_archive_title)
+            .setMessage(R.string.dialog_archive_message)
+            .setPositiveButton(R.string.action_archive) { _, _ ->
+                archiveSession(session, position)
+            }
+            .setNegativeButton(R.string.action_cancel) { dialog, _ ->
+                adapter.notifyItemChanged(position)
+                dialog.dismiss()
+            }
+            .setOnCancelListener { 
+                adapter.notifyItemChanged(position)
+            }
+            .show()
+    }
+
+    private fun archiveSession(session: Session, position: Int) {
+        val layout = android.widget.LinearLayout(this).apply {
+            orientation = android.widget.LinearLayout.HORIZONTAL
+            gravity = android.view.Gravity.CENTER_VERTICAL
+            setPadding(64, 64, 64, 64)
+            addView(com.google.android.material.progressindicator.CircularProgressIndicator(this@MainActivity).apply {
+                isIndeterminate = true
+            })
+            addView(android.widget.TextView(this@MainActivity).apply {
+                text = getString(R.string.dialog_wait_message)
+                setPadding(48, 0, 0, 0)
+                setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyLarge)
+            })
+        }
+
+        val progressDialog = com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.dialog_archiving_title)
+            .setView(layout)
+            .setCancelable(false)
+            .show()
+
         lifecycleScope.launch {
             try {
+                // Use deleteSession as per "Don't change API call" requirement
                 repository.deleteSession(session.id)
                 allSessions = allSessions.filter { it.id != session.id }
                 applyFilters()
-                Snackbar.make(binding.root, "Session deleted", Snackbar.LENGTH_LONG).show()
+                Snackbar.make(binding.root, R.string.message_session_archived, Snackbar.LENGTH_LONG).show()
             } catch (e: Exception) {
-                Log.e("MainActivity", "Error deleting session", e)
-                val currentPosition = adapter.currentList.indexOf(session)
-                if (currentPosition != -1) {
-                    adapter.notifyItemChanged(currentPosition)
-                }
-                Toast.makeText(this@MainActivity, "Failed to delete session", Toast.LENGTH_SHORT).show()
+                Log.e("MainActivity", "Error archiving session", e)
+                adapter.notifyItemChanged(position)
+                Snackbar.make(binding.root, R.string.error_archive_session, Snackbar.LENGTH_SHORT).show()
+            } finally {
+                progressDialog.dismiss()
             }
         }
     }

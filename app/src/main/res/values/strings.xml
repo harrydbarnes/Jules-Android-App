@@ -114,4 +114,17 @@
     <string name="message_api_key_updated">API Key Updated</string>
     <string name="error_api_key_length">API Key must be 53 characters long</string>
     <string name="error_api_key_invalid">Invalid API Key. Please check and try again.</string>
+
+    <!-- Archive & Pause -->
+    <string name="action_archive">Archive</string>
+    <string name="action_pause">Pause</string>
+    <string name="dialog_archive_title">Archive Session?</string>
+    <string name="dialog_archive_message">Are you sure you want to archive this session?</string>
+    <string name="dialog_archiving_title">Archiving Session</string>
+    <string name="dialog_wait_message">Please wait...</string>
+    <string name="message_session_archived">Session archived</string>
+    <string name="message_session_cancelled">Session cancelled</string>
+    <string name="message_session_paused">Session paused</string>
+    <string name="error_archive_session">Failed to archive session</string>
+    <string name="error_pause_session">Failed to pause session</string>
 </resources>
