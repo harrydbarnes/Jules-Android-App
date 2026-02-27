@@ -180,9 +180,6 @@ class TaskDetailActivity : BaseActivity() {
         if (words.size > 10) {
             val truncatedTitle = words.take(10).joinToString(" ") + "..."
             binding.detailTitle.text = truncatedTitle
-            binding.detailTitle.setOnClickListener { view ->
-                showTooltip(view, fullTitle)
-            }
         } else {
             binding.detailTitle.text = fullTitle
         }
@@ -263,25 +260,6 @@ class TaskDetailActivity : BaseActivity() {
                 isLoadingMore = false
             }
         }
-    }
-
-    private fun showTooltip(anchor: View, text: String) {
-        val popupView = layoutInflater.inflate(R.layout.popup_tooltip, null)
-        val textView = popupView.findViewById<TextView>(R.id.tooltipText)
-        textView.text = text
-
-        val popupWindow = android.widget.PopupWindow(
-            popupView,
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            true
-        )
-        popupWindow.elevation = 8f
-        popupWindow.enterTransition = android.transition.Fade().setDuration(200)
-        popupWindow.exitTransition = android.transition.Fade().setDuration(200)
-
-        // Show below anchor
-        popupWindow.showAsDropDown(anchor, 0, 0)
     }
 
     private fun addLogs(newLogs: List<ActivityLog>, prepend: Boolean) {

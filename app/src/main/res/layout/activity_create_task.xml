@@ -87,6 +87,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Auto Create PR"
+                android:textColor="?attr/colorOnSurface"
                 android:layout_marginBottom="8dp" />
 
             <com.google.android.material.materialswitch.MaterialSwitch
@@ -94,6 +95,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Require Plan Approval"
+                android:textColor="?attr/colorOnSurface"
                 android:layout_marginBottom="16dp" />
 
             <com.google.android.material.textfield.TextInputLayout

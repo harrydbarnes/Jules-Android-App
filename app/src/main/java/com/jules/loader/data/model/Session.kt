@@ -1,12 +1,15 @@
 package com.jules.loader.data.model
 
 import com.google.gson.annotations.SerializedName
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 data class ListSessionsResponse(
     val sessions: List<Session>?,
     val nextPageToken: String?
 )
 
+@Parcelize
 data class Session(
     val name: String,
     val id: String,
@@ -16,25 +19,28 @@ data class Session(
     val sourceContext: SourceContext?,
     val createTime: String?,
     val updateTime: String?
-)
+) : Parcelable
 
+@Parcelize
 data class SourceContext(
     @SerializedName(value = "source", alternate = ["name"]) val source: String,
     @SerializedName("githubRepo") val githubRepoContext: GithubRepoContext?
-) {
+) : Parcelable {
     val cleanSource: String
         get() = if (source.startsWith("sources/github/")) source.removePrefix("sources/github/") else source
 }
 
+@Parcelize
 data class GithubRepoContext(
     val startingBranch: String?,
     val branches: List<Branch>?,
     val defaultBranch: Branch?
-)
+) : Parcelable
 
+@Parcelize
 data class Branch(
     val displayName: String
-)
+) : Parcelable
 
 // Request body for creating a new session/task
 data class CreateSessionRequest(

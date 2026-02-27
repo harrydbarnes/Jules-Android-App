@@ -176,7 +176,11 @@ class CreateTaskActivity : BaseActivity() {
 
         branchAdapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, ArrayList())
         binding.branchInput.setAdapter(branchAdapter)
-        binding.branchInput.setOnClickListener { binding.branchInput.showDropDown() }
+        binding.branchInput.setOnClickListener {
+            if (!binding.repoInput.text.isNullOrBlank()) {
+                binding.branchInput.showDropDown()
+            }
+        }
 
         binding.repoInput.setOnItemClickListener { parent, _, position, _ ->
             val selectedSourceName = parent.getItemAtPosition(position) as String
