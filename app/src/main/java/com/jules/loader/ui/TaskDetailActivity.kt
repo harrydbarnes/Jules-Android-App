@@ -113,7 +113,7 @@ class TaskDetailActivity : BaseActivity() {
 
         binding.detailPrChip.setOnClickListener {
             val url = currentPrUrl
-            if (!url.isNullOrEmpty() && url.startsWith("https://")) {
+            if (!url.isNullOrBlank() && url.startsWith("https://")) {
                 try {
                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                     startActivity(intent)
