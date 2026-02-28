@@ -117,9 +117,9 @@ class TaskDetailActivity : BaseActivity() {
                 try {
                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                     startActivity(intent)
-                } catch (e: Exception) {
+                } catch (e: android.content.ActivityNotFoundException) {
                     Toast.makeText(this@TaskDetailActivity, getString(R.string.error_open_url), Toast.LENGTH_SHORT).show()
-                    Log.e("TaskDetailActivity", "Error opening PR URL", e)
+                    Log.e("TaskDetailActivity", "Error opening PR URL. No activity found to handle the intent.", e)
                 }
             } else {
                 Toast.makeText(this@TaskDetailActivity, getString(R.string.error_invalid_url), Toast.LENGTH_SHORT).show()
