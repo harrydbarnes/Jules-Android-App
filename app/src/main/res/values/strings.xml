@@ -127,4 +127,12 @@
     <string name="message_session_paused">Session paused</string>
     <string name="error_archive_session">Failed to archive session</string>
     <string name="error_pause_session">Failed to pause session</string>
+    <string name="error_cancel_session">Failed to cancel session</string>
+    <string name="action_cancel_session">Cancel Task</string>
+    <string name="error_open_url">Failed to open URL</string>
+    <string name="error_invalid_url">Invalid URL format. Expected https://</string>
+    <string name="view_pr">View PR</string>
+    <string name="error_sending_message">Failed to send message</string>
+    <string name="status_initialising">Initialising</string>
+    <string name="status_idle">Idle</string>
 </resources>

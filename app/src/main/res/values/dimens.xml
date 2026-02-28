@@ -2,4 +2,8 @@
 <resources>
     <dimen name="toolbar_content_inset_start">28dp</dimen>
     <dimen name="dialog_top_margin">100dp</dimen>
+    <dimen name="swipe_corner_radius">28dp</dimen>
+    <dimen name="swipe_icon_margin">32dp</dimen>
+    <dimen name="dialog_padding_large">64dp</dimen>
+    <dimen name="dialog_text_padding_start">48dp</dimen>
 </resources>
