@@ -189,15 +189,44 @@ class JulesRepository private constructor(private val context: Context) {
         return cachedSources != null && (System.currentTimeMillis() - lastSourcesFetchTime) < 5000
     }
 
-    suspend fun getSources(): List<SourceContext> {
-        if (hasValidSourceCache()) {
+    suspend fun getSources(
+        filter: String? = null,
+        pageSize: Int = 100,
+        pageToken: String? = null
+    ): List<SourceContext> {
+        // If not using parameters, check cache
+        if (filter == null && pageToken == null && hasValidSourceCache()) {
             return cachedSources!!
         }
+
         val apiKey = requireApiKey()
-        val sources = service.listSources(apiKey).sources ?: emptyList()
-        cachedSources = sources
-        lastSourcesFetchTime = System.currentTimeMillis()
-        return sources
+        val allSources = mutableListOf<SourceContext>()
+        var currentToken = pageToken
+
+        do {
+            val response = service.listSources(apiKey, filter, pageSize, currentToken)
+            val sources = response.sources ?: emptyList()
+            allSources.addAll(sources)
+            currentToken = response.nextPageToken
+        } while (!currentToken.isNullOrEmpty())
+
+        if (filter == null && pageToken == null) {
+            cachedSources = allSources
+            lastSourcesFetchTime = System.currentTimeMillis()
+        }
+        return allSources
+    }
+
+    suspend fun getActivity(activityName: String): ActivityLog {
+        val apiKey = requireApiKey()
+        val name = if (activityName.startsWith("sessions/")) activityName else "sessions/$activityName"
+        return service.getActivity(apiKey, name)
+    }
+
+    suspend fun getSource(sourceName: String): SourceContext {
+        val apiKey = requireApiKey()
+        val name = if (sourceName.startsWith("sources/")) sourceName else "sources/$sourceName"
+        return service.getSource(apiKey, name)
     }
 
     suspend fun validateApiKey(apiKey: String): Boolean {

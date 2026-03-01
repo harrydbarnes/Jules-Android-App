@@ -156,6 +156,36 @@ class CreateTaskActivity : BaseActivity() {
                 }
 
                 launch {
+                    viewModel.availableBranches.collectLatest { branches ->
+                        branchAdapter?.clear()
+                        branchAdapter?.addAll(branches)
+                        branchAdapter?.notifyDataSetChanged()
+                    }
+                }
+
+                launch {
+                    viewModel.selectedBranch.collectLatest { branch ->
+                        if (branch != null) {
+                            binding.branchInput.setText(branch, false)
+                        } else {
+                            binding.branchInput.setText("", false)
+                        }
+                    }
+                }
+
+                launch {
+                    viewModel.isBranchesLoading.collectLatest { isLoading ->
+                        if (isLoading) {
+                            binding.branchInputLayout.hint = "Loading branches..."
+                            binding.branchInputLayout.isEnabled = false
+                        } else {
+                            binding.branchInputLayout.hint = "Branch (Optional)"
+                            binding.branchInputLayout.isEnabled = true
+                        }
+                    }
+                }
+
+                launch {
                     viewModel.errorEvent.collect { errorResId ->
                         Toast.makeText(this@CreateTaskActivity, errorResId, Toast.LENGTH_LONG).show()
                     }
@@ -186,22 +216,12 @@ class CreateTaskActivity : BaseActivity() {
 
         binding.repoInput.setOnItemClickListener { parent, _, position, _ ->
             val selectedSourceName = parent.getItemAtPosition(position) as String
-            val source = viewModel.availableSources.value.find { it.source == selectedSourceName }
-            val branches = source?.githubRepoContext?.branches?.map { it.displayName } ?: emptyList()
+            viewModel.onSourceSelected(selectedSourceName)
+        }
 
-            branchAdapter?.clear()
-            branchAdapter?.addAll(branches)
-            branchAdapter?.notifyDataSetChanged()
-
-            // If a default branch exists, select it
-            val defaultBranch = source?.githubRepoContext?.defaultBranch?.displayName
-            if (defaultBranch != null && branches.contains(defaultBranch)) {
-                binding.branchInput.setText(defaultBranch, false)
-            } else if (branches.isNotEmpty()) {
-                binding.branchInput.setText(branches.first(), false)
-            } else {
-                binding.branchInput.setText("")
-            }
+        binding.branchInput.setOnItemClickListener { parent, _, position, _ ->
+            val selectedBranch = parent.getItemAtPosition(position) as String
+            viewModel.onBranchSelected(selectedBranch)
         }
 
         binding.repoInput.addTextChangedListener {
