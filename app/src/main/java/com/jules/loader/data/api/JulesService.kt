@@ -54,10 +54,4 @@ interface JulesService {
     suspend fun listSources(
         @Header("X-Goog-Api-Key") apiKey: String
     ): ListSourcesResponse
-    @GET("v1alpha/{name}")
-    suspend fun getSource(
-        @Header("X-Goog-Api-Key") apiKey: String,
-        @Path("name", encoded = true) name: String
-    ): SourceContext
-
 }

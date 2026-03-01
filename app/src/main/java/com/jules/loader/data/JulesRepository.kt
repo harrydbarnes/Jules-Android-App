@@ -200,12 +200,6 @@ class JulesRepository private constructor(private val context: Context) {
         return sources
     }
 
-    suspend fun getSource(sourceName: String): SourceContext {
-        val apiKey = requireApiKey()
-        val name = if (sourceName.startsWith("sources/")) sourceName else "sources/$sourceName"
-        return service.getSource(apiKey, name)
-    }
-
     suspend fun validateApiKey(apiKey: String): Boolean {
         return withContext(Dispatchers.IO) {
             try {
