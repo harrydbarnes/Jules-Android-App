@@ -27,6 +27,7 @@ import com.jules.loader.R
 import com.jules.loader.data.JulesRepository
 import com.jules.loader.data.model.SourceContext
 import com.jules.loader.databinding.ActivityCreateTaskBinding
+import com.jules.loader.util.PreferenceUtils
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -40,6 +41,7 @@ class CreateTaskActivity : BaseActivity() {
     private var originalTextBeforeSpeech = ""
     private var repoAdapter: ArrayAdapter<String>? = null
     private var branchAdapter: ArrayAdapter<String>? = null
+    private val sourceMap = mutableMapOf<String, String>()
 
     companion object {
         private val TAG = CreateTaskActivity::class.java.simpleName
@@ -80,7 +82,10 @@ class CreateTaskActivity : BaseActivity() {
         binding.btnStartTask.setOnClickListener {
             val prompt = binding.taskInput.text.toString().trim()
             if (prompt.isNotEmpty()) {
-                val repo = binding.repoInput.text.toString().takeIf { it.isNotBlank() }
+                val repoInputText = binding.repoInput.text.toString().takeIf { it.isNotBlank() }
+                val repo = if (repoInputText != null) {
+                    sourceMap[repoInputText] ?: repoInputText
+                } else null
                 val branch = binding.branchInput.text.toString().takeIf { it.isNotBlank() }
                 val automationMode = if (binding.switchAutoCreatePr.isChecked) "AUTO_CREATE_PR" else null
                 val requirePlanApproval = binding.switchRequirePlanApproval.isChecked
@@ -118,7 +123,12 @@ class CreateTaskActivity : BaseActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.availableSources.collectLatest { sources ->
-                        val sourceNames = sources.map { it.source }.distinct()
+                        sourceMap.clear()
+                        val sourceNames = sources.map { source ->
+                            val displayName = PreferenceUtils.getDisplayRepoName(this@CreateTaskActivity, source.cleanSource)
+                            sourceMap[displayName] = source.source
+                            displayName
+                        }.distinct()
                         repoAdapter?.clear()
                         repoAdapter?.addAll(sourceNames)
                         repoAdapter?.notifyDataSetChanged()
@@ -215,8 +225,9 @@ class CreateTaskActivity : BaseActivity() {
         }
 
         binding.repoInput.setOnItemClickListener { parent, _, position, _ ->
-            val selectedSourceName = parent.getItemAtPosition(position) as String
-            viewModel.onSourceSelected(selectedSourceName)
+            val selectedDisplayName = parent.getItemAtPosition(position) as String
+            val fullSource = sourceMap[selectedDisplayName] ?: selectedDisplayName
+            viewModel.onSourceSelected(fullSource)
         }
 
         binding.branchInput.setOnItemClickListener { parent, _, position, _ ->
