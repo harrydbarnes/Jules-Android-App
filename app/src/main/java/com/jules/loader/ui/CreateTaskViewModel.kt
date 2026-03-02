@@ -51,8 +51,9 @@ class CreateTaskViewModel(private val repository: JulesRepository) : ViewModel()
                 _isSourcesLoading.value = true
             }
             try {
-                val sources = repository.getSources()
-                _availableSources.value = sources
+                // Fetch first page, handle further pages locally if needed.
+                val response = repository.getSources()
+                _availableSources.value = response.sources ?: emptyList()
             } catch (e: Exception) {
                 android.util.Log.e(TAG, "Failed to load repositories", e)
                 _errorEvent.emit(R.string.error_load_repositories)
@@ -89,7 +90,7 @@ class CreateTaskViewModel(private val repository: JulesRepository) : ViewModel()
                 val fullSource = repository.getSource(sourceName)
                 val branches = fullSource.githubRepoContext?.branches?.map { it.displayName } ?: emptyList()
                 _availableBranches.value = branches
-                
+
                 val defaultBranch = fullSource.githubRepoContext?.defaultBranch?.displayName
                 if (defaultBranch != null && branches.contains(defaultBranch)) {
                     _selectedBranch.value = defaultBranch
@@ -100,6 +101,7 @@ class CreateTaskViewModel(private val repository: JulesRepository) : ViewModel()
                 }
             } catch (e: Exception) {
                 android.util.Log.e(TAG, "Failed to load branches for source", e)
+                _errorEvent.emit(R.string.error_load_branches)
                 _availableBranches.value = emptyList()
                 _selectedBranch.value = null
             } finally {

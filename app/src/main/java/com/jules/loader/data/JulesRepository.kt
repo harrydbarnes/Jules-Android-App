@@ -13,6 +13,7 @@ import com.jules.loader.data.model.CreateActivityRequest
 import com.jules.loader.data.model.GithubRepoContext
 import com.jules.loader.data.model.ListActivitiesResponse
 import com.jules.loader.data.model.ListSessionsResponse
+import com.jules.loader.data.model.ListSourcesResponse
 import com.jules.loader.data.model.MessageLog
 import com.jules.loader.data.model.Session
 import com.jules.loader.data.model.SourceContext
@@ -193,39 +194,35 @@ class JulesRepository private constructor(private val context: Context) {
         filter: String? = null,
         pageSize: Int = 100,
         pageToken: String? = null
-    ): List<SourceContext> {
-        // If not using parameters, check cache
+    ): ListSourcesResponse {
+        // Simple cache behavior: only cache the first unfiltered page
         if (filter == null && pageToken == null && hasValidSourceCache()) {
-            return cachedSources!!
+            return ListSourcesResponse(cachedSources, null)
         }
 
         val apiKey = requireApiKey()
-        val allSources = mutableListOf<SourceContext>()
-        var currentToken = pageToken
-
-        do {
-            val response = service.listSources(apiKey, filter, pageSize, currentToken)
-            val sources = response.sources ?: emptyList()
-            allSources.addAll(sources)
-            currentToken = response.nextPageToken
-        } while (!currentToken.isNullOrEmpty())
+        val response = service.listSources(apiKey, filter, pageSize, pageToken)
 
         if (filter == null && pageToken == null) {
-            cachedSources = allSources
+            cachedSources = response.sources
             lastSourcesFetchTime = System.currentTimeMillis()
         }
-        return allSources
+        return response
+    }
+
+    private fun ensurePrefix(value: String, prefix: String): String {
+        return if (value.startsWith(prefix)) value else "$prefix$value"
     }
 
     suspend fun getActivity(activityName: String): ActivityLog {
         val apiKey = requireApiKey()
-        val name = if (activityName.startsWith("sessions/")) activityName else "sessions/$activityName"
+        val name = ensurePrefix(activityName, "sessions/")
         return service.getActivity(apiKey, name)
     }
 
     suspend fun getSource(sourceName: String): SourceContext {
         val apiKey = requireApiKey()
-        val name = if (sourceName.startsWith("sources/")) sourceName else "sources/$sourceName"
+        val name = ensurePrefix(sourceName, "sources/")
         return service.getSource(apiKey, name)
     }
 
